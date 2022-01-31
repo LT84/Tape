@@ -3,6 +3,8 @@ package com.project.tape;
 import static com.project.tape.MainActivity.album_cover_main;
 import static com.project.tape.MainActivity.artist_name_main;
 import static com.project.tape.MainActivity.song_title_main;
+import static com.project.tape.SongInfoTab.isRepeatBtnClicked;
+import static com.project.tape.SongInfoTab.isShuffleBtnClicked;
 import static com.project.tape.SongInfoTab.songSwitched;
 
 import android.content.ContentResolver;
@@ -24,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSongListener {
 
@@ -104,7 +107,15 @@ public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSon
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             mediaPlayer.release();
-            position = ((position + 1) % songsList.size());
+
+            if (isShuffleBtnClicked == true && isRepeatBtnClicked == false) {
+                position = getRandom(songsList.size() -1);
+            }
+            else if (isShuffleBtnClicked == false && isRepeatBtnClicked == false) {
+                position = ((position + 1) % songsList.size());
+            }
+
+
             uri = Uri.parse(songsList.get(position).getData());
             mediaPlayer = MediaPlayer.create(getActivity(), uri);
             song_title_main.setText(songsList.get(position).getTitle());
@@ -114,13 +125,26 @@ public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSon
         } else  {
             mediaPlayer.stop();
             mediaPlayer.release();
-            position = ((position + 1) % songsList.size());
+
+            if (isShuffleBtnClicked == true && isRepeatBtnClicked == false) {
+                position = getRandom(songsList.size() -1);
+            }
+            else if (isShuffleBtnClicked == false && isRepeatBtnClicked == false) {
+                position = ((position + 1) % songsList.size());
+            }
+
+
             uri = Uri.parse(songsList.get(position).getData());
             mediaPlayer = MediaPlayer.create(getActivity(), uri);
             song_title_main.setText(songsList.get(position).getTitle());
             artist_name_main.setText(songsList.get(position).getArtist());
             metaDataInSongsFragment(uri);
         }
+    }
+
+    private int getRandom(int i) {
+        Random random = new Random();
+        return random.nextInt(i + 1);
     }
 
     //Creates RecyclerView filed with songs in SongsFragment
