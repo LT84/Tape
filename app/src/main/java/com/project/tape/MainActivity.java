@@ -25,7 +25,6 @@ import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-
     static ImageView album_cover_main;
     static TextView song_title_main, artist_name_main;
 
