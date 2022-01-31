@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Tape</string>
+    <string name="previous">String</string>
+    <string name="pause">String</string>
+    <string name="play">String</string>
+    <string name="next">String</string>
+    <string name="notification_channel_name">String</string>
+    <string name="open_back">open_back</string>
+    <string name="open_go">open_go</string>
+    <string name="dash">–</string>
+</resources>
