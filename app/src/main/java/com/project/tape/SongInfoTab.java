@@ -1,7 +1,5 @@
 package com.project.tape;
 
-import static com.project.tape.MainActivity.artist_name_main;
-import static com.project.tape.MainActivity.song_title_main;
 import static com.project.tape.SongsFragment.mediaPlayer;
 import static com.project.tape.SongsFragment.position;
 import static com.project.tape.SongsFragment.songsList;
@@ -32,9 +30,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     FloatingActionButton playPauseBtn;
     private SeekBar seekBar;
     private final Handler handler = new Handler();
-    static boolean songSwitched;
-    static boolean isRepeatBtnClicked, isShuffleBtnClicked = false;
-    private boolean isActivityOpen = true;
+    static boolean repeatBtnClicked, shuffleBtnClicked, activityClosed;
+
 
 
     @Override
@@ -48,12 +45,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         song_title.setText(songsList.get(position).getTitle());
         artist_name.setText(songsList.get(position).getArtist());
 
-        if (isShuffleBtnClicked) {
+
+        if (shuffleBtnClicked) {
             shuffleBtn.setImageResource(R.drawable.shuffle_songs_on);
         } else {
             shuffleBtn.setImageResource(R.drawable.shuffle_songs_off);
         }
-        if (isRepeatBtnClicked) {
+        if (repeatBtnClicked) {
             repeatBtn.setImageResource(R.drawable.repeat_song_on);
         } else {
            repeatBtn.setImageResource(R.drawable.repeat_song_off);
@@ -94,10 +92,20 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        activityClosed = true;
+    }
+
     //Sets pause button image and max value of seekBar
     private void getIntentMethod() {
             if (songsList != null) {
-                playPauseBtn.setImageResource(R.drawable.pause_song);
+                if (mediaPlayer.isPlaying()) {
+                    playPauseBtn.setImageResource(R.drawable.pause_song);
+                } else {
+                    playPauseBtn.setImageResource(R.drawable.play_song);
+                }
                 seekBar.setMax(mediaPlayer.getDuration() / 1000);
                 metaDataInInfoTab(uri);
             }
@@ -106,8 +114,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     //Sets song title and artist name
     private void sentIntent() {
         Intent data = new Intent();
-        song_title_main.setText(songsList.get(position).getTitle());
-        artist_name_main.setText(songsList.get(position).getArtist());
+        song_title.setText(songsList.get(position).getTitle());
+        artist_name.setText(songsList.get(position).getArtist());
         setResult(RESULT_OK, data);
     }
 
@@ -124,10 +132,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .asBitmap()
                     .load(art)
                     .into(album_cover);
-        } else if (isActivityOpen == true) {
+        } else if (!activityClosed) {
             Glide.with(this)
                     .asBitmap()
-                    .load(R.drawable.bebra)
+                    .load(R.drawable.default_cover)
                     .into(album_cover);
         }
     }
@@ -209,10 +217,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 nextBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        isRepeatBtnClicked = false;
+                        repeatBtnClicked = false;
                         nextBtnClicked();
                         sentIntent();
-                        songSwitched = true;
+                        repeatBtnClicked = true;
                     }
                 });
             }
@@ -223,27 +231,25 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     /*When next button is clicked, sets position of songsList to +1. Also sets song title,
      artist name, album cover and seekBar position when SongInfoTab is fully opened*/
     public void nextBtnClicked() {
-        if (mediaPlayer.isPlaying() && isActivityOpen) {
+        if (mediaPlayer.isPlaying() && !activityClosed) {
             mediaPlayer.stop();
             mediaPlayer.release();
 
-
-            if (isShuffleBtnClicked && !isRepeatBtnClicked) {
+            if (shuffleBtnClicked && !repeatBtnClicked) {
                 position = getRandom(songsList.size() -1);
                 repeatBtn.setImageResource(R.drawable.repeat_song_off);
             }
-            else if (!isShuffleBtnClicked && isRepeatBtnClicked) {
+            else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
             }
 
-            else if (!isShuffleBtnClicked && !isRepeatBtnClicked) {
+            else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 position = (position + 1 % songsList.size());
                 uri = Uri.parse(songsList.get(position).getData());
-                isRepeatBtnClicked = true;
             }
-            else if (isShuffleBtnClicked && isRepeatBtnClicked ) {
+            else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() -1);
-                isRepeatBtnClicked = false;
+                repeatBtnClicked = false;
                 repeatBtn.setImageResource(R.drawable.repeat_song_off);
             }
 
@@ -253,8 +259,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
             song_title.setText(songsList.get(position).getTitle());
             artist_name.setText(songsList.get(position).getArtist());
-            song_title_main.setText(songsList.get(position).getTitle());
-            artist_name_main.setText(songsList.get(position).getArtist());
 
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
 
@@ -271,29 +275,27 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             mediaPlayer.setOnCompletionListener(this);
             playPauseBtn.setBackgroundResource(R.drawable.pause_song);
             mediaPlayer.start();
-        } else if (isActivityOpen == true) {
+        } else if (!activityClosed) {
                 mediaPlayer.stop();
                 mediaPlayer.release();
 
+                if (shuffleBtnClicked && !repeatBtnClicked) {
+                    position = getRandom(songsList.size() -1);
+                    repeatBtn.setImageResource(R.drawable.repeat_song_off);
+                }
+                else if (!shuffleBtnClicked && repeatBtnClicked) {
+                    uri = Uri.parse(songsList.get(position).getData());
+                }
 
-            if (isShuffleBtnClicked && !isRepeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
-                repeatBtn.setImageResource(R.drawable.repeat_song_off);
-            }
-            else if (!isShuffleBtnClicked && isRepeatBtnClicked) {
-                uri = Uri.parse(songsList.get(position).getData());
-            }
-
-            else if (!isShuffleBtnClicked && !isRepeatBtnClicked) {
-                position = (position + 1 % songsList.size());
-                uri = Uri.parse(songsList.get(position).getData());
-                isRepeatBtnClicked = true;
-            }
-            else if (isShuffleBtnClicked && isRepeatBtnClicked ) {
-                position = getRandom(songsList.size() -1);
-                isRepeatBtnClicked = false;
-                repeatBtn.setImageResource(R.drawable.repeat_song_off);
-            }
+                else if (!shuffleBtnClicked && !repeatBtnClicked) {
+                    position = (position + 1 % songsList.size());
+                    uri = Uri.parse(songsList.get(position).getData());
+                }
+                else if (shuffleBtnClicked && repeatBtnClicked) {
+                    position = getRandom(songsList.size() -1);
+                    repeatBtnClicked = false;
+                    repeatBtn.setImageResource(R.drawable.repeat_song_off);
+                }
 
                 uri = Uri.parse(songsList.get(position).getData());
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
@@ -301,8 +303,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
                 song_title.setText(songsList.get(position).getTitle());
                 artist_name.setText(songsList.get(position).getArtist());
-                song_title_main.setText(songsList.get(position).getTitle());
-                artist_name_main.setText(songsList.get(position).getArtist());
+
 
                 seekBar.setMax(mediaPlayer.getDuration() / 1000);
 
@@ -335,10 +336,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     previousBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                              isRepeatBtnClicked = false;
+                              repeatBtnClicked = false;
                               previousBtnClicked();
                               sentIntent();
-                            songSwitched = true;
+                              repeatBtnClicked = true;
                         }
                     });
                 }
@@ -353,22 +354,21 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             mediaPlayer.stop();
             mediaPlayer.release();
 
-            if (isShuffleBtnClicked && !isRepeatBtnClicked) {
+            if (shuffleBtnClicked && !repeatBtnClicked) {
                 position = getRandom(songsList.size() -1);
                 repeatBtn.setImageResource(R.drawable.repeat_song_off);
             }
-            else if (!isShuffleBtnClicked && isRepeatBtnClicked) {
+            else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
             }
 
-            else if (!isShuffleBtnClicked && !isRepeatBtnClicked) {
+            else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 position = ((position - 1) < 0 ? (songsList.size() - 1) : (position - 1));
                 uri = Uri.parse(songsList.get(position).getData());
-                isRepeatBtnClicked = true;
             }
-            else if (isShuffleBtnClicked && isRepeatBtnClicked ) {
+            else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() -1);
-                isRepeatBtnClicked = false;
+                repeatBtnClicked = false;
                 repeatBtn.setImageResource(R.drawable.repeat_song_off);
             }
 
@@ -399,24 +399,23 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 mediaPlayer.stop();
                 mediaPlayer.release();
 
-            if (isShuffleBtnClicked && !isRepeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
-                repeatBtn.setImageResource(R.drawable.repeat_song_off);
-            }
-            else if (!isShuffleBtnClicked && isRepeatBtnClicked) {
-                uri = Uri.parse(songsList.get(position).getData());
-            }
+                if (shuffleBtnClicked && !repeatBtnClicked) {
+                    position = getRandom(songsList.size() -1);
+                    repeatBtn.setImageResource(R.drawable.repeat_song_off);
+                }
+                else if (!shuffleBtnClicked && repeatBtnClicked) {
+                    uri = Uri.parse(songsList.get(position).getData());
+                }
 
-            else if (!isShuffleBtnClicked && !isRepeatBtnClicked) {
-                position = ((position - 1) < 0 ? (songsList.size() - 1) : (position - 1));
-                uri = Uri.parse(songsList.get(position).getData());
-                isRepeatBtnClicked = true;
-            }
-            else if (isShuffleBtnClicked && isRepeatBtnClicked ) {
-                position = getRandom(songsList.size() -1);
-                isRepeatBtnClicked = false;
-                repeatBtn.setImageResource(R.drawable.repeat_song_off);
-            }
+                else if (!shuffleBtnClicked && !repeatBtnClicked) {
+                    position = ((position - 1) < 0 ? (songsList.size() - 1) : (position - 1));
+                    uri = Uri.parse(songsList.get(position).getData());
+                }
+                else if (shuffleBtnClicked && repeatBtnClicked) {
+                    position = getRandom(songsList.size() -1);
+                    repeatBtnClicked = false;
+                    repeatBtn.setImageResource(R.drawable.repeat_song_off);
+                }
 
                 uri = Uri.parse(songsList.get(position).getData());
 
@@ -446,9 +445,9 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     //When song is finished, switches to next song
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (isActivityOpen == true) {
+        if (!activityClosed) {
             nextBtnClicked();
-            songSwitched = true;
+
             if (mediaPlayer != null) {
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 mediaPlayer.start();
@@ -468,7 +467,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     @Override
     public void onDestroy() {
         super.onDestroy();
-        isActivityOpen = false;
     }
 
     private void initViews() {
@@ -494,30 +492,28 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             switch (v.getId()) {
 
                 case R.id.infoTab_shuffle_button:
-                    if (isShuffleBtnClicked) {
-                        isShuffleBtnClicked = false;
+                    if (shuffleBtnClicked) {
+                        shuffleBtnClicked = false;
                         shuffleBtn.setImageResource(R.drawable.shuffle_songs_off);
                     } else {
-                        isShuffleBtnClicked = true;
+                        shuffleBtnClicked = true;
                         shuffleBtn.setImageResource(R.drawable.shuffle_songs_on);
-                        isRepeatBtnClicked = false;
+                        repeatBtnClicked = false;
                         repeatBtn.setImageResource(R.drawable.repeat_song_off);
                     }
                     break;
                 case R.id.infoTab_repeat_button:
-                    if (isRepeatBtnClicked) {
-                        isRepeatBtnClicked = false;
+                    if (repeatBtnClicked) {
+                        repeatBtnClicked = false;
                         repeatBtn.setImageResource(R.drawable.repeat_song_off);
-                    } else {
-                        isRepeatBtnClicked = true;
+                    } else  {
+                        repeatBtnClicked = true;
                         repeatBtn.setImageResource(R.drawable.repeat_song_on);
                     }
                     break;
             }
         }
     };
-
-
 
 
 }

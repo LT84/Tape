@@ -1,17 +1,14 @@
 package com.project.tape;
 
-import static com.project.tape.SongInfoTab.songSwitched;
+import static com.project.tape.SongsFragment.mediaPlayer;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,14 +17,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    static ImageView album_cover_main;
-    static TextView song_title_main, artist_name_main;
-
+    ImageButton playPauseBtn;
     TabLayout tabLayout;
     ViewPager2 pager2;
     FragmentAdapter adapter;
@@ -35,19 +29,20 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE = 1;
 
 
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        album_cover_main = findViewById(R.id.album_cover_main);
-        song_title_main = findViewById(R.id.song_name_main);
-        artist_name_main = findViewById(R.id.artist_name_main);
+
+        playPauseBtn = findViewById(R.id.pause_button);
+        fullInformationTabB = (Button) findViewById(R.id.open_information_tab);
+        playPauseBtn.setImageResource(R.drawable.pause_song);
 
         permission();
-        metaDataInMain(SongsFragment.uri);
+
 
         //OnClick Listener
-        fullInformationTabB = (Button) findViewById(R.id.open_information_tab);
         View.OnClickListener btnListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,12 +51,16 @@ public class MainActivity extends AppCompatActivity {
                             Intent intent = new Intent(MainActivity.this, SongInfoTab.class);
                             startActivity(intent);
                         break;
+                    case R.id.pause_button:
+                        playThreadBtn();
+                        break;
                     default:
                         break;
                 }
             }
         };
         fullInformationTabB.setOnClickListener(btnListener);
+        playPauseBtn.setOnClickListener(btnListener);
 
         //Tab Layout
         tabLayout = findViewById(R.id.tab_layout);
@@ -101,27 +100,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-   //Sets album cover in main
-    private void metaDataInMain(Uri uri) {
-        if (songSwitched == true) {
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(uri.toString());
-            byte[] art = retriever.getEmbeddedPicture();
-
-            if (art != null) {
-                Glide.with(this)
-                        .asBitmap()
-                        .load(art)
-                        .into(album_cover_main);
-            } else {
-                Glide.with(this)
-                        .asBitmap()
-                        .load(R.drawable.bebra)
-                        .into(album_cover_main);
+    //Creates new Thread for play
+    private void playThreadBtn() {
+        Thread playThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                playPauseBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        playPauseBtnClicked();
+                    }
+                });
             }
-        }
+        };
+        playThread.start();
     }
+    //Sets play button image in main
+    public void playPauseBtnClicked() {
+        if (mediaPlayer.isPlaying()) {
+            playPauseBtn.setImageResource(R.drawable.play_song);
+            mediaPlayer.pause();
+        } else {
+            playPauseBtn.setImageResource(R.drawable.pause_song);
+            mediaPlayer.start();
+        }
 
+    }
 
     //Permission to read data from phone
     private void permission() {
