@@ -10,19 +10,21 @@
 
 
     <ImageView
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:id="@+id/infoTab_album_cover"
+        android:layout_width="290dp"
+        android:layout_height="290dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="40dp"
-        android:id="@+id/infoTab_album_cover"/>
+        android:layout_marginTop="40dp" />
 
 
     <RelativeLayout
         android:id="@+id/infoTab_song_and_artist_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/infoTab_album_cover">
+        android:layout_below="@id/infoTab_album_cover"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="7dp">
 
         <TextView
             android:id="@+id/infoTab_song_title"
@@ -30,8 +32,11 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text=""
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:textColor="@color/white"/>
 
         <TextView
             android:id="@+id/infoTab_artist_title"
@@ -39,23 +44,26 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/infoTab_song_title"
             android:layout_centerHorizontal="true"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text=""
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="@color/transparentWhite"/>
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/infoTab_seekBar_layout"
-        android:layout_width="350dp"
+        android:layout_width="320dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/infoTab_song_and_artist_name"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:layout_marginBottom="110dp">
+        >
 
         <SeekBar
+            android:id="@+id/infoTab_seekBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/infoTab_seekBar"/>
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/infoTab_duration_passed"
@@ -67,13 +75,14 @@
             android:textSize="13sp" />
 
         <TextView
+            android:id="@+id/infoTab_duration_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/infoTab_seekBar"
             android:layout_alignParentEnd="true"
             android:text=""
             android:textSize="13sp"
-            android:id="@+id/infoTab_duration_left"/>
+            />
     </RelativeLayout>
 
 
@@ -81,48 +90,51 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_below="@id/infoTab_seekBar_layout"
-        >
+        android:layout_marginTop="85dp">
 
         <ImageView
-            android:id="@+id/infoTab_shuffle_button"
+            android:id="@+id/infoTab_repeat_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/shuffle_songs_off" />
+            android:layout_marginStart="7dp"
+            android:background="@drawable/repeat_song_off" />
 
         <ImageView
+            android:id="@+id/infoTab_previous_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/infoTab_pause_button"
-            android:background="@drawable/previous_song"
-            android:id="@+id/infoTab_previous_button" />
+            android:background="@drawable/previous_song" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/infoTab_pause_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/play_song" />
 
         <ImageView
+            android:id="@+id/infoTab_next_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/infoTab_pause_button"
-            android:src="@drawable/next_song"
-            android:id="@+id/infoTab_next_button"/>
+            android:src="@drawable/next_song" />
 
         <ImageView
+            android:id="@+id/infoTab_shuffle_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/repeat_song_off"
-            android:id="@+id/infoTab_repeat_button"/>
+            android:background="@drawable/shuffle_songs_off" />
     </RelativeLayout>
 
 

@@ -38,7 +38,7 @@ public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSon
     ImageView album_cover_main;
     ImageButton mainPlayPauseBtn;
     TextView song_title_main, artist_name_main;
-
+    private static final int VERTICAL_ITEM_SPACE = 3;
 
 
 
@@ -56,6 +56,8 @@ public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSon
         album_cover_main = (ImageView)getActivity().findViewById(R.id.album_cover_main);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
 
+        //add ItemDecoration
+        myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
 
         RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), songsList , this);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

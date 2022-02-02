@@ -13,4 +13,14 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="DefaultRecyclerViewStyle">
+
+        <item name="layoutManager">androidx.recyclerview.widget.GridLayoutManager</item>
+        <item name="android:orientation">vertical</item>
+        <item name="spanCount">2</item>
+
+    </style>
+
+
 </resources>

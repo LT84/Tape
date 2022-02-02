@@ -6,48 +6,56 @@
     android:layout_marginTop="5dp"
     >
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/song_title"
+            android:layout_width="320dp"
             android:layout_height="20dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:textSize="16sp"
-            android:id="@+id/song_title"
+            android:textColor="@color/white"
+            android:ellipsize="end"
+            android:maxLines="1"
             />
 
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="320dp"
         android:layout_height="20dp"
         android:orientation="horizontal"
         android:layout_below="@id/song_title"
         >
         <TextView
+            android:id="@+id/artist_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:textSize="11sp"
-            android:id="@+id/artist_title"
+            android:textColor="@color/transparentWhite"
             />
         <TextView
+            android:id="@+id/dash"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginBottom="10dp"
             android:layout_toEndOf="@id/artist_title"
             android:text="@string/dash"
             android:textSize="11sp"
-            android:id="@+id/dash"
+            android:textColor="@color/transparentWhite"
             />
         <TextView
+            android:id="@+id/album_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/dash"
             android:textSize="11sp"
-            android:id="@+id/album_title"
+            android:textColor="@color/transparentWhite"
+            android:ellipsize="end"
+            android:maxLines="1"
              />
     </RelativeLayout>
 

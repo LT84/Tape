@@ -219,10 +219,15 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 nextBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        repeatBtnClicked = false;
-                        nextBtnClicked();
-                        sentIntent();
-                        repeatBtnClicked = true;
+                        if (repeatBtnClicked) {
+                            repeatBtnClicked = false;
+                            nextBtnClicked();
+                            sentIntent();
+                            repeatBtnClicked = true;
+                        } else {
+                            nextBtnClicked();
+                            sentIntent();
+                        }
                     }
                 });
             }
@@ -238,19 +243,21 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             mediaPlayer.release();
 
             if (shuffleBtnClicked && !repeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
+                position = getRandom(songsList.size() - 1);
                 repeatBtn.setImageResource(R.drawable.repeat_song_off);
             }
             else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
             }
-
             else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 position = (position + 1 % songsList.size());
+                if (position == songsList.size()) {
+                    position = 0;
+                }
                 uri = Uri.parse(songsList.get(position).getData());
             }
             else if (shuffleBtnClicked && repeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
+                position = getRandom(songsList.size() - 1);
                 repeatBtnClicked = false;
                 repeatBtn.setImageResource(R.drawable.repeat_song_off);
             }
@@ -288,9 +295,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 else if (!shuffleBtnClicked && repeatBtnClicked) {
                     uri = Uri.parse(songsList.get(position).getData());
                 }
-
                 else if (!shuffleBtnClicked && !repeatBtnClicked) {
                     position = (position + 1 % songsList.size());
+                    if (position == songsList.size()) {
+                        position = 0;
+                    }
                     uri = Uri.parse(songsList.get(position).getData());
                 }
                 else if (shuffleBtnClicked && repeatBtnClicked) {
@@ -338,10 +347,15 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     previousBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                              repeatBtnClicked = false;
-                              previousBtnClicked();
-                              sentIntent();
-                              repeatBtnClicked = true;
+                              if (repeatBtnClicked) {
+                                  repeatBtnClicked = false;
+                                  previousBtnClicked();
+                                  sentIntent();
+                                  repeatBtnClicked = true;
+                              } else {
+                                  previousBtnClicked();
+                                  sentIntent();
+                              }
                         }
                     });
                 }
