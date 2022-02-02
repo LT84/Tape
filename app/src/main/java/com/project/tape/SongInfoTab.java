@@ -30,16 +30,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     FloatingActionButton playPauseBtn;
     private SeekBar seekBar;
     private final Handler handler = new Handler();
-    static boolean repeatBtnClicked, shuffleBtnClicked, activityClosed;
-
+    static boolean repeatBtnClicked, shuffleBtnClicked;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_info_tab);
-
-        activityClosed = false;
 
         initViews();
         getIntentMethod();
@@ -58,7 +55,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         } else {
            repeatBtn.setImageResource(R.drawable.repeat_song_off);
         }
-
 
         mediaPlayer.setOnCompletionListener(this);
 
@@ -92,12 +88,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 handler.postDelayed(this, 1000);
             }
         });
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        activityClosed = true;
     }
 
     //Sets pause button image and max value of seekBar
@@ -134,7 +124,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .asBitmap()
                     .load(art)
                     .into(album_cover);
-        } else if (!activityClosed) {
+        } else {
             Glide.with(this)
                     .asBitmap()
                     .load(R.drawable.default_cover)
@@ -238,7 +228,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     /*When next button is clicked, sets position of songsList to +1. Also sets song title,
      artist name, album cover and seekBar position when SongInfoTab is fully opened*/
     public void nextBtnClicked() {
-        if (mediaPlayer.isPlaying() && !activityClosed) {
+        if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             mediaPlayer.release();
 
@@ -284,7 +274,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             mediaPlayer.setOnCompletionListener(this);
             playPauseBtn.setBackgroundResource(R.drawable.pause_song);
             mediaPlayer.start();
-        } else if (!activityClosed) {
+        } else {
                 mediaPlayer.stop();
                 mediaPlayer.release();
 
@@ -461,21 +451,18 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     //When song is finished, switches to next song
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (!activityClosed) {
             nextBtnClicked();
-
             if (mediaPlayer != null) {
                 mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
                 mediaPlayer.start();
                 mediaPlayer.setOnCompletionListener(this);
             }
-        }
     }
 
     @Override
     protected void onResume() {
-        playThreadBtn();
         nextThreadBtn();
+        playThreadBtn();
         previousThreadBtn();
         super.onResume();
     }

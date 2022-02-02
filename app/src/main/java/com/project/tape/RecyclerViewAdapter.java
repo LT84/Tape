@@ -40,8 +40,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.tv_title.setText(mSongsList.get(position).getTitle());
         holder.tv_artist.setText(mSongsList.get(position).getArtist());
         holder.tv_album.setText(mSongsList.get(position).getAlbum());
-
-
     }
 
 

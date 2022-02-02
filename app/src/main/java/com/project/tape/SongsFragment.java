@@ -29,7 +29,6 @@ import java.util.Random;
 
 public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSongListener {
 
-
     static int position = 0;
     static ArrayList<Song> songsList;
     static MediaPlayer mediaPlayer;
@@ -41,13 +40,12 @@ public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSon
     private static final int VERTICAL_ITEM_SPACE = 3;
 
 
-
     //Creates RecyclerView filed with songs in SongsFragment
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException{
         View v;
-        v = inflater.inflate(R.layout.compositions_fragment, container, false);
+        v = inflater.inflate(R.layout.songs_fragment, container, false);
         loadAudio();
 
         mainPlayPauseBtn = (ImageButton)getActivity().findViewById(R.id.pause_button);
@@ -55,6 +53,7 @@ public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSon
         artist_name_main = (TextView)getActivity().findViewById(R.id.artist_name_main);
         album_cover_main = (ImageView)getActivity().findViewById(R.id.album_cover_main);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
+
 
         //add ItemDecoration
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));

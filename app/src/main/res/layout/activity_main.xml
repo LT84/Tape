@@ -13,9 +13,12 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabMode="fixed"
         app:tabGravity="fill"
-        >
+        app:tabMode="fixed"
+        app:tabIndicatorColor="@color/secondaryColor"
+        app:tabSelectedTextColor="@color/secondaryColor">
+
+
     </com.google.android.material.tabs.TabLayout>
 
 
