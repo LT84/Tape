@@ -39,6 +39,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_info_tab);
 
+        activityClosed = false;
+
         initViews();
         getIntentMethod();
 
@@ -464,10 +466,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         super.onResume();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
     private void initViews() {
         song_title = findViewById(R.id.infoTab_song_title);
