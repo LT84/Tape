@@ -27,10 +27,10 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSongListener {
+public class SongsFragment extends Fragment implements SongAdapter.OnSongListener {
 
     static int position = 0;
-    static ArrayList<Song> songsList;
+    public static ArrayList<Song> songsList;
     static MediaPlayer mediaPlayer;
     static Uri uri;
     private RecyclerView myRecyclerView;
@@ -58,9 +58,9 @@ public class SongsFragment extends Fragment implements RecyclerViewAdapter.OnSon
         //add ItemDecoration
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
 
-        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), songsList , this);
+        SongAdapter songAdapter = new SongAdapter(getContext(), songsList , this);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        myRecyclerView.setAdapter(recyclerViewAdapter);
+        myRecyclerView.setAdapter(songAdapter);
         return v;
     }
 

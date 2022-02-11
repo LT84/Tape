@@ -12,16 +12,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
-    Context mContext;
+    private Context mContext;
     private ArrayList<Song> mSongsList;
     private OnSongListener mOnSongListener;
 
-    public RecyclerViewAdapter(Context mContext, ArrayList<Song> mSongsList, OnSongListener monSongListener) {
+    public SongAdapter(Context mContext, ArrayList<Song> mSongsList, OnSongListener mOnSongListener) {
         this.mContext = mContext;
         this.mSongsList = mSongsList;
-        this.mOnSongListener = monSongListener;
+        this.mOnSongListener = mOnSongListener;
     }
 
 
