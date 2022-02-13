@@ -55,6 +55,8 @@ public class AlbumInfoAdapter extends RecyclerView.Adapter<AlbumInfoAdapter.Albu
             TextView tv_album;
             OnAlbumListener onAlbumInfoListener;
 
+
+
             public AlbumInfoViewHolder(@NonNull View itemView, OnAlbumListener onAlbumInfoListener) {
                 super(itemView);
                 this.onAlbumInfoListener = onAlbumInfoListener;

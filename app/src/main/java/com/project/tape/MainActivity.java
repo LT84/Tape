@@ -26,41 +26,22 @@ public class MainActivity extends AppCompatActivity {
     ViewPager2 pager2;
     FragmentAdapter adapter;
     Button fullInformationTabB;
-    public static final int REQUEST_CODE = 1;
 
+    public static final int REQUEST_CODE = 1;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        permission();
 
 
         playPauseBtn = findViewById(R.id.pause_button);
         fullInformationTabB = (Button) findViewById(R.id.open_information_tab);
-        playPauseBtn.setImageResource(R.drawable.pause_song);
 
-        permission();
-
-
-        //OnClick Listener
-        View.OnClickListener btnListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.open_information_tab:
-                            Intent intent = new Intent(MainActivity.this, SongInfoTab.class);
-                            startActivity(intent);
-                        break;
-                    case R.id.pause_button:
-                        playThreadBtn();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-        fullInformationTabB.setOnClickListener(btnListener);
         playPauseBtn.setOnClickListener(btnListener);
+        fullInformationTabB.setOnClickListener(btnListener);
+
 
         //Tab Layout
         tabLayout = findViewById(R.id.tab_layout);
@@ -100,30 +81,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //Creates new Thread for play
-    private void playThreadBtn() {
-        Thread playThread = new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                playPauseBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        playPauseBtnClicked();
-                    }
-                });
-            }
-        };
-        playThread.start();
-    }
     //Sets play button image in main
     public void playPauseBtnClicked() {
         if (mediaPlayer.isPlaying()) {
             playPauseBtn.setImageResource(R.drawable.play_song);
             mediaPlayer.pause();
         } else {
-            playPauseBtn.setImageResource(R.drawable.pause_song);
             mediaPlayer.start();
+            playPauseBtn.setImageResource(R.drawable.pause_song);
         }
 
     }
@@ -154,6 +119,25 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    //OnClick Listener
+    View.OnClickListener btnListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.open_information_tab:
+                    Intent intent = new Intent(MainActivity.this, SongInfoTab.class);
+                    startActivity(intent);
+                    break;
+                case R.id.pause_button:
+                    playPauseBtnClicked();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
 
 }
 

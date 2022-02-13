@@ -23,9 +23,6 @@
             android:name=".AlbumInfo"
             android:exported="false" />
         <activity
-            android:name=".AlbumDetails"
-            android:exported="false" />
-        <activity
             android:name=".SongInfoTab"
             android:exported="false" />
         <activity

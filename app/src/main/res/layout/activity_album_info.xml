@@ -28,8 +28,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
             android:layout_marginStart="8dp"
-            android:background="@drawable/ic_arrow_back"
-            />
+            android:background="@drawable/ic_arrow_back" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -38,7 +37,69 @@
         android:layout_height="match_parent"
         android:layout_marginStart="10dp"
         android:layout_below="@id/top_navigation_albumInfo"
+        android:layout_above="@id/song_info_tab_in_album"
         />
+
+
+
+    <RelativeLayout
+        android:id="@+id/song_info_tab_in_album"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:background="@color/darkGrey"
+        android:layout_alignParentBottom="true"
+        >
+
+        <ImageView
+            android:id="@+id/album_cover_in_album"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="5dp"
+            />
+
+        <TextView
+            android:id="@+id/song_title_in_album"
+            android:layout_width="180dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="6dp"
+            android:layout_toEndOf="@+id/album_cover_in_album"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:ellipsize="end"
+            android:maxLines="1"/>
+
+        <TextView
+            android:id="@+id/artist_name_in_album"
+            android:layout_width="160dp"
+            android:layout_height="18dp"
+            android:layout_below="@+id/song_title_in_album"
+            android:layout_toEndOf="@id/album_cover_in_album"
+            android:textSize="12sp"
+            android:textColor="@color/transparentWhite"
+            android:ellipsize="end"
+            android:maxLines="1"
+            />
+
+        <Button
+            android:id="@+id/open_information_tab_in_album"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@id/pause_button_in_album"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/pause_button_in_album"
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="18dp"
+            android:background="@android:color/transparent" />
+    </RelativeLayout>
 
 
 </RelativeLayout>

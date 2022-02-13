@@ -13,10 +13,12 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/darkGrey"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/secondaryColor"
         app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/secondaryColor">
+        app:tabSelectedTextColor="@color/secondaryColor"
+        >
 
 
     </com.google.android.material.tabs.TabLayout>
@@ -44,12 +46,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+
         >
 
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="75dp"
         android:layout_weight="1"
+        android:background="@color/darkGrey"
         >
 
         <ImageView
@@ -100,7 +104,8 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="18dp"
-            android:background="@android:color/transparent" />
+            android:background="@android:color/transparent"
+            />
         </RelativeLayout>
     </LinearLayout>
 

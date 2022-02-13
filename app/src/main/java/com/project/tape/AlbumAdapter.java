@@ -1,9 +1,8 @@
 package com.project.tape;
 
-import static com.project.tape.AlbumsFragment.albumList;
-
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,20 +16,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder> {
 
     private Context mContext;
-    private Set<Song> albumSet;
+    private List<Song> albumList;
     private OnAlbumListener onAlbumListener;
     private Uri uri;
     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
 
-    public AlbumAdapter(Context mContext, Set<Song> albumSet, OnAlbumListener onAlbumListener) {
+    public AlbumAdapter(Context mContext, List<Song> albumList, OnAlbumListener onAlbumListener) {
         this.mContext = mContext;
-        this.albumSet = albumSet;
+        this.albumList = albumList;
         this.onAlbumListener = onAlbumListener;
     }
 
@@ -47,7 +46,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     @Override
     public void onBindViewHolder(@NonNull AlbumViewHolder holder, int position) {
-
         holder.tv_album_title.setText(albumList.get(position).getAlbum());
         uri = Uri.parse(albumList.get(position).getData());
         retriever.setDataSource(uri.toString());
@@ -56,14 +54,14 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
         if (art != null) {
             Glide.with(mContext)
                     .load(art)
-                    .override(200, 200)
+                    .override(100, 100)
                     .placeholder(R.drawable.default_cover)
                     .into(holder.album_cover_albumFragment);
         } else {
             Glide.with(mContext)
                     .asBitmap()
                     .load(R.drawable.default_cover)
-                    .override(70, 70)
+                    .override(100, 100)
                     .into(holder.album_cover_albumFragment);
         }
     }
@@ -101,6 +99,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     public interface OnAlbumListener {
         void onAlbumClick(int position) throws IOException;
+        void onCompletion(MediaPlayer mp);
     }
 
 

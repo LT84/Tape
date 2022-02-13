@@ -4,6 +4,7 @@ import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongInfoTab.shuffleBtnClicked;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
@@ -29,14 +30,18 @@ import java.util.Random;
 
 public class SongsFragment extends Fragment implements SongAdapter.OnSongListener {
 
-    static int position = 0;
-    public static ArrayList<Song> songsList;
-    static MediaPlayer mediaPlayer;
-    static Uri uri;
-    private RecyclerView myRecyclerView;
+    TextView song_title_main, artist_name_main;
     ImageView album_cover_main;
     ImageButton mainPlayPauseBtn;
-    TextView song_title_main, artist_name_main;
+
+    public static int position = 0;
+    static byte[] art;
+    static Uri uri;
+    static MediaPlayer mediaPlayer = new MediaPlayer();
+
+    public static ArrayList<Song> songsList;
+
+    private RecyclerView myRecyclerView;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
 
@@ -46,8 +51,10 @@ public class SongsFragment extends Fragment implements SongAdapter.OnSongListene
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException{
         View v;
         v = inflater.inflate(R.layout.songs_fragment, container, false);
+
         loadAudio();
 
+        //Init views
         mainPlayPauseBtn = (ImageButton)getActivity().findViewById(R.id.pause_button);
         song_title_main = (TextView)getActivity().findViewById(R.id.song_title_main);
         artist_name_main = (TextView)getActivity().findViewById(R.id.artist_name_main);
@@ -55,11 +62,24 @@ public class SongsFragment extends Fragment implements SongAdapter.OnSongListene
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
 
 
-        //add ItemDecoration
-        myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
+        song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
+        artist_name_main = (TextView) getActivity().findViewById(R.id.artist_name_main);
 
+        //Saving last played song
+        position = getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).getInt("progress", 0);
+        uri = Uri.parse(songsList.get(position).getData());
+        mediaPlayer = MediaPlayer.create(getContext(), uri);
+
+        //Setting song title and artist name in infoTab
+        song_title_main.setText(songsList.get(position).getTitle());
+        artist_name_main.setText(songsList.get(position).getArtist());
+
+
+        //Sets adapter to list and applies settings to recyclerView
         SongAdapter songAdapter = new SongAdapter(getContext(), songsList , this);
+        myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         myRecyclerView.setAdapter(songAdapter);
         return v;
     }
@@ -103,9 +123,13 @@ public class SongsFragment extends Fragment implements SongAdapter.OnSongListene
     //Plays song after it clicked in RecyclerView
     @Override
     public void onSongClick(int position) {
-        SongsFragment.position = position;
+        this.position = position;
+
+        getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", this.position).commit();
+
         playMusic();
         metaDataInSongsFragment(uri);
+
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
         mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
@@ -140,6 +164,7 @@ public class SongsFragment extends Fragment implements SongAdapter.OnSongListene
             artist_name_main.setText(songsList.get(position).getArtist());
             metaDataInSongsFragment(uri);
             mediaPlayer.start();
+
         } else  {
             mediaPlayer.stop();
             mediaPlayer.release();
@@ -178,7 +203,7 @@ public class SongsFragment extends Fragment implements SongAdapter.OnSongListene
     private void metaDataInSongsFragment(Uri uri) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(uri.toString());
-        byte[] art = retriever.getEmbeddedPicture();
+        art = retriever.getEmbeddedPicture();
 
         if (art != null) {
             Glide.with(SongsFragment.this)
@@ -218,15 +243,13 @@ public class SongsFragment extends Fragment implements SongAdapter.OnSongListene
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     switchSongInSongsFragment();
+                    getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
                     mediaPlayer = MediaPlayer.create(getActivity(), uri);
                     mediaPlayer.start();
                 }
             });
         }
-
-
     }
-
 
 
 }
