@@ -2,7 +2,6 @@ package com.project.tape;
 
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +65,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
         }
     }
 
+
     @Override
     public int getItemCount() {
         return albumList.size();
@@ -97,9 +97,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     }
 
+
     public interface OnAlbumListener {
         void onAlbumClick(int position) throws IOException;
-        void onCompletion(MediaPlayer mp);
     }
 
 

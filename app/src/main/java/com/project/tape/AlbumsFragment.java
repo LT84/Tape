@@ -1,18 +1,9 @@
 package com.project.tape;
 
-import static com.project.tape.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.SongInfoTab.shuffleBtnClicked;
-import static com.project.tape.SongsFragment.art;
-import static com.project.tape.SongsFragment.mediaPlayer;
-import static com.project.tape.SongsFragment.position;
-import static com.project.tape.SongsFragment.songsList;
-import static com.project.tape.SongsFragment.uri;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,7 +18,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,13 +29,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
-public class AlbumsFragment extends Fragment implements AlbumAdapter.OnAlbumListener {
+public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAlbumListener {
 
-    TextView album_title_albumFragments, song_title_main, artist_name_main;
-    ImageView album_cover_albumFragment, album_cover_main;
-    ImageButton mainPlayPauseBtn;
+    TextView album_title_albumFragments;
+    ImageView album_cover_albumFragment;
     private Parcelable listState;
     private RecyclerView myRecyclerView;
     LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
@@ -68,18 +56,16 @@ public class AlbumsFragment extends Fragment implements AlbumAdapter.OnAlbumList
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.albums_recyclerview);
         album_cover_albumFragment = v.findViewById(R.id.album_cover_albumFragment);
-
         song_title_main = (TextView)getActivity().findViewById(R.id.song_title_main);
         artist_name_main = (TextView)getActivity().findViewById(R.id.artist_name_main);
-        album_cover_main = (ImageView)getActivity().findViewById(R.id.album_cover_main);
-        mainPlayPauseBtn = (ImageButton)getActivity().findViewById(R.id.pause_button);
-
         //Setting song title and artist name in infoTab
+        album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
+        mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
 
         //Throwing out duplicates from list
-        //Sorting to albums
+        //Sorting albums
         Collections.sort(albumList, new Comparator<Song>() {
             @Override
             public int compare(Song lhs, Song rhs) {
@@ -121,8 +107,9 @@ public class AlbumsFragment extends Fragment implements AlbumAdapter.OnAlbumList
     }
 
 
+    @Override
     //Loading audio files
-    private void loadAudio() throws NullPointerException {
+    protected void loadAudio() throws NullPointerException {
         ContentResolver contentResolver = getActivity().getContentResolver();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
@@ -144,6 +131,23 @@ public class AlbumsFragment extends Fragment implements AlbumAdapter.OnAlbumList
         cursor.close();
     }
 
+    //Saving place where recyclerView stopped
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
+    }
+
+    //ClickListener in recyclerView
+    @Override
+    public void onAlbumClick(int position) throws IOException {
+        Intent intent = new Intent(getContext(), AlbumInfo.class);
+        intent.putExtra("albumName",  albumList.get(position).getAlbum());
+        intent.putExtra("songTitle", song_title_main.getText().toString());
+        intent.putExtra("artistName", artist_name_main.getText().toString());
+        intent.putExtra("cover", art);
+        getContext().startActivity(intent);
+    }
 
     @Override
     public void onPause() {
@@ -184,7 +188,7 @@ public class AlbumsFragment extends Fragment implements AlbumAdapter.OnAlbumList
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                switchSongInAlbumsFragment();
+                switchSongInFragment();
                 getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
                 mediaPlayer = MediaPlayer.create(getActivity(), uri);
                 mediaPlayer.start();
@@ -192,108 +196,8 @@ public class AlbumsFragment extends Fragment implements AlbumAdapter.OnAlbumList
         });
     }
 
-    //Saving place where recyclerView stopped
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
-    }
 
-    //ClickListener in recyclerView
-    @Override
-    public void onAlbumClick(int position) throws IOException {
-        Intent intent = new Intent(getContext(), AlbumInfo.class);
-        intent.putExtra("albumName",  albumList.get(position).getAlbum());
-        getContext().startActivity(intent);
-    }
-
-    //Loads cover
-    private void metaDataInAlbumsFragment(Uri uri) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(uri.toString());
-        art = retriever.getEmbeddedPicture();
-
-        if (art != null) {
-            Glide.with(getContext())
-                    .asBitmap()
-                    .load(art)
-                    .into(album_cover_main);
-        } else {
-            Glide.with(getContext())
-                    .asBitmap()
-                    .load(R.drawable.default_cover)
-                    .into(album_cover_main);
-        }
-    }
-
-    //Gets random number
-    private int getRandom(int i) {
-        Random random = new Random();
-        return random.nextInt(i + 1);
-    }
-
-    //Switches song
-    public void switchSongInAlbumsFragment() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-
-            if (shuffleBtnClicked && !repeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
-            }
-            else if (!shuffleBtnClicked && repeatBtnClicked) {
-                uri = Uri.parse(songsList.get(position).getData());
-            }
-
-            else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = (position + 1 % songsList.size());
-                uri = Uri.parse(songsList.get(position).getData());
-            }
-            else if (shuffleBtnClicked && repeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
-                repeatBtnClicked = false;
-            }
-
-            uri = Uri.parse(songsList.get(position).getData());
-            mediaPlayer = MediaPlayer.create(getContext(), uri);
-            song_title_main.setText(songsList.get(position).getTitle());
-            artist_name_main.setText(songsList.get(position).getArtist());
-            metaDataInAlbumsFragment(uri);
-            mediaPlayer.start();
-
-        } else  {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-
-            if (shuffleBtnClicked && !repeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
-            }
-            else if (!shuffleBtnClicked && repeatBtnClicked) {
-                uri = Uri.parse(songsList.get(position).getData());
-            }
-
-            else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = (position + 1 % songsList.size());
-                uri = Uri.parse(songsList.get(position).getData());
-            }
-            else if (shuffleBtnClicked && repeatBtnClicked) {
-                position = getRandom(songsList.size() -1);
-                repeatBtnClicked = false;
-            }
-
-            uri = Uri.parse(songsList.get(position).getData());
-            mediaPlayer = MediaPlayer.create(getContext(), uri);
-            song_title_main.setText(songsList.get(position).getTitle());
-            artist_name_main.setText(songsList.get(position).getArtist());
-            metaDataInAlbumsFragment(uri);
-        }
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-    }
-
-    }
+}
 
 
 
