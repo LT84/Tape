@@ -1,5 +1,8 @@
 package com.project.tape;
 
+import static com.project.tape.MainActivity.artistNameStr;
+import static com.project.tape.MainActivity.songNameStr;
+
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -21,6 +24,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     private static final int VERTICAL_ITEM_SPACE = 3;
 
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException{
@@ -29,20 +33,34 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         //Loading audio list
         loadAudio();
 
+        position = getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).getInt("progress", 0);
+
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
         song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
         artist_name_main = (TextView) getActivity().findViewById(R.id.artist_name_main);
 
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
-        mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
-        song_title_main.setText(songsList.get(position).getTitle());
-        artist_name_main.setText(songsList.get(position).getArtist());
 
-        //Saving last played song
-        position = getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).getInt("progress", 0);
+        mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
+
         uri = Uri.parse(songsList.get(position).getData());
+
+
+        songNameStr = getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
+                .getString("songNameStr", " ");
+        artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
+                .getString("artistNameStr", " ");
+        uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
+               .getString("progress", uri.toString()));
+
+
+        song_title_main.setText(songNameStr);
+        artist_name_main.setText(artistNameStr);
+
+
         mediaPlayer = MediaPlayer.create(getContext(), uri);
+
 
         //Sets adapter to list and applies settings to recyclerView
         SongAdapter songAdapter = new SongAdapter(getContext(), songsList , this);
@@ -72,9 +90,23 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     public void onSongClick(int position) {
         this.position = position;
 
-        getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", this.position).commit();
+        AlbumInfo.FromAlbumInfo = false;
+
+        songNameStr = songsList.get(position).getTitle();
+        artistNameStr = songsList.get(position).getArtist();
+
+        uri = Uri.parse(songsList.get(position).getData());
+
+        getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("progress", uri.toString()).commit();
+        getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+                .putString("songNameStr", songNameStr).commit();
+        getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+                .putString("artistNameStr", artistNameStr).commit();
 
         playMusic();
+
+
         metaDataInFragment(uri);
 
         song_title_main.setText(songsList.get(position).getTitle());
@@ -95,8 +127,8 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
         if (mediaPlayer != null) {
 
-            song_title_main.setText(songsList.get(position).getTitle());
-            artist_name_main.setText(songsList.get(position).getArtist());
+            song_title_main.setText(songNameStr);
+            artist_name_main.setText(artistNameStr);
 
             if (mediaPlayer.isPlaying()) {
                 mainPlayPauseBtn.setImageResource(R.drawable.pause_song);

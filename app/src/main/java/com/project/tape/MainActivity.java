@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager2 pager2;
     FragmentAdapter adapter;
     Button fullInformationTabB;
+    static String songNameStr, artistNameStr;
 
     public static final int REQUEST_CODE = 1;
 
@@ -34,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permission();
-
 
         playPauseBtn = findViewById(R.id.pause_button);
         fullInformationTabB = (Button) findViewById(R.id.open_information_tab);

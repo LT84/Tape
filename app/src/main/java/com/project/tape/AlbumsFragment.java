@@ -1,5 +1,9 @@
 package com.project.tape;
 
+import static android.app.Activity.RESULT_OK;
+import static com.project.tape.MainActivity.artistNameStr;
+import static com.project.tape.MainActivity.songNameStr;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,9 +44,15 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
     static List<Song> albumList;
 
+    final int REQUEST_CODE = 1;
+
     int positionIndex, topView;
     private static final int VERTICAL_ITEM_SPACE = 5;
 
+    static String requestedTitle;
+    static String requestedName;
+
+    static boolean albumInfoWasClosed = true;
 
     @Nullable
     @Override
@@ -103,6 +113,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
             listState = savedInstanceState.getParcelable("ListState");
         }
 
+
+
         return v;
     }
 
@@ -138,19 +150,29 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
+
     //ClickListener in recyclerView
     @Override
     public void onAlbumClick(int position) throws IOException {
-        Intent intent = new Intent(getContext(), AlbumInfo.class);
+        Intent intent = new Intent(getActivity(), AlbumInfo.class);
         intent.putExtra("albumName",  albumList.get(position).getAlbum());
-        intent.putExtra("songTitle", song_title_main.getText().toString());
-        intent.putExtra("artistName", artist_name_main.getText().toString());
-        intent.putExtra("cover", art);
-        getContext().startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE);
     }
 
     @Override
-    public void onPause() {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CODE:
+                    songNameStr = data.getStringExtra("titleToMain");
+                    artistNameStr = data.getStringExtra("ArtistNameToMain");
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onPause () {
         super.onPause();
         positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
         View startView = myRecyclerView.getChildAt(0);
@@ -158,10 +180,12 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     }
 
     @Override
-    public void onResume() {
+    public void onResume () {
         super.onResume();
-        song_title_main.setText(songsList.get(position).getTitle());
-        artist_name_main.setText(songsList.get(position).getArtist());
+
+        song_title_main.setText(songNameStr);
+        artist_name_main.setText(artistNameStr);
+
         if (mediaPlayer != null) {
             if (art != null) {
                 Glide.with(this)
@@ -198,6 +222,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
 
 }
+
 
 
 
