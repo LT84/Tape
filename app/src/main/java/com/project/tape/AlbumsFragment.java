@@ -49,10 +49,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     int positionIndex, topView;
     private static final int VERTICAL_ITEM_SPACE = 5;
 
-    static String requestedTitle;
-    static String requestedName;
-
-    static boolean albumInfoWasClosed = true;
 
     @Nullable
     @Override

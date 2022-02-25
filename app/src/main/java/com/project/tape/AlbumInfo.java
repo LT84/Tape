@@ -49,7 +49,8 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
 
     ArrayList<Song> copyOfSongsList = songsList;
 
-    static boolean FromAlbumInfo;
+    public static boolean fromAlbumInfo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +105,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         myRecyclerView = findViewById(R.id.albumSongs_recyclerview);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         myRecyclerView.setAdapter(albumInfoAdapter);
-
     }
 
     private void getIntentMethod() {
@@ -118,17 +118,17 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
     }
 
     private void playMusic() {
-        if (songsList != null) {
+        if (songsInAlbum!= null) {
             uri = Uri.parse(songsInAlbum.get(positionInOpenedAlbum).getData());
         }
+
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
         }
-        mediaPlayer = MediaPlayer.create(this, uri);
+        mediaPlayer = MediaPlayer.create(AlbumInfo.this, uri);
         mediaPlayer.start();
     }
-
 
     View.OnClickListener btnListener = new View.OnClickListener() {
         @Override
@@ -157,7 +157,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
             mediaPlayer.start();
             playPauseBtn.setImageResource(R.drawable.pause_song);
         }
-
     }
 
     @Override
@@ -169,13 +168,12 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
     public void onAlbumClick(int position) throws IOException {
         this.positionInOpenedAlbum = position;
 
+        fromAlbumInfo = true;
+
+        songNameStr = songsInAlbum.get(positionInOpenedAlbum).getTitle();
+        artistNameStr = songsInAlbum.get(positionInOpenedAlbum).getArtist();
+
         playMusic();
-
-        FromAlbumInfo = true;
-
-        songNameStr = songsInAlbum.get(position).getTitle();
-        artistNameStr = songsInAlbum.get(position).getArtist();
-        uri = Uri.parse(songsInAlbum.get(position).getData());
 
         AlbumInfo.this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit().putString("progress", uri.toString()).commit();
         AlbumInfo.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
@@ -183,6 +181,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         AlbumInfo.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
        // AlbumInfo.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", this.positionInOpenedAlbum).commit();
+
 
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);

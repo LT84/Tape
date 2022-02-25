@@ -2,7 +2,7 @@ package com.project.tape;
 
 import static com.project.tape.AlbumInfo.copyOfSongsInAlbum;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
-import static com.project.tape.AlbumInfo.FromAlbumInfo;
+import static com.project.tape.AlbumInfo.fromAlbumInfo;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
@@ -97,31 +97,31 @@ public abstract class FragmentGeneral extends Fragment {
 
             if (shuffleBtnClicked && !repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 position = (position + 1 % songsList.size());
                 position = (position) > songsList.size() ? (songsList.indexOf(0)) : (position = 0);
                 uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = (positionInOpenedAlbum + 1 % copyOfSongsInAlbum.size());
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
                 repeatBtnClicked = false;
             }
 
-            if (FromAlbumInfo) {
+            if (fromAlbumInfo) {
                 songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                 uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
@@ -152,31 +152,31 @@ public abstract class FragmentGeneral extends Fragment {
 
             if (shuffleBtnClicked && !repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 position = (position + 1 % songsList.size());
                 position = (position) > songsList.size() ? (songsList.indexOf(0)) : (position = 0);
                 uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = (positionInOpenedAlbum + 1 % copyOfSongsInAlbum.size());
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
                 repeatBtnClicked = false;
             }
 
-            if (FromAlbumInfo) {
+            if (fromAlbumInfo) {
                 songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                 uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());

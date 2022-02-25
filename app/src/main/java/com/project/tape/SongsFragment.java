@@ -24,7 +24,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     private static final int VERTICAL_ITEM_SPACE = 3;
 
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException{
@@ -90,12 +89,12 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     public void onSongClick(int position) {
         this.position = position;
 
-        AlbumInfo.FromAlbumInfo = false;
+        AlbumInfo.fromAlbumInfo = false;
 
         songNameStr = songsList.get(position).getTitle();
         artistNameStr = songsList.get(position).getArtist();
 
-        uri = Uri.parse(songsList.get(position).getData());
+        playMusic();
 
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("progress", uri.toString()).commit();
@@ -103,9 +102,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putString("songNameStr", songNameStr).commit();
         getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
-
-        playMusic();
-
 
         metaDataInFragment(uri);
 

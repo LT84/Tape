@@ -12,7 +12,6 @@
 
 
     <application
-        android:name=".MyApplication"
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"

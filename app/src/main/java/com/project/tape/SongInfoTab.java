@@ -1,6 +1,6 @@
 package com.project.tape;
 
-import static com.project.tape.AlbumInfo.FromAlbumInfo;
+import static com.project.tape.AlbumInfo.fromAlbumInfo;
 import static com.project.tape.AlbumInfo.copyOfSongsInAlbum;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
@@ -43,23 +43,22 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     static boolean repeatBtnClicked, shuffleBtnClicked;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_info_tab);
 
         initViews();
-        getIntentMethod();
 
-        if (FromAlbumInfo) {
-            songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
-            artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
-            uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
-        } else {
-            uri = Uri.parse(songsList.get(position).getData());
-            songNameStr = songsList.get(position).getTitle();
-            artistNameStr = songsList.get(position).getArtist();
-        }
+        songNameStr = SongInfoTab.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
+                .getString("songNameStr", " ");
+        artistNameStr = SongInfoTab.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
+                .getString("artistNameStr", " ");
+        uri = Uri.parse(SongInfoTab.this.getSharedPreferences("uri", Context.MODE_PRIVATE)
+                .getString("progress", uri.toString()));
+
+        getIntentMethod();
 
         if (shuffleBtnClicked) {
             shuffleBtn.setImageResource(R.drawable.shuffle_songs_on);
@@ -114,7 +113,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 } else {
                     playPauseBtn.setImageResource(R.drawable.play_song);
                 }
-                seekBar.setMax(mediaPlayer.getDuration() / 1000);
                 metaDataInInfoTab(uri);
             }
         }
@@ -122,7 +120,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     //Sets song title and artist name
     private void sentIntent() {
         Intent data = new Intent();
-        if (FromAlbumInfo) {
+        if (fromAlbumInfo) {
             songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
             artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
         } else {
@@ -132,11 +130,17 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         setResult(RESULT_OK, data);
     }
 
-    //Sets album cover when SongInfoTab is fully opened
+    //Sets album cover when SongInfoTab is fully opened, set duration
     private void metaDataInInfoTab(Uri uri) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(uri.toString());
-        int durationTotal = Integer.parseInt(songsList.get(position).getDuration()) / 1000;
+        int durationTotal;
+        //Set duration here !!!
+        if (fromAlbumInfo) {
+            durationTotal = Integer.parseInt(copyOfSongsInAlbum.get(positionInOpenedAlbum).getDuration()) / 1000;
+        } else {
+            durationTotal = Integer.parseInt(songsList.get(position).getDuration()) / 1000;
+        }
         time_duration_total.setText(formattedTime(durationTotal));
         art = retriever.getEmbeddedPicture();
 
@@ -170,7 +174,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     //Creates new Thread for play
     private void playThreadBtn() {
-        Thread playThread = new Thread() {
+         Thread playThread = new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -260,35 +264,39 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             //Checking is shuffle or repeat button clicked
             if (shuffleBtnClicked && !repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
-            } else if (!shuffleBtnClicked && repeatBtnClicked) {
+            }
+            else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
-            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = position > songsList.size() ? (position = 0) : (position + 1);
-                uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+            }
+            else if (!shuffleBtnClicked && !repeatBtnClicked) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = positionInOpenedAlbum + 1 == copyOfSongsInAlbum.size()
                             ? (0) : (positionInOpenedAlbum + 1);
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else {
+                    position = position > songsList.size() ? (position = 0) : (position + 1);
+                    uri = Uri.parse(songsList.get(position).getData());
                 }
-            } else if (shuffleBtnClicked && repeatBtnClicked) {
+            }
+            else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
                 repeatBtnClicked = false;
             }
 
             //Sets song and artist strings
-            if (FromAlbumInfo) {
+            if (fromAlbumInfo) {
+                uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
-                uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
             } else {
                 uri = Uri.parse(songsList.get(position).getData());
                 songNameStr = songsList.get(position).getTitle();
@@ -325,35 +333,39 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             //Checking is shuffle or repeat button clicked
             if (shuffleBtnClicked && !repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
-            } else if (!shuffleBtnClicked && repeatBtnClicked) {
+            }
+            else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
-            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = position > songsList.size() ? (position = 0) : (position + 1);
-                uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+            }
+            else if (!shuffleBtnClicked && !repeatBtnClicked) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = positionInOpenedAlbum + 1 == copyOfSongsInAlbum.size()
                             ? (0) : (positionInOpenedAlbum + 1);
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else {
+                    position = position > songsList.size() ? (position = 0) : (position + 1);
+                    uri = Uri.parse(songsList.get(position).getData());
                 }
-            } else if (shuffleBtnClicked && repeatBtnClicked) {
+            }
+            else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
                 repeatBtnClicked = false;
             }
 
             //Sets song and artist strings
-            if (FromAlbumInfo) {
+            if (fromAlbumInfo) {
+                uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
-                uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
             } else {
                 uri = Uri.parse(songsList.get(position).getData());
                 songNameStr = songsList.get(position).getTitle();
@@ -426,32 +438,36 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             //Checking is shuffle or repeat button clicked
             if (shuffleBtnClicked && !repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
-            } else if (!shuffleBtnClicked && repeatBtnClicked) {
+            }
+            else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
-            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = ((position - 1) < 0 ? (songsList.size() - 1) : (position - 1));
-                uri = Uri.parse(songsList.get(position).getData());
-                if (FromAlbumInfo) {
+            }
+            else if (!shuffleBtnClicked && !repeatBtnClicked) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = positionInOpenedAlbum - 1 < 0
                             ? (copyOfSongsInAlbum.size() - 1) : (positionInOpenedAlbum - 1);
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else {
+                    position = ((position - 1) < 0 ? (songsList.size() - 1) : (position - 1));
+                    uri = Uri.parse(songsList.get(position).getData());
                 }
-            } else if (shuffleBtnClicked && repeatBtnClicked) {
+            }
+            else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
                 repeatBtnClicked = false;
             }
 
             //Sets song and artist strings
-            if (FromAlbumInfo) {
+            if (fromAlbumInfo) {
                 songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                 uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
@@ -490,32 +506,36 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 //Checking is shuffle or repeat button clicked
                 if (shuffleBtnClicked && !repeatBtnClicked) {
                     position = getRandom(songsList.size() - 1);
-                    if (FromAlbumInfo) {
+                    if (fromAlbumInfo) {
                         positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                     }
-                } else if (!shuffleBtnClicked && repeatBtnClicked) {
+                }
+                else if (!shuffleBtnClicked && repeatBtnClicked) {
                     uri = Uri.parse(songsList.get(position).getData());
-                    if (FromAlbumInfo) {
+                    if (fromAlbumInfo) {
                         uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                     }
-                } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                    position = (position) > songsList.size() ? (songsList.indexOf(0)) : (position = 0);
-                    uri = Uri.parse(songsList.get(position).getData());
-                    if (FromAlbumInfo) {
+                }
+                else if (!shuffleBtnClicked && !repeatBtnClicked) {
+                    if (fromAlbumInfo) {
                         positionInOpenedAlbum = positionInOpenedAlbum - 1 < 0
                                 ? (copyOfSongsInAlbum.size() - 1) : (positionInOpenedAlbum - 1);
                         uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                    } else {
+                        position = ((position - 1) < 0 ? (songsList.size() - 1) : (position - 1));
+                        uri = Uri.parse(songsList.get(position).getData());
                     }
-                } else if (shuffleBtnClicked && repeatBtnClicked) {
+                }
+                else if (shuffleBtnClicked && repeatBtnClicked) {
                     position = getRandom(songsList.size() - 1);
-                    if (FromAlbumInfo) {
+                    if (fromAlbumInfo) {
                         positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                     }
                     repeatBtnClicked = false;
                 }
 
                 //Sets song and artist strings
-                if (FromAlbumInfo) {
+                if (fromAlbumInfo) {
                     songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                     artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
@@ -532,7 +552,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 song_title.setText(songNameStr);
                 artist_name.setText(artistNameStr);
 
-                seekBar.setMax(mediaPlayer.getDuration() / 1000);
 
                 SongInfoTab.this.runOnUiThread(new Runnable() {
                     @Override
@@ -577,6 +596,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         song_title.setText(songNameStr);
         artist_name.setText(artistNameStr);
         super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -644,6 +668,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             }
         }
     };
+
+
 
 
 }
