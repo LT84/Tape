@@ -1,7 +1,11 @@
 package com.project.tape;
 
+import static com.project.tape.AlbumInfo.copyOfSongsInAlbum;
+import static com.project.tape.AlbumInfo.fromAlbumInfo;
+import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
+import static com.project.tape.SongInfoTab.repeatBtnClicked;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -18,7 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener {
+public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
 
     private RecyclerView myRecyclerView;
     private static final int VERTICAL_ITEM_SPACE = 3;
@@ -32,34 +36,59 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         //Loading audio list
         loadAudio();
 
-        position = getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).getInt("progress", 0);
-
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
         song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
         artist_name_main = (TextView) getActivity().findViewById(R.id.artist_name_main);
 
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
-
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
 
-        uri = Uri.parse(songsList.get(position).getData());
 
+        repeatBtnClicked = getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE)
+                .getBoolean("repeatBtnClicked", repeatBtnClicked);
+
+        position = getActivity().getSharedPreferences("position", Context.MODE_PRIVATE)
+                .getInt("position", position);
+
+        positionInOpenedAlbum = getActivity().getSharedPreferences("positionInOpenedAlbum", Context.MODE_PRIVATE)
+                .getInt("positionInOpenedAlbum", positionInOpenedAlbum);
 
         songNameStr = getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
                 .getString("songNameStr", " ");
+
         artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
                 .getString("artistNameStr", " ");
-        uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
-               .getString("progress", uri.toString()));
 
+        fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
+                .getBoolean("fromAlbumInfo", fromAlbumInfo);
+
+
+         String albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
+                .getString("albumName", " ");
+
+        if (fromAlbumInfo) {
+            uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
+                    .getString("uri",  songsList.get(position).getData()));
+            int j = 0;
+            for (int i = 0; i < songsList.size(); i++) {
+                if (albumName.equals(songsList.get(i).getAlbum())) {
+                    copyOfSongsInAlbum.add(j, songsList.get(i));
+                    j++;
+                }
+            }
+        } else {
+            uri = Uri.parse(songsList.get(position).getData());
+        }
+
+        metaDataInFragment(uri);
 
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
 
 
         mediaPlayer = MediaPlayer.create(getContext(), uri);
-
+        mediaPlayer.setOnCompletionListener(SongsFragment.this);
 
         //Sets adapter to list and applies settings to recyclerView
         SongAdapter songAdapter = new SongAdapter(getContext(), songsList , this);
@@ -96,15 +125,18 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
         playMusic();
 
+        metaDataInFragment(uri);
+
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("progress", uri.toString()).commit();
+                .putString("uri", uri.toString()).commit();
         getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
                 .putString("songNameStr", songNameStr).commit();
         getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
+        getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
 
-        metaDataInFragment(uri);
-
+        mediaPlayer.setOnCompletionListener(SongsFragment.this);
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
         mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
@@ -115,10 +147,11 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
        title and artist when SongsFragment is opened*/
     @Override
     public void onResume() {
-        super.onResume();
-
-        if (uri != null) {
-            metaDataInFragment(uri);
+        if (!coverLoaded) {
+            if (uri != null) {
+                metaDataInFragment(uri);
+                coverLoaded = true;
+            }
         }
 
         if (mediaPlayer != null) {
@@ -131,20 +164,50 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
             } else  {
                 mainPlayPauseBtn.setImageResource(R.drawable.play_song);
             }
-
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    switchSongInFragment();
-                    getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
-                    mediaPlayer = MediaPlayer.create(getActivity(), uri);
-                    mediaPlayer.start();
-                }
-            });
         }
+        super.onResume();
     }
 
+    @Override
+    public void onStop() {
+        if (repeatBtnClicked) {
+            getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", true).commit();
+        } else {
+            getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", false).commit();
+        }
 
+        getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
+        getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+                .putString("songNameStr", songNameStr).commit();
+        getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+                .putString("artistNameStr", artistNameStr).commit();
+        getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
+
+        super.onStop();
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        position = getActivity().getSharedPreferences("position", Context.MODE_PRIVATE)
+                .getInt("position", position);
+        if (repeatBtnClicked) {
+            switchSongInFragment();
+            metaDataInFragment(uri);
+            mediaPlayer.setOnCompletionListener(this);
+            mediaPlayer.start();
+        } else {
+            switchSongInFragment();
+            metaDataInFragment(uri);
+            mediaPlayer.setOnCompletionListener(this);
+            mediaPlayer.start();
+        }
+        getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
+    }
 }
 
 

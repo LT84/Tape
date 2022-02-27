@@ -19,7 +19,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
@@ -28,12 +28,14 @@ public class MainActivity extends AppCompatActivity {
     Button fullInformationTabB;
     static String songNameStr, artistNameStr;
 
+
     public static final int REQUEST_CODE = 1;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         permission();
 
         playPauseBtn = findViewById(R.id.pause_button);
@@ -41,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
         playPauseBtn.setOnClickListener(btnListener);
         fullInformationTabB.setOnClickListener(btnListener);
-
 
         //Tab Layout
         tabLayout = findViewById(R.id.tab_layout);
@@ -90,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.start();
             playPauseBtn.setImageResource(R.drawable.pause_song);
         }
-
     }
 
     //Permission to read data from phone

@@ -40,6 +40,7 @@ public abstract class FragmentGeneral extends Fragment {
 
     static byte[] art;
 
+    static boolean coverLoaded;
 
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {
@@ -75,18 +76,19 @@ public abstract class FragmentGeneral extends Fragment {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(uri.toString());
         art = retriever.getEmbeddedPicture();
+            if (art != null) {
+                Glide.with(getContext())
+                        .asBitmap()
+                        .load(art)
+                        .into(album_cover_main);
+            } else {
+                Glide.with(getContext())
+                        .asBitmap()
+                        .load(R.drawable.default_cover)
+                        .into(album_cover_main);
+            }
 
-        if (art != null) {
-            Glide.with(getContext())
-                    .asBitmap()
-                    .load(art)
-                    .into(album_cover_main);
-        } else {
-            Glide.with(getContext())
-                    .asBitmap()
-                    .load(R.drawable.default_cover)
-                    .into(album_cover_main);
-        }
+
     }
 
     //Switches next composition
@@ -106,8 +108,8 @@ public abstract class FragmentGeneral extends Fragment {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = (position + 1 % songsList.size());
-                position = (position) > songsList.size() ? (songsList.indexOf(0)) : (position = 0);
+                position = position + 1 == songsList.size() ? (0)
+                        : (position + 1);
                 uri = Uri.parse(songsList.get(position).getData());
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = (positionInOpenedAlbum + 1 % copyOfSongsInAlbum.size());
@@ -143,7 +145,14 @@ public abstract class FragmentGeneral extends Fragment {
             getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                     .putString("artistNameStr", artistNameStr).commit();
 
-            metaDataInFragment(uri);
+
+            if (!coverLoaded) {
+                if (uri != null) {
+                    metaDataInFragment(uri);
+                    coverLoaded = true;
+                }
+            }
+
             mediaPlayer.start();
 
         } else {
@@ -161,8 +170,8 @@ public abstract class FragmentGeneral extends Fragment {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = (position + 1 % songsList.size());
-                position = (position) > songsList.size() ? (songsList.indexOf(0)) : (position = 0);
+                position = position + 1 == songsList.size() ? (0)
+                        : (position + 1);
                 uri = Uri.parse(songsList.get(position).getData());
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = (positionInOpenedAlbum + 1 % copyOfSongsInAlbum.size());
@@ -198,7 +207,12 @@ public abstract class FragmentGeneral extends Fragment {
             getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                     .putString("artistNameStr", artistNameStr).commit();
 
-            metaDataInFragment(uri);
+            if (!coverLoaded) {
+                if (uri != null) {
+                    metaDataInFragment(uri);
+                    coverLoaded = true;
+                }
+            }
         }
     }
 

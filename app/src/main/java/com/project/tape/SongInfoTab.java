@@ -3,6 +3,7 @@ package com.project.tape;
 import static com.project.tape.AlbumInfo.fromAlbumInfo;
 import static com.project.tape.AlbumInfo.copyOfSongsInAlbum;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
+import static com.project.tape.FragmentGeneral.coverLoaded;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongsFragment.art;
@@ -51,12 +52,12 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
         initViews();
 
-        songNameStr = SongInfoTab.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
-                .getString("songNameStr", " ");
-        artistNameStr = SongInfoTab.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
-                .getString("artistNameStr", " ");
         uri = Uri.parse(SongInfoTab.this.getSharedPreferences("uri", Context.MODE_PRIVATE)
-                .getString("progress", uri.toString()));
+                .getString("uri",  songsList.get(position).getData()));
+
+        repeatBtnClicked = SongInfoTab.this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE)
+                .getBoolean("repeatBtnClicked", true);
+
 
         getIntentMethod();
 
@@ -70,6 +71,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         } else {
            repeatBtn.setImageResource(R.drawable.repeat_song_off);
         }
+
         mediaPlayer.setOnCompletionListener(this);
 
 
@@ -137,11 +139,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         int durationTotal;
         //Set duration here !!!
         if (fromAlbumInfo) {
-            durationTotal = Integer.parseInt(copyOfSongsInAlbum.get(positionInOpenedAlbum).getDuration()) / 1000;
+            seekBar.setMax(mediaPlayer.getDuration() / 1000);
+           // durationTotal = Integer.parseInt(copyOfSongsInAlbum.get(positionInOpenedAlbum).getDuration()) / 1000;
         } else {
-            durationTotal = Integer.parseInt(songsList.get(position).getDuration()) / 1000;
+            seekBar.setMax(mediaPlayer.getDuration() / 1000);
+           // durationTotal = Integer.parseInt(songsList.get(position).getDuration()) / 1000;
         }
-        time_duration_total.setText(formattedTime(durationTotal));
+      //  time_duration_total.setText(formattedTime(durationTotal));
         art = retriever.getEmbeddedPicture();
 
         if (art != null) {
@@ -156,7 +160,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .into(album_cover);
         }
     }
-
     //Formats time to seconds and minutes to pass it to seekBar
     private String formattedTime(int mCurrentPosition) {
         String totalOut = "";
@@ -239,12 +242,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                             repeatBtnClicked = false;
                             nextBtnClicked();
                             sentIntent();
-                            SongInfoTab.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
                             repeatBtnClicked = true;
                         } else {
                             nextBtnClicked();
                             sentIntent();
-                            SongInfoTab.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
                         }
                     }
                 });
@@ -257,6 +258,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     /*When next button is clicked, sets position of songsList to +1. Also sets song title,
      artist name, album cover and seekBar position when SongInfoTab is fully opened*/
     public void nextBtnClicked() {
+        coverLoaded = false;
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             mediaPlayer.release();
@@ -280,7 +282,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                             ? (0) : (positionInOpenedAlbum + 1);
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 } else {
-                    position = position > songsList.size() ? (position = 0) : (position + 1);
+                    position = position + 1 == songsList.size() ? (0)
+                            : (position + 1);
                     uri = Uri.parse(songsList.get(position).getData());
                 }
             }
@@ -349,7 +352,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                             ? (0) : (positionInOpenedAlbum + 1);
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 } else {
-                    position = position > songsList.size() ? (position = 0) : (position + 1);
+                    position = position + 1 == songsList.size() ? (0)
+                            : (position + 1);
                     uri = Uri.parse(songsList.get(position).getData());
                 }
             }
@@ -394,6 +398,18 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             mediaPlayer.setOnCompletionListener(this);
             playPauseBtn.setBackgroundResource(R.drawable.play_song);
         }
+
+        SongInfoTab.this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
+        SongInfoTab.this.getSharedPreferences("positionInOpenedAlbum", Context.MODE_PRIVATE).edit()
+                .putInt("positionInOpenedAlbum", positionInOpenedAlbum).commit();
+        SongInfoTab.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+                .putString("songNameStr", songNameStr).commit();
+        SongInfoTab.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+                .putString("artistNameStr", artistNameStr).commit();
+        SongInfoTab.this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
+
     }
 
     private int getRandom(int i) {
@@ -414,12 +430,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                                   repeatBtnClicked = false;
                                   previousBtnClicked();
                                   sentIntent();
-                                  SongInfoTab.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
                                   repeatBtnClicked = true;
                               } else {
                                   previousBtnClicked();
                                   sentIntent();
-                                  SongInfoTab.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
                               }
                         }
                     });
@@ -431,6 +445,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     /*When previous button is clicked, sets position of songsList to -1. Also sets song title,
     artist name, album cover and seekBar position when SongInfoTab is fully opened*/
     private void previousBtnClicked() {
+        coverLoaded = false;
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             mediaPlayer.release();
@@ -566,6 +581,15 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 mediaPlayer.setOnCompletionListener(this);
                 playPauseBtn.setBackgroundResource(R.drawable.play_song);
             }
+
+        SongInfoTab.this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
+        SongInfoTab.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+                .putString("songNameStr", songNameStr).commit();
+        SongInfoTab.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+                .putString("artistNameStr", artistNameStr).commit();
+        SongInfoTab.this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
     }
 
     //When song is finished, switches to next song
@@ -579,13 +603,19 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 nextBtnClicked();
                 mediaPlayer.setOnCompletionListener(this);
                 mediaPlayer.start();
-                SongInfoTab.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
+                SongInfoTab.this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                        .putInt("position", position).commit();
             }
-        SongInfoTab.this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit().putString("progress", uri.toString()).commit();
+
+        SongInfoTab.this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
         SongInfoTab.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
                 .putString("songNameStr", songNameStr).commit();
         SongInfoTab.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
+        SongInfoTab.this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
+
     }
 
     @Override
@@ -605,12 +635,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     @Override
     public void finish() {
-        SongInfoTab.this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit().putString("progress", uri.toString()).commit();
-        SongInfoTab.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
-                .putString("songNameStr", songNameStr).commit();
-        SongInfoTab.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
-                .putString("artistNameStr", artistNameStr).commit();
-        SongInfoTab.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
         super.finish();
     }
 
@@ -656,9 +680,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 case R.id.infoTab_repeat_button:
                     if (repeatBtnClicked) {
                         repeatBtnClicked = false;
+                        SongInfoTab.this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("repeatBtnClicked",  repeatBtnClicked).commit();
                         repeatBtn.setImageResource(R.drawable.repeat_song_off);
                     } else  {
                         repeatBtnClicked = true;
+                        SongInfoTab.this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("repeatBtnClicked",  repeatBtnClicked).commit();
                         repeatBtn.setImageResource(R.drawable.repeat_song_on);
                     }
                     break;

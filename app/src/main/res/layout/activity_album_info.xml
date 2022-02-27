@@ -18,8 +18,13 @@
         <TextView
             android:id="@+id/album_title_albumInfo"
             android:layout_width="250dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="40dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_centerVertical="true"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"/>
 
         <ImageButton
             android:id="@+id/backBtn_albumInfo"

@@ -25,8 +25,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,6 +56,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         //Loading audio list
         loadAudio();
 
+        coverLoaded = false;
+
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.albums_recyclerview);
@@ -69,6 +69,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
+
 
         //Throwing out duplicates from list
         //Sorting albums
@@ -183,16 +184,12 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         artist_name_main.setText(artistNameStr);
 
         if (mediaPlayer != null) {
-            if (art != null) {
-                Glide.with(this)
-                        .asBitmap()
-                        .load(art)
-                        .into(album_cover_main);
-            } else {
-                Glide.with(this)
-                        .asBitmap()
-                        .load(R.drawable.default_cover)
-                        .into(album_cover_main);
+
+            if (!coverLoaded) {
+                if (uri != null) {
+                    metaDataInFragment(uri);
+                    coverLoaded = true;
+                }
             }
 
             if (mediaPlayer.isPlaying()) {

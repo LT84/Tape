@@ -1,5 +1,6 @@
 package com.project.tape;
 
+import static com.project.tape.FragmentGeneral.coverLoaded;
 import static com.project.tape.FragmentGeneral.songsList;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
@@ -34,7 +35,7 @@ import java.util.Random;
 
 public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnAlbumListener,  Serializable {
 
-    TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main;
+    TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
     ImageView album_cover_in_album;
     ImageButton backBtn, playPauseBtn, playPauseBtnInTab;
     Button openFullInfoTab;
@@ -63,6 +64,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         openFullInfoTab.setOnClickListener(btnListener);
         playPauseBtnInTab = findViewById(R.id.pause_button_in_album);
 
+        album_title_albumInfo = findViewById(R.id.album_title_albumInfo);
         song_title_in_album = findViewById(R.id.song_title_in_album);
         artist_name_in_album = findViewById(R.id.artist_name_in_album);
         album_cover_in_album = findViewById(R.id.album_cover_in_album);
@@ -72,8 +74,11 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
+        fromAlbumInfo = true;
+
         getIntentMethod();
 
+        album_title_albumInfo.setText(getIntent().getStringExtra("albumName"));
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
         if (art != null) {
@@ -169,19 +174,23 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         this.positionInOpenedAlbum = position;
 
         fromAlbumInfo = true;
+        coverLoaded = false;
 
         songNameStr = songsInAlbum.get(positionInOpenedAlbum).getTitle();
         artistNameStr = songsInAlbum.get(positionInOpenedAlbum).getArtist();
 
         playMusic();
 
-        AlbumInfo.this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit().putString("progress", uri.toString()).commit();
+        AlbumInfo.this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", " ").commit();
+        AlbumInfo.this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
         AlbumInfo.this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
                 .putString("songNameStr", songNameStr).commit();
         AlbumInfo.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
-       // AlbumInfo.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", this.positionInOpenedAlbum).commit();
-
+        AlbumInfo.this.getSharedPreferences("positionInOpenedAlbum", Context.MODE_PRIVATE).edit()
+                .putInt("positionInOpenedAlbum", positionInOpenedAlbum).commit();
 
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
