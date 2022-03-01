@@ -3,16 +3,13 @@ package com.project.tape;
 import static android.app.Activity.RESULT_OK;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
+import static com.project.tape.SongsFragment.albumList;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +23,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
 
 public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAlbumListener {
 
@@ -40,13 +32,12 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     private RecyclerView myRecyclerView;
     LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
 
-    static List<Song> albumList;
-
     final int REQUEST_CODE = 1;
 
     int positionIndex, topView;
     private static final int VERTICAL_ITEM_SPACE = 5;
 
+    static String previousAlbumName;
 
     @Nullable
     @Override
@@ -54,9 +45,12 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         View v;
         v = inflater.inflate(R.layout.albums_fragment, container, false);
         //Loading audio list
-        loadAudio();
 
         coverLoaded = false;
+
+
+        previousAlbumName = getActivity().getIntent().getStringExtra("previousAlbumName");
+
 
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
@@ -70,29 +64,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
 
-
-        //Throwing out duplicates from list
-        //Sorting albums
-        Collections.sort(albumList, new Comparator<Song>() {
-            @Override
-            public int compare(Song lhs, Song rhs) {
-                return lhs.getAlbum().toLowerCase().compareTo(rhs.getAlbum().toLowerCase());
-            }
-        });
-
-        //Creates iterator and throws out duplicates
-        Iterator<Song> iterator = albumList.iterator();
-        String album = "";
-        while (iterator.hasNext()) {
-            Song track = iterator.next();
-            String currentAlbum = track.getAlbum().toLowerCase();
-            if (currentAlbum.equals(album)) {
-                iterator.remove();
-
-            } else {
-                album = currentAlbum;
-            }
-        }
 
         //Sets adapter to list and applies settings to recyclerView
         AlbumAdapter albumAdapter = new AlbumAdapter(getContext(),albumList, this);
@@ -110,35 +81,9 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
             listState = savedInstanceState.getParcelable("ListState");
         }
 
-
-
         return v;
     }
 
-
-    @Override
-    //Loading audio files
-    protected void loadAudio() throws NullPointerException {
-        ContentResolver contentResolver = getActivity().getContentResolver();
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-        Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
-
-        if (cursor != null && cursor.getCount() > 0) {
-            albumList = new ArrayList<>();
-            while (cursor.moveToNext()) {
-                String data = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                String album = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
-                String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-                String duration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
-                // Save to audioList
-                albumList.add(new Song(data, title, album, artist, duration));
-            }
-        }
-        cursor.close();
-    }
 
     //Saving place where recyclerView stopped
     @Override
@@ -147,12 +92,18 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
-
     //ClickListener in recyclerView
     @Override
     public void onAlbumClick(int position) throws IOException {
         Intent intent = new Intent(getActivity(), AlbumInfo.class);
         intent.putExtra("albumName",  albumList.get(position).getAlbum());
+        intent.putExtra("previousAlbumName",  previousAlbumName);
+        //!!!!!!!!!!!!
+        getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE).edit()
+                .putString("albumName", albumList.get(position).getAlbum()).commit();
+
+        getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", true).commit();
         startActivityForResult(intent, REQUEST_CODE);
     }
 
@@ -215,7 +166,3 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
 
 }
-
-
-
-

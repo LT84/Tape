@@ -1,6 +1,5 @@
 package com.project.tape;
 
-import static com.project.tape.AlbumInfo.copyOfSongsInAlbum;
 import static com.project.tape.AlbumInfo.fromAlbumInfo;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
@@ -22,11 +21,19 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
 public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
 
     private RecyclerView myRecyclerView;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
+    static List<Song> albumList;
+    static ArrayList<Song> copyOfSongsInAlbum = new ArrayList<>();
 
     @Nullable
     @Override
@@ -46,7 +53,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
 
         repeatBtnClicked = getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE)
-                .getBoolean("repeatBtnClicked", repeatBtnClicked);
+                .getBoolean("repeatBtnClicked", true);
 
         position = getActivity().getSharedPreferences("position", Context.MODE_PRIVATE)
                 .getInt("position", position);
@@ -61,25 +68,17 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .getString("artistNameStr", " ");
 
         fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
-                .getBoolean("fromAlbumInfo", fromAlbumInfo);
+                .getBoolean("fromAlbumInfo", false);
 
 
-         String albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
-                .getString("albumName", " ");
 
         if (fromAlbumInfo) {
             uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                     .getString("uri",  songsList.get(position).getData()));
-            int j = 0;
-            for (int i = 0; i < songsList.size(); i++) {
-                if (albumName.equals(songsList.get(i).getAlbum())) {
-                    copyOfSongsInAlbum.add(j, songsList.get(i));
-                    j++;
-                }
-            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
         }
+
 
         metaDataInFragment(uri);
 
@@ -96,7 +95,46 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         myRecyclerView.setAdapter(songAdapter);
+
+        //Throwing out duplicates from list
+        //Sorting albums
+        Collections.sort(albumList, new Comparator<Song>() {
+            @Override
+            public int compare(Song lhs, Song rhs) {
+                return lhs.getAlbum().toLowerCase().compareTo(rhs.getAlbum().toLowerCase());
+            }
+        });
+
+
+        //Creates iterator and throws out duplicates
+        Iterator<Song> iterator = albumList.iterator();
+        String album = "";
+        while (iterator.hasNext()) {
+            Song track = iterator.next();
+            String currentAlbum = track.getAlbum().toLowerCase();
+            if (currentAlbum.equals(album)) {
+                iterator.remove();
+
+            } else {
+                album = currentAlbum;
+            }
+        }
+
+        String albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
+                .getString("albumName", " ");
+
+
+        int j = 0;
+        for (int i = 0; i < songsList.size(); i++) {
+            if (albumName.equals(songsList.get(i).getAlbum())) {
+                copyOfSongsInAlbum.add(j, songsList.get(i));
+                j++;
+            }
+
+        }
+
         return v;
+
     }
 
 
@@ -209,9 +247,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putInt("position", position).commit();
     }
 }
-
-
-
 
 
 

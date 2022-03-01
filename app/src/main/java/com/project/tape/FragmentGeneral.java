@@ -1,12 +1,13 @@
 package com.project.tape;
 
-import static com.project.tape.AlbumInfo.copyOfSongsInAlbum;
-import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.AlbumInfo.fromAlbumInfo;
+import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongInfoTab.shuffleBtnClicked;
+import static com.project.tape.SongsFragment.albumList;
+import static com.project.tape.SongsFragment.copyOfSongsInAlbum;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -52,6 +53,7 @@ public abstract class FragmentGeneral extends Fragment {
 
         if (cursor != null && cursor.getCount() > 0) {
             songsList = new ArrayList<>();
+            albumList = new ArrayList<>();
             while (cursor.moveToNext()) {
                 String data = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
@@ -60,6 +62,7 @@ public abstract class FragmentGeneral extends Fragment {
                 String duration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
                 // Save to audioList
                 songsList.add(new Song(data, title, album, artist, duration));
+                albumList.add(new Song(data, title, album, artist, duration));
             }
         }
         cursor.close();
