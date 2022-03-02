@@ -1,6 +1,7 @@
 package com.project.tape;
 
 import static com.project.tape.FragmentGeneral.coverLoaded;
+import static com.project.tape.FragmentGeneral.position;
 import static com.project.tape.FragmentGeneral.songsList;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
@@ -52,7 +53,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
     ArrayList<Song> copyOfSongsList = songsList;
 
     public static boolean fromAlbumInfo;
-
+    //!!!!!!!!!!!!
     static String albumName;
 
     boolean oneTimeBoolean;
@@ -111,6 +112,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     j++;
                 }
             }
+
 
         AlbumInfoAdapter albumInfoAdapter = new AlbumInfoAdapter(this, currentSongsInAlbum, this);
 
@@ -182,6 +184,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         Intent intent = new Intent();
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
+        //!!!!!!!!!!!!
         previousAlbumName = albumName;
         intent.putExtra("previousAlbumName", previousAlbumName);
         super.onPause();
@@ -231,9 +234,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     .into(album_cover_in_album);
         }
 
-
-
-
     }
 
     public void switchSong() {
@@ -247,15 +247,16 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
             else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
             }
-            //!!!!!!!!!!!!
             else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (!previousAlbumName.equals(albumName)) {
-                    positionInOpenedAlbum = (positionInOpenedAlbum + 1);
+                    //!!!!!!!!!!!!
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == previousSongsInAlbum.size() ? (0)
+                            : (position + 1);
                     uri = Uri.parse(previousSongsInAlbum.get(positionInOpenedAlbum).getData());
                     songNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                     artistNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                 } else {
-                    positionInOpenedAlbum = (positionInOpenedAlbum + 1);
+                    positionInOpenedAlbum = (positionInOpenedAlbum + 1 % previousSongsInAlbum.size());
                     uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
                     songNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                     artistNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getArtist();
@@ -279,7 +280,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     .putString("songNameStr", songNameStr).commit();
             AlbumInfo.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                     .putString("artistNameStr", artistNameStr).commit();
-
 
             mediaPlayer.start();
 
@@ -293,15 +293,17 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
             else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
             }
-           //!!!!!!!!!!!!
             else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (!previousAlbumName.equals(albumName)) {
-                    positionInOpenedAlbum = (positionInOpenedAlbum + 1);
-                    uri = Uri.parse(previousSongsInAlbum.get(positionInOpenedAlbum).getData());
-                    songNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
-                    artistNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
+                    //!!!!!!!!!!!!
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == previousSongsInAlbum.size() ? (0)
+                            : (position + 1);
+                        uri = Uri.parse(previousSongsInAlbum.get(positionInOpenedAlbum).getData());
+                        songNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
+                        artistNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
+
                 } else {
-                    positionInOpenedAlbum = (positionInOpenedAlbum + 1);
+                    positionInOpenedAlbum = (positionInOpenedAlbum + 1 );
                     uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
                     songNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                     artistNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getArtist();
@@ -324,6 +326,8 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     .putString("songNameStr", songNameStr).commit();
             AlbumInfo.this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                     .putString("artistNameStr", artistNameStr).commit();
+
+            mediaPlayer.start();
         }
     }
 
@@ -349,25 +353,23 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-
+                switchSong();
+                AlbumInfo.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE)
+                        .edit().putInt("progress", positionInOpenedAlbum).commit();
+                //!!!!!!!!!!!!
                 if (oneTimeBoolean = true) {
                     if (!previousAlbumName.equals(albumName)) {
                         previousSongsInAlbum.clear();
-                        int j = 0;
+                        int a = 0;
                         for (int i = 0; i < copyOfSongsList.size(); i++) {
                             if (previousAlbumName.equals(copyOfSongsList.get(i).getAlbum())) {
-                                previousSongsInAlbum.add(j, copyOfSongsList.get(i));
-                                j++;
+                                previousSongsInAlbum.add(a, copyOfSongsList.get(i));
+                                a++;
                             }
                         }
                     }
                     oneTimeBoolean = false;
                 }
-
-                switchSong();
-                AlbumInfo.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", positionInOpenedAlbum).commit();
-                mediaPlayer = MediaPlayer.create(AlbumInfo.this, uri);
-                mediaPlayer.start();
 
             }
         });

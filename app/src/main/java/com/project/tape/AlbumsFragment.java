@@ -49,9 +49,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         coverLoaded = false;
 
 
-        previousAlbumName = getActivity().getIntent().getStringExtra("previousAlbumName");
-
-
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.albums_recyclerview);
@@ -114,6 +111,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
                 case REQUEST_CODE:
                     songNameStr = data.getStringExtra("titleToMain");
                     artistNameStr = data.getStringExtra("ArtistNameToMain");
+                    //!!!!!!!!!!!!
+                    previousAlbumName = data.getStringExtra("previousAlbumName");
                     break;
             }
         }
@@ -129,10 +128,10 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
     @Override
     public void onResume () {
-        super.onResume();
 
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
+
 
         if (mediaPlayer != null) {
 
@@ -162,6 +161,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
                 mediaPlayer.start();
             }
         });
+        super.onResume();
     }
 
 
