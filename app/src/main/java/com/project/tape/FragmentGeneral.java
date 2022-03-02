@@ -111,12 +111,10 @@ public abstract class FragmentGeneral extends Fragment {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = position + 1 == songsList.size() ? (0)
-                        : (position + 1);
-                uri = Uri.parse(songsList.get(position).getData());
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = (positionInOpenedAlbum + 1 % copyOfSongsInAlbum.size());
-                    uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else {
+                    position = position + 1 == songsList.size() ? (0) : (position + 1);
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
@@ -138,6 +136,8 @@ public abstract class FragmentGeneral extends Fragment {
 
             mediaPlayer = MediaPlayer.create(getContext(), uri);
 
+            metaDataInFragment(uri);
+
             song_title_main.setText(songNameStr);
             artist_name_main.setText(artistNameStr);
 
@@ -147,14 +147,6 @@ public abstract class FragmentGeneral extends Fragment {
                     .putString("songNameStr", songNameStr).commit();
             getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                     .putString("artistNameStr", artistNameStr).commit();
-
-
-            if (!coverLoaded) {
-                if (uri != null) {
-                    metaDataInFragment(uri);
-                    coverLoaded = true;
-                }
-            }
 
             mediaPlayer.start();
 
@@ -173,12 +165,10 @@ public abstract class FragmentGeneral extends Fragment {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                position = position + 1 == songsList.size() ? (0)
-                        : (position + 1);
-                uri = Uri.parse(songsList.get(position).getData());
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = (positionInOpenedAlbum + 1 % copyOfSongsInAlbum.size());
-                    uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else {
+                    position = position + 1 == songsList.size() ? (0) : (position + 1);
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
@@ -200,6 +190,8 @@ public abstract class FragmentGeneral extends Fragment {
 
             mediaPlayer = MediaPlayer.create(getContext(), uri);
 
+            metaDataInFragment(uri);
+
             song_title_main.setText(songNameStr);
             artist_name_main.setText(artistNameStr);
 
@@ -210,16 +202,14 @@ public abstract class FragmentGeneral extends Fragment {
             getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                     .putString("artistNameStr", artistNameStr).commit();
 
-            if (!coverLoaded) {
-                if (uri != null) {
-                    metaDataInFragment(uri);
-                    coverLoaded = true;
-                }
-            }
+            coverLoaded = true;
         }
     }
 
 
 }
+
+
+
 
 

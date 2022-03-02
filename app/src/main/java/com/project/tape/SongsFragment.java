@@ -71,7 +71,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .getBoolean("fromAlbumInfo", false);
 
 
-
+        //Checks uri origin
         if (fromAlbumInfo) {
             uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                     .getString("uri",  songsList.get(position).getData()));
@@ -79,12 +79,10 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
             uri = Uri.parse(songsList.get(position).getData());
         }
 
-
         metaDataInFragment(uri);
 
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
-
 
         mediaPlayer = MediaPlayer.create(getContext(), uri);
         mediaPlayer.setOnCompletionListener(SongsFragment.this);
@@ -119,11 +117,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 album = currentAlbum;
             }
         }
-
+        //Fills up copyOfSongList to pass it to SongInfoTab
         String albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
                 .getString("albumName", " ");
-
-
         int j = 0;
         for (int i = 0; i < songsList.size(); i++) {
             if (albumName.equals(songsList.get(i).getAlbum())) {
@@ -134,7 +130,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         }
 
         return v;
-
     }
 
 
@@ -193,7 +188,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         }
 
         if (mediaPlayer != null) {
-
             song_title_main.setText(songNameStr);
             artist_name_main.setText(artistNameStr);
 
@@ -203,6 +197,8 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 mainPlayPauseBtn.setImageResource(R.drawable.play_song);
             }
         }
+
+        mediaPlayer.setOnCompletionListener(SongsFragment.this);
         super.onResume();
     }
 

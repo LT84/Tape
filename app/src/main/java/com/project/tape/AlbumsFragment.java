@@ -130,13 +130,10 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
     @Override
     public void onResume () {
-
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
 
-
         if (mediaPlayer != null) {
-
             if (!coverLoaded) {
                 if (uri != null) {
                     metaDataInFragment(uri);
