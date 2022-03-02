@@ -1,12 +1,16 @@
 package com.project.tape;
 
+import static com.project.tape.AlbumInfo.albumName;
 import static com.project.tape.AlbumInfo.fromAlbumInfo;
-import static com.project.tape.SongsFragment.copyOfSongsInAlbum;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
+import static com.project.tape.AlbumInfo.staticCurrentSongsInAlbum;
+import static com.project.tape.AlbumsFragment.previousAlbumName;
+import static com.project.tape.AlbumsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.FragmentGeneral.coverLoaded;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongsFragment.art;
+import static com.project.tape.SongsFragment.copyOfSongsInAlbum;
 import static com.project.tape.SongsFragment.mediaPlayer;
 import static com.project.tape.SongsFragment.position;
 import static com.project.tape.SongsFragment.songsList;
@@ -137,12 +141,21 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         //Set duration here !!!
         if (fromAlbumInfo) {
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
-           // durationTotal = Integer.parseInt(copyOfSongsInAlbum.get(positionInOpenedAlbum).getDuration()) / 1000;
+            //!!!!!!!!
+            if (!previousAlbumName.equals(albumName)) {
+
+                durationTotal = Integer.parseInt(staticPreviousSongsInAlbum
+                        .get(positionInOpenedAlbum)
+                        .getDuration()) / 1000;
+                time_duration_total.setText(formattedTime(durationTotal));
+            }
+
         } else {
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
             durationTotal = Integer.parseInt(songsList.get(position).getDuration()) / 1000;
+            time_duration_total.setText(formattedTime(durationTotal));
         }
-           // time_duration_total.setText(formattedTime(durationTotal));
+
         art = retriever.getEmbeddedPicture();
 
         if (art != null) {
@@ -275,9 +288,18 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             }
             else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
-                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == copyOfSongsInAlbum.size()
+
+                    int j = 0;
+                    for (int i = 0; i < songsList.size(); i++) {
+                        if (albumName.equals(songsList.get(i).getAlbum())) {
+                            staticCurrentSongsInAlbum.add(j, songsList.get(i));
+                            j++;
+                        }
+                    }
+
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
                             ? (0) : (positionInOpenedAlbum + 1);
-                    uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                    uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
                 } else {
                     position = position + 1 == songsList.size() ? (0)
                             : (position + 1);
@@ -294,6 +316,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
             //Sets song and artist strings
             if (fromAlbumInfo) {
+                //!!!!!!!!!!
                 uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 songNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = copyOfSongsInAlbum.get(positionInOpenedAlbum).getArtist();
@@ -336,18 +359,25 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = getRandom(copyOfSongsInAlbum.size() - 1);
                 }
-            }
-            else if (!shuffleBtnClicked && repeatBtnClicked) {
+            } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(songsList.get(position).getData());
                 if (fromAlbumInfo) {
                     uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
                 }
-            }
-            else if (!shuffleBtnClicked && !repeatBtnClicked) {
+            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
-                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == copyOfSongsInAlbum.size()
+                    //!!!!!!!!!!
+                    int j = 0;
+                    for (int i = 0; i < songsList.size(); i++) {
+                        if (albumName.equals(songsList.get(i).getAlbum())) {
+                            staticCurrentSongsInAlbum.add(j, songsList.get(i));
+                            j++;
+                        }
+                    }
+
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
                             ? (0) : (positionInOpenedAlbum + 1);
-                    uri = Uri.parse(copyOfSongsInAlbum.get(positionInOpenedAlbum).getData());
+                    uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
                 } else {
                     position = position + 1 == songsList.size() ? (0)
                             : (position + 1);

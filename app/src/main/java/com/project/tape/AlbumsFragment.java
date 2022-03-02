@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAlbumListener {
 
@@ -38,6 +39,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     private static final int VERTICAL_ITEM_SPACE = 5;
 
     static String previousAlbumName;
+    static ArrayList<Song> staticPreviousSongsInAlbum;
 
     @Nullable
     @Override
