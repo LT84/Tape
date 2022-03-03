@@ -72,7 +72,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
 
         previousAlbumName = this.getIntent().getStringExtra("previousAlbumName");
 
-
         backBtn = findViewById(R.id.backBtn_albumInfo);
         backBtn.setOnClickListener(btnListener);
         openFullInfoTab = findViewById(R.id.open_information_tab_in_album);
@@ -90,6 +89,8 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
         fromAlbumInfo = true;
+        AlbumInfo.this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", true).commit();
 
         getIntentMethod();
 
@@ -111,9 +112,9 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         //!!!!!!!!!!!!
             albumName = getIntent().getStringExtra("albumName");
             int j = 0;
-            for (int i = 0; i < copyOfSongsList.size(); i++) {
-                if (albumName.equals(copyOfSongsList.get(i).getAlbum())) {
-                    currentSongsInAlbum.add(j, copyOfSongsList.get(i));
+            for (int i = 0; i < songsList.size(); i++) {
+                if (albumName.equals(songsList.get(i).getAlbum())) {
+                    currentSongsInAlbum.add(j, songsList.get(i));
                     j++;
                 }
             }
@@ -160,7 +161,8 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     break;
                 case R.id.open_information_tab_in_album:
                     Intent intent = new Intent(AlbumInfo.this, SongInfoTab.class);
-                    intent.putExtra("positionInAlbum", positionInOpenedAlbum);
+                    fromAlbumInfo = true;
+                    intent.putExtra("positionInOpenedAlbum", positionInOpenedAlbum);
                     startActivity(intent);
             }
         }
@@ -199,6 +201,9 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
 
         fromAlbumInfo = true;
         coverLoaded = false;
+
+        String a = Integer.toString(positionInOpenedAlbum);
+        Toast.makeText(this, a, Toast.LENGTH_LONG).show();
 
         //!!!!!!!!!!!!
         previousAlbumName = albumName;
