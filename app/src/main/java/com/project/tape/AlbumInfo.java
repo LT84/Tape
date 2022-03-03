@@ -3,7 +3,6 @@ package com.project.tape;
 import static com.project.tape.AlbumsFragment.previousAlbumName;
 import static com.project.tape.AlbumsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.FragmentGeneral.coverLoaded;
-import static com.project.tape.FragmentGeneral.position;
 import static com.project.tape.FragmentGeneral.songsList;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
@@ -192,8 +191,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         fromAlbumInfo = true;
         coverLoaded = false;
 
-        String a = Integer.toString(positionInOpenedAlbum);
-
         previousAlbumName = albumName;
         staticCurrentSongsInAlbum = currentSongsInAlbum;
 
@@ -242,27 +239,25 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
             mediaPlayer.release();
 
             if (shuffleBtnClicked && !repeatBtnClicked) {
-                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() -1);
-            }
-            else if (!shuffleBtnClicked && repeatBtnClicked) {
+                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() - 1);
+            } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
-            }
-            else if (!shuffleBtnClicked && !repeatBtnClicked) {
+            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (!previousAlbumName.equals(albumName)) {
-                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == previousSongsInAlbum.size() ? (0)
-                            : (position + 1);
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
+                            ? (0) : (positionInOpenedAlbum + 1);
                     uri = Uri.parse(previousSongsInAlbum.get(positionInOpenedAlbum).getData());
                     songNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                     artistNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                 } else {
-                    positionInOpenedAlbum = (positionInOpenedAlbum + 1 % currentSongsInAlbum.size());
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
+                            ? (0) : (positionInOpenedAlbum + 1);
                     uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
                     songNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                     artistNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                 }
-            }
-            else if (shuffleBtnClicked && repeatBtnClicked) {
-                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() -1);
+            } else if (shuffleBtnClicked && repeatBtnClicked) {
+                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() - 1);
                 repeatBtnClicked = false;
             }
 
@@ -282,15 +277,13 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
 
             mediaPlayer.start();
 
-        } else  {
+        } else {
             mediaPlayer.stop();
             mediaPlayer.release();
 
             if (shuffleBtnClicked && !repeatBtnClicked) {
-                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() -1);
-            }
-
-            else if (!shuffleBtnClicked && !repeatBtnClicked) {
+                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() - 1);
+            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (!previousAlbumName.equals(albumName)) {
                     if (!previousAlbumName.equals(albumName)) {
                         int a = 0;
@@ -301,21 +294,21 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                             }
                         }
                     }
-                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == previousSongsInAlbum.size() ? (0)
-                            : (position + 1);
-                        uri = Uri.parse(previousSongsInAlbum.get(positionInOpenedAlbum).getData());
-                        songNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
-                        artistNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
-                        previousSongsInAlbum.clear();
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
+                            ? (0) : (positionInOpenedAlbum + 1);
+                    uri = Uri.parse(previousSongsInAlbum.get(positionInOpenedAlbum).getData());
+                    songNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
+                    artistNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
+                    previousSongsInAlbum.clear();
                 } else {
-                    positionInOpenedAlbum = (positionInOpenedAlbum + 1 );
+                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
+                            ? (0) : (positionInOpenedAlbum + 1);
                     uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
                     songNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                     artistNameStr = currentSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                 }
-            }
-            else if (shuffleBtnClicked && repeatBtnClicked) {
-                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() -1);
+            } else if (shuffleBtnClicked && repeatBtnClicked) {
+                positionInOpenedAlbum = getRandom(currentSongsInAlbum.size() - 1);
                 repeatBtnClicked = false;
             }
 

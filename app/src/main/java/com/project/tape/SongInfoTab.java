@@ -68,7 +68,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             repeatBtn.setImageResource(R.drawable.repeat_song_off);
         }
 
-
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
