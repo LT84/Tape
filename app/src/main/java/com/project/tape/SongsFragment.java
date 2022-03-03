@@ -35,6 +35,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     static List<Song> albumList;
     static ArrayList<Song> copyOfSongsInAlbum = new ArrayList<>();
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException{

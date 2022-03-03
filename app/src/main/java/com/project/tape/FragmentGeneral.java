@@ -43,6 +43,7 @@ public abstract class FragmentGeneral extends Fragment {
 
     static boolean coverLoaded;
 
+
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {
         ContentResolver contentResolver = getActivity().getContentResolver();

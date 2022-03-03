@@ -1,5 +1,7 @@
 package com.project.tape;
 
+import static com.project.tape.AlbumsFragment.previousAlbumName;
+import static com.project.tape.AlbumsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.FragmentGeneral.coverLoaded;
 import static com.project.tape.FragmentGeneral.position;
 import static com.project.tape.FragmentGeneral.songsList;
@@ -10,8 +12,6 @@ import static com.project.tape.SongInfoTab.shuffleBtnClicked;
 import static com.project.tape.SongsFragment.art;
 import static com.project.tape.SongsFragment.mediaPlayer;
 import static com.project.tape.SongsFragment.uri;
-import static com.project.tape.AlbumsFragment.previousAlbumName;
-import static com.project.tape.AlbumsFragment.staticPreviousSongsInAlbum;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +24,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,25 +42,19 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
     ImageView album_cover_in_album;
     ImageButton backBtn, playPauseBtn, playPauseBtnInTab;
     Button openFullInfoTab;
-
     RecyclerView myRecyclerView;
-
 
     public static int positionInOpenedAlbum;
 
-    //!!!!!!!!!!!!
     ArrayList<Song> currentSongsInAlbum = new ArrayList<>();
     static ArrayList<Song> staticCurrentSongsInAlbum;
 
     ArrayList<Song> previousSongsInAlbum = new ArrayList<>();
 
-
-
     ArrayList<Song> copyOfSongsList = songsList;
 
     public static boolean fromAlbumInfo;
 
-    //!!!!!!!!!!!!
     static String albumName;
 
 
@@ -109,15 +102,14 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     .into(album_cover_in_album);
         }
 
-        //!!!!!!!!!!!!
-            albumName = getIntent().getStringExtra("albumName");
-            int j = 0;
-            for (int i = 0; i < songsList.size(); i++) {
-                if (albumName.equals(songsList.get(i).getAlbum())) {
-                    currentSongsInAlbum.add(j, songsList.get(i));
-                    j++;
-                }
+        albumName = getIntent().getStringExtra("albumName");
+        int j = 0;
+        for (int i = 0; i < songsList.size(); i++) {
+            if (albumName.equals(songsList.get(i).getAlbum())) {
+                currentSongsInAlbum.add(j, songsList.get(i));
+                j++;
             }
+        }
 
 
         AlbumInfoAdapter albumInfoAdapter = new AlbumInfoAdapter(this, currentSongsInAlbum, this);
@@ -189,8 +181,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         Intent intent = new Intent();
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
-
-        //!!!!!!!!!!!!
         intent.putExtra("previousAlbumName", previousAlbumName);
         super.onPause();
     }
@@ -203,9 +193,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         coverLoaded = false;
 
         String a = Integer.toString(positionInOpenedAlbum);
-        Toast.makeText(this, a, Toast.LENGTH_LONG).show();
 
-        //!!!!!!!!!!!!
         previousAlbumName = albumName;
         staticCurrentSongsInAlbum = currentSongsInAlbum;
 
@@ -261,7 +249,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
             }
             else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (!previousAlbumName.equals(albumName)) {
-                    //!!!!!!!!!!!!
                     positionInOpenedAlbum = positionInOpenedAlbum + 1 == previousSongsInAlbum.size() ? (0)
                             : (position + 1);
                     uri = Uri.parse(previousSongsInAlbum.get(positionInOpenedAlbum).getData());
@@ -305,9 +292,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
 
             else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (!previousAlbumName.equals(albumName)) {
-                    //!!!!!!!!!!!!
                     if (!previousAlbumName.equals(albumName)) {
-
                         int a = 0;
                         for (int i = 0; i < copyOfSongsList.size(); i++) {
                             if (previousAlbumName.equals(copyOfSongsList.get(i).getAlbum())) {
@@ -322,7 +307,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                         songNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                         artistNameStr = previousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
                         previousSongsInAlbum.clear();
-                    Toast.makeText(this, previousAlbumName, Toast.LENGTH_LONG).show();
                 } else {
                     positionInOpenedAlbum = (positionInOpenedAlbum + 1 );
                     uri = Uri.parse(currentSongsInAlbum.get(positionInOpenedAlbum).getData());
@@ -366,7 +350,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
-
         if (mediaPlayer.isPlaying()) {
             playPauseBtnInTab.setImageResource(R.drawable.pause_song);
         } else  {
@@ -378,9 +361,8 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
             public void onCompletion(MediaPlayer mp) {
                 AlbumInfo.this.getSharedPreferences("preferences_name", Context.MODE_PRIVATE)
                         .edit().putInt("progress", positionInOpenedAlbum).commit();
-                //!!!!!!!!!!!!
-                switchSong();
 
+                switchSong();
             }
         });
         super.onResume();
