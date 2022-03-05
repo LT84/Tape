@@ -33,8 +33,12 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     private static final int VERTICAL_ITEM_SPACE = 3;
 
     static List<Song> albumList;
-    static ArrayList<Song> copyOfSongsInAlbum = new ArrayList<>();
 
+    static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
+    static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
+
+    static String albumName;
+    static String previousAlbumName;
 
     @Nullable
     @Override
@@ -72,10 +76,32 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .getBoolean("fromAlbumInfo", false);
 
 
+
+        albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
+                .getString("albumName", " ");
+        //Fills up copyOfSongList to pass it to SongInfoTab
+        int j = 0;
+        for (int i = 0; i < songsList.size(); i++) {
+            if (albumName.equals(songsList.get(i).getAlbum())) {
+                staticCurrentSongsInAlbum.add(j, songsList.get(i));
+                j++;
+            }
+        }
+
+        previousAlbumName = getContext().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE)
+                .getString("previousAlbumName", " ");
+        int a = 0;
+        for (int i = 0; i < songsList.size(); i++) {
+            if (previousAlbumName.equals(songsList.get(i).getAlbum())) {
+                staticPreviousSongsInAlbum.add(a, songsList.get(i));
+                a++;
+            }
+        }
+
+
         //Checks uri origin
         if (fromAlbumInfo) {
-            uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
-                    .getString("uri",  songsList.get(position).getData()));
+            uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
         } else {
             uri = Uri.parse(songsList.get(position).getData());
         }
@@ -118,17 +144,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 album = currentAlbum;
             }
         }
-        //Fills up copyOfSongList to pass it to SongInfoTab
-        String albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
-                .getString("albumName", " ");
-        int j = 0;
-        for (int i = 0; i < songsList.size(); i++) {
-            if (albumName.equals(songsList.get(i).getAlbum())) {
-                copyOfSongsInAlbum.add(j, songsList.get(i));
-                j++;
-            }
-
-        }
 
         return v;
     }
@@ -152,7 +167,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     public void onSongClick(int position) {
         this.position = position;
 
-        AlbumInfo.fromAlbumInfo = false;
+        fromAlbumInfo = false;
 
         songNameStr = songsList.get(position).getTitle();
         artistNameStr = songsList.get(position).getArtist();
@@ -169,6 +184,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putString("artistNameStr", artistNameStr).commit();
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
+        getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", false).commit();
+
 
         mediaPlayer.setOnCompletionListener(SongsFragment.this);
         song_title_main.setText(songsList.get(position).getTitle());

@@ -1,9 +1,12 @@
 package com.project.tape;
 
 import static android.app.Activity.RESULT_OK;
+import static com.project.tape.AlbumInfo.fromAlbumInfo;
+import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongsFragment.albumList;
+import static com.project.tape.SongsFragment.previousAlbumName;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,9 +26,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAlbumListener {
+public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAlbumListener, MediaPlayer.OnCompletionListener {
 
     TextView album_title_albumFragments;
     ImageView album_cover_albumFragment;
@@ -38,19 +40,15 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     int positionIndex, topView;
     private static final int VERTICAL_ITEM_SPACE = 5;
 
-    static String previousAlbumName;
-    static ArrayList<Song> staticPreviousSongsInAlbum;
-
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.albums_fragment, container, false);
-        //Loading audio list
+
 
         coverLoaded = false;
-
 
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
@@ -80,7 +78,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
             myRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
             listState = savedInstanceState.getParcelable("ListState");
         }
-
+        mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
         return v;
     }
 
@@ -104,6 +102,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
         getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", true).commit();
+
         startActivityForResult(intent, REQUEST_CODE);
     }
 
@@ -116,6 +115,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
                     artistNameStr = data.getStringExtra("ArtistNameToMain");
                     //!!!!!!!!!!!!
                     previousAlbumName = data.getStringExtra("previousAlbumName");
+                    getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
+                            .putString("previousAlbumName", previousAlbumName);
                     break;
             }
         }
@@ -123,17 +124,17 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
     @Override
     public void onPause () {
-        super.onPause();
         positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
         View startView = myRecyclerView.getChildAt(0);
         topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());
+        super.onPause();
     }
 
     @Override
     public void onResume () {
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
-
+        mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
         if (mediaPlayer != null) {
             if (!coverLoaded) {
                 if (uri != null) {
@@ -152,16 +153,21 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
             artist_name_main.setText(" ");
         }
 
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                switchSongInFragment();
-                getActivity().getSharedPreferences("preferences_name", Context.MODE_PRIVATE).edit().putInt("progress", position).commit();
-                mediaPlayer = MediaPlayer.create(getActivity(), uri);
-                mediaPlayer.start();
-            }
-        });
         super.onResume();
+    }
+
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        switchSongInFragment();
+        mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
+        if (fromAlbumInfo) {
+            getContext().getSharedPreferences("positionInOpenedAlbum", Context.MODE_PRIVATE).edit()
+                    .putInt("positionInOpenedAlbum", positionInOpenedAlbum).commit();
+        } else {
+            getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                    .putInt("position", position).commit();
+        }
     }
 
 
