@@ -2,8 +2,10 @@ package com.project.tape;
 
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongsFragment.mediaPlayer;
+import static com.project.tape.SongsFragment.previousAlbumName;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -29,9 +31,7 @@ public class MainActivity extends AppCompatActivity  {
     Button fullInformationTabB;
     static String songNameStr, artistNameStr;
 
-
-    public static final int REQUEST_CODE = 1;
-
+    final int REQUEST_CODE = 1;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity  {
             switch (v.getId()) {
                 case R.id.open_information_tab:
                     Intent intent = new Intent(MainActivity.this, SongInfoTab.class);
-                    intent.putExtra("repeatBtnClicked", repeatBtnClicked);
                     startActivity(intent);
                     break;
                 case R.id.pause_button:

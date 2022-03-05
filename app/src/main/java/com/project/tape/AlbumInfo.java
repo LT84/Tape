@@ -181,7 +181,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
     protected void onPause() {
         Intent intent = new Intent();
         intent.putExtra("previousAlbumName", previousAlbumName);
-        intent.putExtra("repeatBtnClicked", repeatBtnClicked);
         super.onPause();
     }
 

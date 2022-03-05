@@ -554,9 +554,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     @Override
     protected void onPause() {
         if (repeatBtnClicked) {
+            repeatBtnClicked = true;
             this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", true).commit();
         } else {
+            repeatBtnClicked = false;
             this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
         }
@@ -603,6 +605,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                         repeatBtnClicked = false;
                         repeatBtn.setImageResource(R.drawable.repeat_song_off);
                     }
+                    Intent intent = new Intent();
+                    intent.putExtra("repeatBtnClicked", repeatBtnClicked);
                     break;
                 case R.id.infoTab_repeat_button:
                     if (repeatBtnClicked) {

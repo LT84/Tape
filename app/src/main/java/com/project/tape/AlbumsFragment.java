@@ -125,10 +125,12 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         View startView = myRecyclerView.getChildAt(0);
         topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());
         if (repeatBtnClicked) {
+            repeatBtnClicked = true;
             getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", true).commit();
         } else {
-            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+            repeatBtnClicked = false;
+           getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
         }
         super.onPause();
