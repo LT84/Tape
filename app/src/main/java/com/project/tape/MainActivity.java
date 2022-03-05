@@ -1,5 +1,6 @@
 package com.project.tape;
 
+import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongsFragment.mediaPlayer;
 
 import android.Manifest;
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity  {
             switch (v.getId()) {
                 case R.id.open_information_tab:
                     Intent intent = new Intent(MainActivity.this, SongInfoTab.class);
+                    intent.putExtra("repeatBtnClicked", repeatBtnClicked);
                     startActivity(intent);
                     break;
                 case R.id.pause_button:

@@ -5,6 +5,7 @@ import static com.project.tape.AlbumInfo.fromAlbumInfo;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
+import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.previousAlbumName;
 
@@ -95,10 +96,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     public void onAlbumClick(int position) throws IOException {
         Intent intent = new Intent(getActivity(), AlbumInfo.class);
         intent.putExtra("albumName",  albumList.get(position).getAlbum());
-        intent.putExtra("previousAlbumName",  previousAlbumName);
-        //!!!!!!!!!!!!
-        getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE).edit()
-                .putString("albumName", albumList.get(position).getAlbum()).commit();
 
         getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", true).commit();
@@ -127,6 +124,13 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
         View startView = myRecyclerView.getChildAt(0);
         topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());
+        if (repeatBtnClicked) {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", true).commit();
+        } else {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", false).commit();
+        }
         super.onPause();
     }
 

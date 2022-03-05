@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,7 +36,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     static List<Song> albumList;
 
     static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
-    static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
 
     static String albumName;
     static String previousAlbumName;
@@ -75,10 +75,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromAlbumInfo", false);
 
-
-
         albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
                 .getString("albumName", " ");
+
         //Fills up copyOfSongList to pass it to SongInfoTab
         int j = 0;
         for (int i = 0; i < songsList.size(); i++) {
@@ -88,20 +87,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
             }
         }
 
-        previousAlbumName = getContext().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE)
-                .getString("previousAlbumName", " ");
-        int a = 0;
-        for (int i = 0; i < songsList.size(); i++) {
-            if (previousAlbumName.equals(songsList.get(i).getAlbum())) {
-                staticPreviousSongsInAlbum.add(a, songsList.get(i));
-                a++;
-            }
-        }
-
-
         //Checks uri origin
         if (fromAlbumInfo) {
-            uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
+            uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
         } else {
             uri = Uri.parse(songsList.get(position).getData());
         }
