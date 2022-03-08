@@ -33,12 +33,12 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     private static final int VERTICAL_ITEM_SPACE = 3;
 
     static List<Song> albumList;
-
     static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
     static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
 
     static String albumName;
     static String previousAlbumName;
+
 
     @Nullable
     @Override
@@ -261,6 +261,8 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
     }
+
+
 }
 
 

@@ -118,7 +118,6 @@ public abstract class FragmentGeneral extends Fragment {
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
                             ? (0) : (positionInOpenedAlbum + 1);
-                   // uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
                 } else {
                     position = position + 1 == songsList.size() ? (0) : (position + 1);
                     uri = Uri.parse(songsList.get(position).getData());
@@ -132,9 +131,9 @@ public abstract class FragmentGeneral extends Fragment {
             }
 
             if (fromAlbumInfo) {
+                uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
                 songNameStr = staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getArtist();
-                uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
             } else {
                 uri = Uri.parse(songsList.get(position).getData());
                 songNameStr = songsList.get(position).getTitle();
@@ -190,9 +189,9 @@ public abstract class FragmentGeneral extends Fragment {
             }
 
             if (fromAlbumInfo) {
+                uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
                 songNameStr = staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getTitle();
                 artistNameStr = staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getArtist();
-                uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
             } else {
                 uri = Uri.parse(songsList.get(position).getData());
                 songNameStr = songsList.get(position).getTitle();
