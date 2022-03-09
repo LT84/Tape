@@ -106,10 +106,9 @@ public abstract class FragmentGeneral extends Fragment {
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 if (fromAlbumInfo) {
                     uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else {
+                    uri = Uri.parse(songsList.get(position).getData());
                 }
-             else {
-                uri = Uri.parse(songsList.get(position).getData());
-            }
 
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
@@ -165,8 +164,7 @@ public abstract class FragmentGeneral extends Fragment {
                 }
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 if (fromAlbumInfo) {
-                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticCurrentSongsInAlbum.size()
-                            ? (0) : (positionInOpenedAlbum + 1);
+                    uri = Uri.parse(staticCurrentSongsInAlbum.get(positionInOpenedAlbum).getData());
                 } else {
                     uri = Uri.parse(songsList.get(position).getData());
                 }
