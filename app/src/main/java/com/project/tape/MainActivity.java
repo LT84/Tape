@@ -1,17 +1,22 @@
 package com.project.tape;
 
+import static com.project.tape.FragmentGeneral.songsList;
 import static com.project.tape.SongsFragment.mediaPlayer;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
@@ -19,7 +24,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 
-public class MainActivity extends AppCompatActivity  {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
@@ -35,6 +42,8 @@ public class MainActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.darkGrey));
 
         permission();
 
@@ -137,6 +146,34 @@ public class MainActivity extends AppCompatActivity  {
             }
         }
     };
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search, menu);
+        MenuItem menuItem = menu.findItem(R.id.search_option);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        String userInput = newText.toLowerCase();
+        ArrayList<Song> mySongs = new ArrayList<>();
+        for (Song song : songsList) {
+            if (song.getTitle().toLowerCase().contains(userInput)) {
+                mySongs.add(song);
+            }
+        }
+        SongsFragment.songAdapter.updateSongList(mySongs);
+        return true;
+    }
 
 
 }

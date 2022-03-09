@@ -15,8 +15,9 @@ import java.util.ArrayList;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<Song> mSongsList;
+    static ArrayList<Song> mSongsList;
     private OnSongListener mOnSongListener;
+
 
     public SongAdapter(Context mContext, ArrayList<Song> mSongsList, OnSongListener mOnSongListener) {
         this.mContext = mContext;
@@ -74,6 +75,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         }
 
     }
+
+    void updateSongList(ArrayList<Song> songsArrayList) {
+        mSongsList = new ArrayList<>();
+        mSongsList.addAll(songsArrayList);
+        notifyDataSetChanged();
+    }
+
 
     public interface OnSongListener {
         void onSongClick(int position) throws IOException;

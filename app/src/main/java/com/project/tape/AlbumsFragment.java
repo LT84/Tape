@@ -48,7 +48,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         View v;
         v = inflater.inflate(R.layout.albums_fragment, container, false);
 
-
         coverLoaded = false;
 
         //Init views

@@ -79,10 +79,9 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
-        fromAlbumInfo = true;
 
         AlbumInfo.this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromAlbumInfo", true).commit();
+                .putBoolean("fromAlbumInfo", false).commit();
 
         getIntentMethod();
 
@@ -111,6 +110,7 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
             }
         }
 
+        staticPreviousSongsInAlbum.clear();
         int a = 0;
         for (int i = 0; i < songsList.size(); i++) {
             if (previousAlbumName.equals(songsList.get(i).getAlbum())) {
@@ -118,8 +118,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                 a++;
             }
         }
-
-        staticCurrentSongsInAlbum = currentSongsInAlbum;
 
         AlbumInfoAdapter albumInfoAdapter = new AlbumInfoAdapter(this, currentSongsInAlbum, this);
         myRecyclerView = findViewById(R.id.albumSongs_recyclerview);
@@ -162,7 +160,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     break;
                 case R.id.open_information_tab_in_album:
                     Intent intent = new Intent(AlbumInfo.this, SongInfoTab.class);
-                    fromAlbumInfo = true;
                     intent.putExtra("positionInOpenedAlbum", positionInOpenedAlbum);
                     startActivity(intent);
             }
@@ -202,9 +199,9 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
         fromAlbumInfo = true;
         coverLoaded = false;
 
+        staticCurrentSongsInAlbum = currentSongsInAlbum;
         previousAlbumName = albumName;
         staticCurrentSongsInAlbum = currentSongsInAlbum;
-
         this.getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
                 .putString("previousAlbumName", previousAlbumName).commit();
 
@@ -244,7 +241,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
                     .load(R.drawable.default_cover)
                     .into(album_cover_in_album);
         }
-
     }
 
     public void switchSong() {
@@ -271,7 +267,6 @@ public class AlbumInfo extends AppCompatActivity implements AlbumInfoAdapter.OnA
 
             song_title_in_album.setText(songNameStr);
             artist_name_in_album.setText(artistNameStr);
-
 
             AlbumInfo.this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                     .putString("progress", uri.toString()).commit();

@@ -19,17 +19,20 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Design.NoActionBar"
+        android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".AlbumInfo"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyOwnSize"/>
         <activity
             android:name=".SongInfoTab"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MyOwnSize"/>
     <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.MyOwnSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

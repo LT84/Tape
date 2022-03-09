@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Tape" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Tape" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_200</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -15,12 +15,9 @@
     </style>
 
     <style name="DefaultRecyclerViewStyle">
-
         <item name="layoutManager">androidx.recyclerview.widget.GridLayoutManager</item>
         <item name="android:orientation">vertical</item>
         <item name="spanCount">2</item>
-
     </style>
-
 
 </resources>
