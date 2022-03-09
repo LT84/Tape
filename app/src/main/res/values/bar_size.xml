@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.MyOwnSize" parent="@style/Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="actionBarSize">40dp</item>
+        <item name="android:actionBarSize">40dp</item>
+    </style>
+</resources>
