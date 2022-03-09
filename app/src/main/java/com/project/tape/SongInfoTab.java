@@ -27,7 +27,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -159,7 +158,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         } else if (searchWasOpened) {
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
             durationTotal = Integer.parseInt(songsFromSearch.get(position).getDuration()) / 1000;
-            Toast.makeText(this, Integer.toString(position),Toast.LENGTH_LONG).show();
             time_duration_total.setText(formattedTime(durationTotal));
         } else {
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
@@ -525,7 +523,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();
-            Toast.makeText(this, Integer.toString(position), Toast.LENGTH_SHORT).show();
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();

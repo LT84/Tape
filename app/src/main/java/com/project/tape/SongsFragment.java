@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,7 +52,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
         albumList.addAll(songsList);
 
-        Toast.makeText(getActivity(), "onCreateCalled", Toast.LENGTH_SHORT).show();
 
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
