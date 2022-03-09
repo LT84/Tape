@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     Button fullInformationTabB;
     static String songNameStr, artistNameStr;
 
+    static ArrayList<Song> songsFromSearch = new ArrayList<>();
+    static boolean searchWasOpened;
 
     public static final int REQUEST_CODE = 1;
 
@@ -105,10 +107,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     //Permission to read data from phone
     private void permission() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        != PackageManager.PERMISSION_GRANTED)
+                != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}
-            ,REQUEST_CODE);
+                    ,REQUEST_CODE);
         }
     }
 
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             else
             {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}
-                ,REQUEST_CODE);
+                        ,REQUEST_CODE);
             }
         }
     }
@@ -147,37 +149,42 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     };
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
         MenuItem menuItem = menu.findItem(R.id.search_option);
         SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnCloseListener(closeListener);
         searchView.setOnQueryTextListener(this);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
     public boolean onQueryTextChange(String newText) {
+        searchWasOpened = true;
         String userInput = newText.toLowerCase();
         ArrayList<Song> mySongs = new ArrayList<>();
         for (Song song : songsList) {
             if (song.getTitle().toLowerCase().contains(userInput)) {
                 mySongs.add(song);
+                songsFromSearch.add(song);
             }
         }
         SongsFragment.songAdapter.updateSongList(mySongs);
         return true;
     }
 
+    SearchView.OnCloseListener closeListener = new SearchView.OnCloseListener() {
+        @Override
+        public boolean onClose() {
+            return false;
+        }
+    };
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
 
 }
-
-
-
-

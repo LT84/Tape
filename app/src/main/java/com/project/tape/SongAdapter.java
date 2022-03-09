@@ -51,10 +51,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-         TextView tv_title;
-         TextView tv_artist;
-         TextView tv_album;
-         OnSongListener onSongListener;
+        TextView tv_title;
+        TextView tv_artist;
+        TextView tv_album;
+        OnSongListener onSongListener;
 
         public ViewHolder(@NonNull View itemView, OnSongListener onSongListener) {
             super(itemView);
@@ -89,4 +89,3 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
 
 }
-

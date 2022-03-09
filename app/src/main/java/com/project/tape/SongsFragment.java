@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,14 +27,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 
-public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
+public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener
+{
 
     private RecyclerView myRecyclerView;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
-    static List<Song> albumList;
+    static ArrayList<Song> albumList = new ArrayList<>();
     static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
     static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
 
@@ -50,7 +51,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         v = inflater.inflate(R.layout.songs_fragment, container, false);
         //Loading audio list
         loadAudio();
-        albumList = songsList;
+        albumList.addAll(songsList);
+
+        Toast.makeText(getActivity(), "onCreateCalled", Toast.LENGTH_SHORT).show();
 
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -59,7 +62,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
-
 
         repeatBtnClicked = getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE)
                 .getBoolean("repeatBtnClicked", true);
@@ -186,7 +188,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putBoolean("fromAlbumInfo", false).commit();
 
 
-        mediaPlayer.setOnCompletionListener(SongsFragment.this);
+        mediaPlayer.setOnCompletionListener(this);
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
         mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
@@ -258,27 +260,12 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        position = getActivity().getSharedPreferences("position", Context.MODE_PRIVATE)
-                .getInt("position", position);
-        if (repeatBtnClicked) {
-            switchSongInFragment();
-            metaDataInFragment(uri);
-            mediaPlayer.setOnCompletionListener(this);
-            mediaPlayer.start();
-        } else {
-            switchSongInFragment();
-            metaDataInFragment(uri);
-            mediaPlayer.setOnCompletionListener(this);
-            mediaPlayer.start();
-        }
+
+        switchSongInFragment();
+
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
     }
 
 
 }
-
-
-
-
-
