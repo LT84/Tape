@@ -76,21 +76,19 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
             }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
             }
-        });
+            });
 
         pager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                tabLayout.selectTab(tabLayout.getTabAt(position));
-            }
-        });
+                @Override
+                public void onPageSelected(int position) {
+                    tabLayout.selectTab(tabLayout.getTabAt(position));
+                }
+           });
     }
 
     //Sets play button image in main
@@ -149,14 +147,19 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     };
 
+    //Functions for search
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
         MenuItem menuItem = menu.findItem(R.id.search_option);
         SearchView searchView = (SearchView) menuItem.getActionView();
-        searchView.setOnCloseListener(closeListener);
         searchView.setOnQueryTextListener(this);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
     }
 
     @Override
@@ -172,18 +175,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
         SongsFragment.songAdapter.updateSongList(mySongs);
         return true;
-    }
-
-    SearchView.OnCloseListener closeListener = new SearchView.OnCloseListener() {
-        @Override
-        public boolean onClose() {
-            return false;
-        }
-    };
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
     }
 
 

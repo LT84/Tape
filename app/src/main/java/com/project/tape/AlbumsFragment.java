@@ -62,7 +62,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
 
-
         //Sets adapter to list and applies settings to recyclerView
         AlbumAdapter albumAdapter = new AlbumAdapter(getContext(),albumList, this);
 
@@ -81,7 +80,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
         return v;
     }
-
 
     //Saving place where recyclerView stopped
     @Override
@@ -157,7 +155,6 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
             song_title_main.setText(" ");
             artist_name_main.setText(" ");
         }
-
         super.onResume();
     }
 

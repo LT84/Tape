@@ -48,10 +48,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException{
         View v;
         v = inflater.inflate(R.layout.songs_fragment, container, false);
-        //Loading audio list
+        //Loading audio list and albumList
         loadAudio();
         albumList.addAll(songsList);
-
 
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -61,31 +60,25 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
 
+        //sharedPreferences
         repeatBtnClicked = getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE)
                 .getBoolean("repeatBtnClicked", true);
-
         position = getActivity().getSharedPreferences("position", Context.MODE_PRIVATE)
                 .getInt("position", position);
-
         positionInOpenedAlbum = getActivity().getSharedPreferences("positionInOpenedAlbum", Context.MODE_PRIVATE)
                 .getInt("positionInOpenedAlbum", positionInOpenedAlbum);
-
         songNameStr = getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
                 .getString("songNameStr", " ");
-
         artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
                 .getString("artistNameStr", " ");
-
         fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromAlbumInfo", false);
-
         uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                 .getString("uri", songsList.get(0).getData()));
-
         albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
                 .getString("albumName", " ");
 
-        //Fills up copyOfSongList to pass it to SongInfoTab
+        //Fills up staticCurrentSongsInAlbum to pass it to SongInfoTab
         int j = 0;
         for (int i = 0; i < songsList.size(); i++) {
             if (albumName.equals(songsList.get(i).getAlbum())) {
@@ -93,7 +86,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 j++;
             }
         }
-
+        //Fills up staticPreviousSongsInAlbum to pass it to SongInfoTab
         previousAlbumName = getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE)
                 .getString("previousAlbumName", " ");
         int a = 0;
@@ -128,7 +121,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
             }
         });
 
-
         //Creates iterator and throws out duplicates
         Iterator<Song> iterator = albumList.iterator();
         String album = "";
@@ -146,7 +138,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         return v;
     }
 
-
     //Creates mediaPlayer
     private void playMusic() {
         if (songsList != null) {
@@ -158,7 +149,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         mediaPlayer = MediaPlayer.create(getContext(), uri);
         mediaPlayer.start();
     }
-
 
     //Plays song after it clicked in RecyclerView
     @Override
@@ -205,7 +195,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
     }
 
-
     /*Switches next composition, sets album cover in main, sets
        title and artist when SongsFragment is opened*/
     @Override
@@ -229,7 +218,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         }
 
         mediaPlayer.setOnCompletionListener(SongsFragment.this);
-
         super.onResume();
     }
 
@@ -243,7 +231,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                     .putBoolean("repeatBtnClicked", false).commit();
         }
 
-
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
         getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
@@ -252,15 +239,12 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putString("artistNameStr", artistNameStr).commit();
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
-
         super.onStop();
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-
         switchSongInFragment();
-
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
     }

@@ -25,7 +25,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         this.mOnSongListener = mOnSongListener;
     }
 
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,7 +34,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return vHolder;
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.tv_title.setText(mSongsList.get(position).getTitle());
@@ -43,12 +41,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         holder.tv_album.setText(mSongsList.get(position).getAlbum());
     }
 
-
     @Override
     public int getItemCount() {
         return mSongsList.size();
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tv_title;
@@ -81,7 +77,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         mSongsList.addAll(songsArrayList);
         notifyDataSetChanged();
     }
-
 
     public interface OnSongListener {
         void onSongClick(int position) throws IOException;

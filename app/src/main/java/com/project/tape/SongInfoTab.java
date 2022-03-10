@@ -53,7 +53,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_info_tab);
 
-
         staticPreviousSongsInAlbum.clear();
         int a = 0;
         for (int i = 0; i < songsList.size(); i++) {
@@ -179,7 +178,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .load(R.drawable.default_cover)
                     .into(album_cover);
         }
-
     }
 
     //Formats time to seconds and minutes to pass it to seekBar
@@ -456,20 +454,23 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     positionInOpenedAlbum = getRandom(staticPreviousSongsInAlbum.size() - 1);
                 }
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
-                uri = Uri.parse(songsList.get(position).getData());
                 if (fromAlbumInfo) {
                     uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else if (searchWasOpened) {
+                    uri = Uri.parse(songsFromSearch.get(position).getData());
+                } else {
+                    uri = Uri.parse(songsList.get(position).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
-                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInOpenedAlbum + 1);
+                    positionInOpenedAlbum = positionInOpenedAlbum - 1 == staticPreviousSongsInAlbum.size()
+                            ? (0) : (positionInOpenedAlbum - 1);
                 } else if (searchWasOpened) {
-                    position = position + 1 == songsFromSearch.size() ? (0)
-                            : (position + 1);
+                    position = position - 1 == songsFromSearch.size() ? (0)
+                            : (position - 1);
                 } else {
-                    position = position + 1 == songsList.size() ? (0)
-                            : (position + 1);
+                    position = position - 1 == songsList.size() ? (0)
+                            : (position - 1);
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
@@ -489,20 +490,23 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     positionInOpenedAlbum = getRandom(staticPreviousSongsInAlbum.size() - 1);
                 }
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
-                uri = Uri.parse(songsList.get(position).getData());
                 if (fromAlbumInfo) {
                     uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
+                } else if (searchWasOpened) {
+                    uri = Uri.parse(songsFromSearch.get(position).getData());
+                } else {
+                    uri = Uri.parse(songsList.get(position).getData());
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
-                    positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInOpenedAlbum + 1);
+                    positionInOpenedAlbum = positionInOpenedAlbum - 1 == staticPreviousSongsInAlbum.size()
+                            ? (0) : (positionInOpenedAlbum - 1);
                 } else if (searchWasOpened) {
-                    position = position + 1 == songsFromSearch.size() ? (0)
-                            : (position + 1);
+                    position = position - 1 == songsFromSearch.size() ? (0)
+                            : (position - 1);
                 } else {
-                    position = position + 1 == songsList.size() ? (0)
-                            : (position + 1);
+                    position = position - 1 == songsList.size() ? (0)
+                            : (position - 1);
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {
                 position = getRandom(songsList.size() - 1);
@@ -513,9 +517,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             }
         }
 
-        //Sets song and artist strings
         if (fromAlbumInfo) {
-            //Sets song uri, name and album title if it's from albumInfo
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
