@@ -15,20 +15,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder> {
 
     private Context mContext;
-    private List<Song> albumList;
+    static ArrayList<Song> mAlbumList;
     private OnAlbumListener onAlbumListener;
     private Uri uri;
     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
 
-    public AlbumAdapter(Context mContext, List<Song> albumList, OnAlbumListener onAlbumListener) {
+    public AlbumAdapter(Context mContext, ArrayList<Song> mAlbumList, OnAlbumListener onAlbumListener) {
         this.mContext = mContext;
-        this.albumList = albumList;
+        this.mAlbumList = mAlbumList;
         this.onAlbumListener = onAlbumListener;
     }
 
@@ -45,8 +45,8 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     @Override
     public void onBindViewHolder(@NonNull AlbumViewHolder holder, int position) {
-        holder.tv_album_title.setText(albumList.get(position).getAlbum());
-        uri = Uri.parse(albumList.get(position).getData());
+        holder.tv_album_title.setText(mAlbumList.get(position).getAlbum());
+        uri = Uri.parse(mAlbumList.get(position).getData());
         retriever.setDataSource(uri.toString());
         byte[] art = retriever.getEmbeddedPicture();
 
@@ -68,7 +68,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     @Override
     public int getItemCount() {
-        return albumList.size();
+        return mAlbumList.size();
     }
 
 
@@ -95,6 +95,12 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
             }
         }
 
+    }
+
+    void updateSongList(ArrayList<Song> albumsArrayList) {
+        mAlbumList = new ArrayList<>();
+        mAlbumList.addAll(albumsArrayList);
+        notifyDataSetChanged();
     }
 
 

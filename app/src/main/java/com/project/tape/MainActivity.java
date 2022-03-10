@@ -1,6 +1,7 @@
 package com.project.tape;
 
 import static com.project.tape.FragmentGeneral.songsList;
+import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.mediaPlayer;
 
 import android.Manifest;
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     public static final int REQUEST_CODE = 1;
 
+    boolean albumsFragmentSelected;
+
+    static boolean searchOpenedInAlbumFragments;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +75,11 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 1) {
+                    albumsFragmentSelected = true;
+                } else {
+                    albumsFragmentSelected = false;
+                }
                 pager2.setCurrentItem(tab.getPosition());
             }
 
@@ -166,14 +175,25 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public boolean onQueryTextChange(String newText) {
         searchWasOpened = true;
         String userInput = newText.toLowerCase();
-        ArrayList<Song> mySongs = new ArrayList<>();
-        for (Song song : songsList) {
-            if (song.getTitle().toLowerCase().contains(userInput)) {
-                mySongs.add(song);
-                songsFromSearch.add(song);
+        ArrayList<Song> mySearch = new ArrayList<>();
+        if (albumsFragmentSelected) {
+            searchOpenedInAlbumFragments = true;
+            userInput = newText.toLowerCase();
+            for (Song song : albumList) {
+                if (song.getAlbum().toLowerCase().contains(userInput)) {
+                    mySearch.add(song);
+                }
             }
+            AlbumsFragment.albumAdapter.updateSongList(mySearch);
+        } else {
+            for (Song song : songsList) {
+                if (song.getTitle().toLowerCase().contains(userInput)) {
+                    mySearch.add(song);
+                    songsFromSearch.add(song);
+                }
+            }
+            SongsFragment.songAdapter.updateSongList(mySearch);
         }
-        SongsFragment.songAdapter.updateSongList(mySongs);
         return true;
     }
 

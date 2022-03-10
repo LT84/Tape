@@ -8,6 +8,7 @@ import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.MainActivity.songsFromSearch;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongInfoTab.shuffleBtnClicked;
+import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
 
@@ -27,6 +28,9 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Random;
 
 public abstract class FragmentGeneral extends Fragment {
@@ -197,6 +201,30 @@ public abstract class FragmentGeneral extends Fragment {
                 .putString("songNameStr", songNameStr).commit();
         getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
+    }
+
+    public void sortAlbumsList() {
+        //Throwing out duplicates from list
+        //Sorting albums
+        Collections.sort(albumList, new Comparator<Song>() {
+            @Override
+            public int compare(Song lhs, Song rhs) {
+                return lhs.getAlbum().toLowerCase().compareTo(rhs.getAlbum().toLowerCase());
+            }
+        });
+
+        //Creates iterator and throws out duplicates
+        Iterator<Song> iterator = albumList.iterator();
+        String album = "";
+        while (iterator.hasNext()) {
+            Song track = iterator.next();
+            String currentAlbum = track.getAlbum().toLowerCase();
+            if (currentAlbum.equals(album)) {
+                iterator.remove();
+            } else {
+                album = currentAlbum;
+            }
+        }
     }
 
 

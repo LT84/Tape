@@ -23,9 +23,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 
 public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener
 {
@@ -112,28 +109,8 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
         myRecyclerView.setAdapter(songAdapter);
 
-        //Throwing out duplicates from list
-        //Sorting albums
-        Collections.sort(albumList, new Comparator<Song>() {
-            @Override
-            public int compare(Song lhs, Song rhs) {
-                return lhs.getAlbum().toLowerCase().compareTo(rhs.getAlbum().toLowerCase());
-            }
-        });
-
-        //Creates iterator and throws out duplicates
-        Iterator<Song> iterator = albumList.iterator();
-        String album = "";
-        while (iterator.hasNext()) {
-            Song track = iterator.next();
-            String currentAlbum = track.getAlbum().toLowerCase();
-            if (currentAlbum.equals(album)) {
-                iterator.remove();
-
-            } else {
-                album = currentAlbum;
-            }
-        }
+        //Sorting albums in albumsFragment
+        sortAlbumsList();
 
         return v;
     }
@@ -191,7 +168,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
-
         loadAudio();
     }
 

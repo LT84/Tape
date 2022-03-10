@@ -463,13 +463,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
-                    positionInOpenedAlbum = positionInOpenedAlbum - 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInOpenedAlbum - 1);
+                    positionInOpenedAlbum = positionInOpenedAlbum - 1 < 0 ?   (songsFromSearch.size())
+                            : (positionInOpenedAlbum - 1);
                 } else if (searchWasOpened) {
-                    position = position - 1 == songsFromSearch.size() ? (0)
+                    position = position - 1 < 0 ? (songsFromSearch.size())
                             : (position - 1);
                 } else {
-                    position = position - 1 == songsList.size() ? (0)
+                    position = position - 1 < 0 ? (songsList.size())
                             : (position - 1);
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {
@@ -499,13 +499,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
-                    positionInOpenedAlbum = positionInOpenedAlbum - 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInOpenedAlbum - 1);
+                    positionInOpenedAlbum = positionInOpenedAlbum - 1 < 0 ?   (songsFromSearch.size())
+                            : (positionInOpenedAlbum - 1);
                 } else if (searchWasOpened) {
-                    position = position - 1 == songsFromSearch.size() ? (0)
+                    position = position - 1 < 0 ? (songsFromSearch.size())
                             : (position - 1);
                 } else {
-                    position = position - 1 == songsList.size() ? (0)
+                    position = position - 1 < 0 ? (songsList.size())
                             : (position - 1);
                 }
             } else if (shuffleBtnClicked && repeatBtnClicked) {

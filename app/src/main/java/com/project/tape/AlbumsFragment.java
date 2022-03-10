@@ -1,9 +1,11 @@
 package com.project.tape;
 
 import static android.app.Activity.RESULT_OK;
+import static com.project.tape.AlbumAdapter.mAlbumList;
 import static com.project.tape.AlbumInfo.fromAlbumInfo;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
+import static com.project.tape.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongsFragment.albumList;
@@ -41,6 +43,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     int positionIndex, topView;
     private static final int VERTICAL_ITEM_SPACE = 5;
 
+    static AlbumAdapter albumAdapter;
 
     @Nullable
     @Override
@@ -63,7 +66,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         artist_name_main.setText(songsList.get(position).getArtist());
 
         //Sets adapter to list and applies settings to recyclerView
-        AlbumAdapter albumAdapter = new AlbumAdapter(getContext(),albumList, this);
+        albumAdapter = new AlbumAdapter(getContext(), albumList, this);
 
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(LLMAlbumFragment);
@@ -91,13 +94,22 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     //ClickListener in recyclerView
     @Override
     public void onAlbumClick(int position) throws IOException {
-        Intent intent = new Intent(getActivity(), AlbumInfo.class);
-        intent.putExtra("albumName",  albumList.get(position).getAlbum());
 
+        albumList.addAll(mAlbumList);
+
+        Intent intent = new Intent(getActivity(), AlbumInfo.class);
+
+        if (searchOpenedInAlbumFragments) {
+            intent.putExtra("albumName", mAlbumList.get(position).getAlbum());
+        } else {
+            intent.putExtra("albumName",  albumList.get(position).getAlbum());
+        }
         getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", true).commit();
-
         startActivityForResult(intent, REQUEST_CODE);
+
+        //Sorting albums in albumsFragment
+        sortAlbumsList();
     }
 
     @Override
