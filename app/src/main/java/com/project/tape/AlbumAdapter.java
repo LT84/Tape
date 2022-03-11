@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
     private Uri uri;
     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
+    byte[] art;
 
     public AlbumAdapter(Context mContext, ArrayList<Song> mAlbumList, OnAlbumListener onAlbumListener) {
         this.mContext = mContext;
@@ -42,17 +44,17 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
         return vHolder;
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull AlbumViewHolder holder, int position) {
         holder.tv_album_title.setText(mAlbumList.get(position).getAlbum());
         uri = Uri.parse(mAlbumList.get(position).getData());
         retriever.setDataSource(uri.toString());
-        byte[] art = retriever.getEmbeddedPicture();
-
+        art = retriever.getEmbeddedPicture();
         if (art != null) {
             Glide.with(mContext)
+                    .asBitmap()
                     .load(art)
+                    .format(DecodeFormat.PREFER_RGB_565)
                     .override(100, 100)
                     .placeholder(R.drawable.default_cover)
                     .into(holder.album_cover_albumFragment);
@@ -65,6 +67,11 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
         }
     }
 
+    @Override
+    public void onViewRecycled(@NonNull AlbumViewHolder holder) {
+        Glide.with(mContext).clear(holder.album_cover_albumFragment);
+        super.onViewRecycled(holder);
+    }
 
     @Override
     public int getItemCount() {

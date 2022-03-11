@@ -41,7 +41,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     final int REQUEST_CODE = 1;
 
     int positionIndex, topView;
-    private static final int VERTICAL_ITEM_SPACE = 5;
+    private static final int VERTICAL_ITEM_SPACE = 10;
 
     static AlbumAdapter albumAdapter;
 

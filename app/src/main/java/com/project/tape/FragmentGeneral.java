@@ -3,7 +3,7 @@ package com.project.tape;
 import static com.project.tape.AlbumInfo.fromAlbumInfo;
 import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.searchWasOpened;
+import static com.project.tape.MainActivity.songSearchWasOpened;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.MainActivity.songsFromSearch;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
@@ -111,7 +111,7 @@ public abstract class FragmentGeneral extends Fragment {
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 if (fromAlbumInfo) {
                     uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
-                } else if (searchWasOpened) {
+                } else if (songSearchWasOpened) {
                     uri = Uri.parse(songsFromSearch.get(position).getData());
                 } else {
                     uri = Uri.parse(songsList.get(position).getData());
@@ -120,7 +120,7 @@ public abstract class FragmentGeneral extends Fragment {
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticPreviousSongsInAlbum.size()
                             ? (0) : (positionInOpenedAlbum + 1);
-                } else if (searchWasOpened) {
+                } else if (songSearchWasOpened) {
                     position = position + 1 == songsFromSearch.size() ? (0)
                             : (position + 1);
                 } else {
@@ -147,7 +147,7 @@ public abstract class FragmentGeneral extends Fragment {
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 if (fromAlbumInfo) {
                     uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
-                } else if (searchWasOpened) {
+                } else if (songSearchWasOpened) {
                     uri = Uri.parse(songsFromSearch.get(position).getData());
                 } else {
                     uri = Uri.parse(songsList.get(position).getData());
@@ -156,7 +156,7 @@ public abstract class FragmentGeneral extends Fragment {
                 if (fromAlbumInfo) {
                     positionInOpenedAlbum = positionInOpenedAlbum + 1 == staticPreviousSongsInAlbum.size()
                             ? (0) : (positionInOpenedAlbum + 1);
-                } else if (searchWasOpened) {
+                } else if (songSearchWasOpened) {
                     position = position + 1 == songsFromSearch.size() ? (0)
                             : (position + 1);
                 } else {
@@ -178,7 +178,7 @@ public abstract class FragmentGeneral extends Fragment {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInOpenedAlbum).getArtist();
-        } else if (searchWasOpened) {
+        } else if (songSearchWasOpened) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();

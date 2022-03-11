@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     static String songNameStr, artistNameStr;
 
     static ArrayList<Song> songsFromSearch = new ArrayList<>();
-    static boolean searchWasOpened;
+    static boolean songSearchWasOpened;
 
     public static final int REQUEST_CODE = 1;
 
@@ -83,9 +83,11 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 1) {
-                    searchView.setQueryHint("Find your album");
-                    albumsFragmentSelected = true;
-                } else {
+                    if (searchView != null) {
+                        searchView.setQueryHint("Find your album");
+                        albumsFragmentSelected = true;
+                    }
+                } else if (searchView != null) {
                     searchView.setQueryHint("Find your song");
                     albumsFragmentSelected = false;
                 }
@@ -216,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        searchWasOpened = true;
         String userInput = newText.toLowerCase();
         ArrayList<Song> mySearch = new ArrayList<>();
         if (albumsFragmentSelected) {
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             }
             AlbumsFragment.albumAdapter.updateSongList(mySearch);
         } else {
+            songSearchWasOpened = true;
             for (Song song : songsList) {
                 if (song.getTitle().toLowerCase().contains(userInput)) {
                     mySearch.add(song);
