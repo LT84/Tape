@@ -10,9 +10,11 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,11 +47,16 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     static boolean searchOpenedInAlbumFragments;
 
+    SearchView searchView;
+    MenuItem menuItem;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.darkGrey));
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setElevation(0);
 
         permission();
 
@@ -76,8 +83,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 1) {
+                    searchView.setQueryHint("Find your album");
                     albumsFragmentSelected = true;
                 } else {
+                    searchView.setQueryHint("Find your song");
                     albumsFragmentSelected = false;
                 }
                 pager2.setCurrentItem(tab.getPosition());
@@ -89,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
+
             }
             });
 
@@ -156,13 +166,46 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     };
 
+
     //Functions for search
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
-        MenuItem menuItem = menu.findItem(R.id.search_option);
-        SearchView searchView = (SearchView) menuItem.getActionView();
+        menuItem = menu.findItem(R.id.search_option);
+        searchView = (SearchView) menuItem.getActionView();
         searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Find your song");
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pager2.setUserInputEnabled(false);
+                LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
+                for (int i = 0; i < tabStrip.getChildCount(); i++) {
+                    tabStrip.getChildAt(i).setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return true;
+                        }
+                    });
+                }
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                pager2.setUserInputEnabled(true);
+                LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
+                for (int i = 0; i < tabStrip.getChildCount(); i++) {
+                    tabStrip.getChildAt(i).setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return false;
+                        }
+                    });
+                }
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 

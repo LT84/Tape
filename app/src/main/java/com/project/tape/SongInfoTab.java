@@ -52,7 +52,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_info_tab);
-
+        getSupportActionBar().hide();
         staticPreviousSongsInAlbum.clear();
         int a = 0;
         for (int i = 0; i < songsList.size(); i++) {
