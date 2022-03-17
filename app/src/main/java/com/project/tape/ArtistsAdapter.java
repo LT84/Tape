@@ -1,8 +1,6 @@
 package com.project.tape;
 
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +17,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ArtistsV
     private Context mContext;
     static ArrayList<Song> mArtistsList;
     private OnArtistListener onArtistListener;
-    private Uri uri;
-    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
-    byte[] art;
 
     public ArtistsAdapter(Context mContext, ArrayList<Song> mArtistsList, OnArtistListener onAlbumListener) {
         this.mContext = mContext;
@@ -74,9 +69,9 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ArtistsV
 
     }
 
-    void updateArtistsList(ArrayList<Song> albumsArrayList) {
+    void updateArtistsList(ArrayList<Song> artistsArrayList) {
         mArtistsList = new ArrayList<>();
-        mArtistsList.addAll(albumsArrayList);
+        mArtistsList.addAll(artistsArrayList);
         notifyDataSetChanged();
     }
 

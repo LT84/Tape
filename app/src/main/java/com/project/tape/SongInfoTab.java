@@ -29,7 +29,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -69,8 +68,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             }
         }
 
-        Toast.makeText(this, previousArtistName, Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, Integer.toString(staticPreviousArtistSongs.size()), Toast.LENGTH_SHORT).show();
         initViews();
 
         getIntentMethod();

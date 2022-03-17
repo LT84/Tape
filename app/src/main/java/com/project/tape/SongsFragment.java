@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -121,8 +120,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 d++;
             }
         }
-
-        Toast.makeText(getContext(), previousArtistName, Toast.LENGTH_SHORT).show();
 
         metaDataInFragment(uri);
 

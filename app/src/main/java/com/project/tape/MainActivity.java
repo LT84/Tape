@@ -2,6 +2,7 @@ package com.project.tape;
 
 import static com.project.tape.FragmentGeneral.songsList;
 import static com.project.tape.SongsFragment.albumList;
+import static com.project.tape.SongsFragment.artistList;
 import static com.project.tape.SongsFragment.mediaPlayer;
 
 import android.Manifest;
@@ -43,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     public static final int REQUEST_CODE = 1;
 
-    boolean albumsFragmentSelected;
+    boolean albumsFragmentSelected, artistsFragmentSelected;
 
-    static boolean searchOpenedInAlbumFragments;
+    static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments, searchSongsFragmentSelected;
 
     SearchView searchView;
     MenuItem menuItem;
@@ -82,15 +83,15 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                if (searchView != null) {
                 if (tab.getPosition() == 1) {
-                    if (searchView != null) {
-                        searchView.setQueryHint("Find your album");
-                        albumsFragmentSelected = true;
-                    }
-                } else if (searchView != null) {
-                    searchView.setQueryHint("Find your song");
-                    albumsFragmentSelected = false;
+                    searchView.setQueryHint("Find your album");
+                    albumsFragmentSelected = true;
+                } else if (tab.getPosition() == 2) {
+                    searchView.setQueryHint("Find your artist");
+                    artistsFragmentSelected = true;
                 }
+            }
                 pager2.setCurrentItem(tab.getPosition());
             }
 
@@ -229,8 +230,18 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                 }
             }
             AlbumsFragment.albumAdapter.updateSongList(mySearch);
+        }  if (artistsFragmentSelected) {
+            searchOpenedInArtistsFragments = true;
+            userInput = newText.toLowerCase();
+            for (Song song : artistList) {
+                if (song.getArtist().toLowerCase().contains(userInput)) {
+                    mySearch.add(song);
+                }
+            }
+            ArtistsFragment.artistsAdapter.updateArtistsList(mySearch);
         } else {
-            songSearchWasOpened = true;
+            searchSongsFragmentSelected = true;
+            userInput = newText.toLowerCase();
             for (Song song : songsList) {
                 if (song.getTitle().toLowerCase().contains(userInput)) {
                     mySearch.add(song);

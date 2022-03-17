@@ -34,7 +34,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -262,7 +261,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             previousArtistName = artistName;
             this.getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
                     .putString("previousArtistName", previousArtistName).commit();
-            Toast.makeText(AboutFragmentItem.this, previousArtistName, Toast.LENGTH_SHORT).show();
             songNameStr = artistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = artistSongs.get(positionInInfoAboutItem).getArtist();
         }

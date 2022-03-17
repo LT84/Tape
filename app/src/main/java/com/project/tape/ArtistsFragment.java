@@ -5,7 +5,9 @@ import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.AlbumsFragment.fromAlbumsFragment;
+import static com.project.tape.ArtistsAdapter.mArtistsList;
 import static com.project.tape.MainActivity.artistNameStr;
+import static com.project.tape.MainActivity.searchOpenedInArtistsFragments;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongsFragment.artistList;
 
@@ -95,8 +97,15 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     public void OnArtistsClick(int position) throws IOException {
         fromAlbumsFragment = false;
         fromAlbumInfo = false;
+        artistList.addAll(mArtistsList);
+
         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
-        intent.putExtra("artistName", artistList.get(position).getArtist());
+        if (searchOpenedInArtistsFragments) {
+            intent.putExtra("artistName", mArtistsList.get(position).getArtist());
+        } else {
+            intent.putExtra("artistName", artistList.get(position).getArtist());
+        }
+
         startActivityForResult(intent, REQUEST_CODE);
         sortArtistsList();
     }
