@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AlbumInfo"
+    tools:context=".AboutFragmentItem"
     >
 
 
@@ -16,7 +16,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/album_title_albumInfo"
+            android:id="@+id/item_title_fragmentItemInfo"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
@@ -27,7 +27,7 @@
             android:maxLines="1"/>
 
         <ImageButton
-            android:id="@+id/backBtn_albumInfo"
+            android:id="@+id/backBtn_fragmentItemInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -37,18 +37,18 @@
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/albumSongs_recyclerview"
+        android:id="@+id/itemSongs_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="10dp"
         android:layout_below="@id/top_navigation_albumInfo"
-        android:layout_above="@id/song_info_tab_in_album"
+        android:layout_above="@id/song_info_tab_in_itemFragment"
         />
 
 
 
     <RelativeLayout
-        android:id="@+id/song_info_tab_in_album"
+        android:id="@+id/song_info_tab_in_itemFragment"
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:background="@color/darkGrey"
@@ -56,7 +56,7 @@
         >
 
         <ImageView
-            android:id="@+id/album_cover_in_album"
+            android:id="@+id/album_cover_in_itemInfo"
             android:layout_width="58dp"
             android:layout_height="58dp"
             android:layout_marginStart="14dp"
@@ -65,12 +65,12 @@
             />
 
         <TextView
-            android:id="@+id/song_title_in_album"
+            android:id="@+id/song_title_in_itemInfo"
             android:layout_width="180dp"
             android:layout_height="20dp"
             android:layout_marginTop="14dp"
             android:layout_marginBottom="6dp"
-            android:layout_toEndOf="@+id/album_cover_in_album"
+            android:layout_toEndOf="@+id/album_cover_in_itemInfo"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/white"
@@ -81,8 +81,8 @@
             android:id="@+id/artist_name_in_album"
             android:layout_width="160dp"
             android:layout_height="18dp"
-            android:layout_below="@+id/song_title_in_album"
-            android:layout_toEndOf="@id/album_cover_in_album"
+            android:layout_below="@+id/song_title_in_itemInfo"
+            android:layout_toEndOf="@id/album_cover_in_itemInfo"
             android:textSize="12sp"
             android:textColor="@color/transparentWhite"
             android:ellipsize="end"
@@ -90,14 +90,14 @@
             />
 
         <Button
-            android:id="@+id/open_information_tab_in_album"
+            android:id="@+id/open_information_tab_in_itemInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toStartOf="@id/pause_button_in_album"
+            android:layout_toStartOf="@id/pause_button_in_itemInfo"
             android:background="@android:color/transparent" />
 
         <ImageButton
-            android:id="@+id/pause_button_in_album"
+            android:id="@+id/pause_button_in_itemInfo"
             android:layout_width="53dp"
             android:layout_height="53dp"
             android:layout_alignParentEnd="true"

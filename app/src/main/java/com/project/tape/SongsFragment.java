@@ -1,7 +1,8 @@
 package com.project.tape;
 
-import static com.project.tape.AlbumInfo.fromAlbumInfo;
-import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
+import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.AboutFragmentItem.fromArtistInfo;
+import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongAdapter.mSongsList;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,30 +26,36 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener
-{
+public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
 
     private RecyclerView myRecyclerView;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
     static ArrayList<Song> albumList = new ArrayList<>();
+    static ArrayList<Song> artistList = new ArrayList<>();
     static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
     static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
+    static ArrayList<Song> staticArtistSongs = new ArrayList<>();
+    static ArrayList<Song> staticPreviousArtistSongs = new ArrayList<>();
 
     static String albumName;
     static String previousAlbumName;
+    static String artistName;
+    static String previousArtistName;
 
     static SongAdapter songAdapter;
 
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException{
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException {
         View v;
         v = inflater.inflate(R.layout.songs_fragment, container, false);
         //Loading audio list and albumList
         loadAudio();
         albumList.addAll(songsList);
+        artistList.addAll(songsList);
+
 
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -62,37 +70,59 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .getBoolean("repeatBtnClicked", true);
         position = getActivity().getSharedPreferences("position", Context.MODE_PRIVATE)
                 .getInt("position", position);
-        positionInOpenedAlbum = getActivity().getSharedPreferences("positionInOpenedAlbum", Context.MODE_PRIVATE)
-                .getInt("positionInOpenedAlbum", positionInOpenedAlbum);
+        positionInInfoAboutItem = getActivity().getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE)
+                .getInt("positionInInfoAboutItem", positionInInfoAboutItem);
         songNameStr = getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
                 .getString("songNameStr", " ");
-        artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
-                .getString("artistNameStr", " ");
         fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromAlbumInfo", false);
         uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                 .getString("uri", songsList.get(0).getData()));
-        albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
-                .getString("albumName", " ");
+
+          //uri = Uri.parse(songsList.get(0).getData());
 
         //Fills up staticCurrentSongsInAlbum to pass it to SongInfoTab
-        int j = 0;
+        int a = 0;
+        albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
+                .getString("albumName", " ");
         for (int i = 0; i < songsList.size(); i++) {
             if (albumName.equals(songsList.get(i).getAlbum())) {
-                staticCurrentSongsInAlbum.add(j, songsList.get(i));
-                j++;
+                staticCurrentSongsInAlbum.add(a, songsList.get(i));
+                a++;
             }
         }
         //Fills up staticPreviousSongsInAlbum to pass it to SongInfoTab
         previousAlbumName = getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE)
                 .getString("previousAlbumName", " ");
-        int a = 0;
+        int b = 0;
         for (int i = 0; i < songsList.size(); i++) {
             if (previousAlbumName.equals(songsList.get(i).getAlbum())) {
-                staticPreviousSongsInAlbum.add(a, songsList.get(i));
-                a++;
+                staticPreviousSongsInAlbum.add(b, songsList.get(i));
+                b++;
             }
         }
+        //Fills up staticArtistSongs to pass it to SongInfoTab
+        artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
+                .getString("artistNameStr", " ");
+        int c = 0;
+        for (int i = 0; i < songsList.size(); i++) {
+            if (artistNameStr.equals(songsList.get(i).getArtist())) {
+                staticArtistSongs.add(c, songsList.get(i));
+                c++;
+            }
+        }
+
+        int d = 0;
+        previousArtistName = getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE)
+                .getString("previousArtistName", " ");
+        for (int i = 0; i < songsList.size(); i++) {
+            if (previousArtistName.equals(songsList.get(i).getArtist())) {
+                staticPreviousArtistSongs.add(d, songsList.get(i));
+                d++;
+            }
+        }
+
+        Toast.makeText(getContext(), previousArtistName, Toast.LENGTH_SHORT).show();
 
         metaDataInFragment(uri);
 
@@ -110,6 +140,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         myRecyclerView.setAdapter(songAdapter);
 
         //Sorting albums in albumsFragment
+        sortArtistsList();
         sortAlbumsList();
 
         return v;
@@ -119,7 +150,8 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     private void playMusic() {
         if (songsList != null) {
             uri = Uri.parse(songsList.get(position).getData());
-        } if (mediaPlayer != null) {
+        }
+        if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
         }
@@ -135,6 +167,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         songsList = mSongsList;
 
         fromAlbumInfo = false;
+        fromArtistInfo = false;
 
         songNameStr = songsList.get(position).getTitle();
         artistNameStr = songsList.get(position).getArtist();
@@ -188,7 +221,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
             if (mediaPlayer.isPlaying()) {
                 mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
-            } else  {
+            } else {
                 mainPlayPauseBtn.setImageResource(R.drawable.play_song);
             }
         }

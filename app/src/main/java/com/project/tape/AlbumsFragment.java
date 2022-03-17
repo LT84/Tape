@@ -1,15 +1,16 @@
 package com.project.tape;
 
 import static android.app.Activity.RESULT_OK;
+import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.AlbumAdapter.mAlbumList;
-import static com.project.tape.AlbumInfo.fromAlbumInfo;
-import static com.project.tape.AlbumInfo.positionInOpenedAlbum;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.previousAlbumName;
+import static com.project.tape.SongsFragment.previousArtistName;
 
 import android.content.Context;
 import android.content.Intent;
@@ -38,32 +39,33 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     private RecyclerView myRecyclerView;
     LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
 
-    final int REQUEST_CODE = 1;
-
     int positionIndex, topView;
+    final int REQUEST_CODE = 1;
     private static final int VERTICAL_ITEM_SPACE = 10;
 
     static AlbumAdapter albumAdapter;
+
+    static boolean fromAlbumsFragment;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.albums_fragment, container, false);
-
         coverLoaded = false;
 
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.albums_recyclerview);
         album_cover_albumFragment = v.findViewById(R.id.album_cover_albumFragment);
-        song_title_main = (TextView)getActivity().findViewById(R.id.song_title_main);
-        artist_name_main = (TextView)getActivity().findViewById(R.id.artist_name_main);
+        song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
+        artist_name_main = (TextView) getActivity().findViewById(R.id.artist_name_main);
         //Setting song title and artist name in infoTab
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
-        song_title_main.setText(songsList.get(position).getTitle());
-        artist_name_main.setText(songsList.get(position).getArtist());
+        song_title_main.setText(songNameStr);
+        artist_name_main.setText(artistNameStr);
 
         //Sets adapter to list and applies settings to recyclerView
         albumAdapter = new AlbumAdapter(getContext(), albumList, this);
@@ -94,20 +96,20 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     //ClickListener in recyclerView
     @Override
     public void onAlbumClick(int position) throws IOException {
+        fromAlbumsFragment = true;
 
         albumList.addAll(mAlbumList);
 
-        Intent intent = new Intent(getActivity(), AlbumInfo.class);
+        Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
 
         if (searchOpenedInAlbumFragments) {
             intent.putExtra("albumName", mAlbumList.get(position).getAlbum());
         } else {
-            intent.putExtra("albumName",  albumList.get(position).getAlbum());
+            intent.putExtra("albumName", albumList.get(position).getAlbum());
         }
         getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", true).commit();
         startActivityForResult(intent, REQUEST_CODE);
-
         //Sorting albums in albumsFragment
         sortAlbumsList();
     }
@@ -119,17 +121,19 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
                 case REQUEST_CODE:
                     songNameStr = data.getStringExtra("titleToMain");
                     artistNameStr = data.getStringExtra("ArtistNameToMain");
-                    //!!!!!!!!!!!!
                     previousAlbumName = data.getStringExtra("previousAlbumName");
+                    previousArtistName = data.getStringExtra("previousArtistName");
                     getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
                             .putString("previousAlbumName", previousAlbumName);
+                    getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
+                            .putString("previousArtistName",  previousArtistName);
                     break;
             }
         }
     }
 
     @Override
-    public void onPause () {
+    public void onPause() {
         positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
         View startView = myRecyclerView.getChildAt(0);
         topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());
@@ -139,14 +143,14 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
                     .putBoolean("repeatBtnClicked", true).commit();
         } else {
             repeatBtnClicked = false;
-           getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
         }
         super.onPause();
     }
 
     @Override
-    public void onResume () {
+    public void onResume() {
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
@@ -176,8 +180,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         switchSongInFragment();
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
         if (fromAlbumInfo) {
-            getContext().getSharedPreferences("positionInOpenedAlbum", Context.MODE_PRIVATE).edit()
-                    .putInt("positionInOpenedAlbum", positionInOpenedAlbum).commit();
+            getContext().getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
+                    .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
         } else {
             getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                     .putInt("position", position).commit();

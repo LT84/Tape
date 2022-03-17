@@ -19,12 +19,15 @@
         <entry key="..\:/Tape/app/src/main/res/drawable/repeat_song_on.xml" value="0.38125" />
         <entry key="..\:/Tape/app/src/main/res/drawable/shuffle_songs_off.xml" value="0.38125" />
         <entry key="..\:/Tape/app/src/main/res/drawable/shuffle_songs_on.xml" value="0.38125" />
+        <entry key="..\:/Tape/app/src/main/res/layout/about_fragment_item.xml" value="0.25" />
         <entry key="..\:/Tape/app/src/main/res/layout/activity_album_details.xml" value="0.3188405797101449" />
         <entry key="..\:/Tape/app/src/main/res/layout/activity_album_info.xml" value="0.34057971014492755" />
         <entry key="..\:/Tape/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Tape/app/src/main/res/layout/activity_song_info_tab.xml" value="0.33" />
         <entry key="..\:/Tape/app/src/main/res/layout/album_item.xml" value="0.3188405797101449" />
         <entry key="..\:/Tape/app/src/main/res/layout/albums_fragment.xml" value="0.3188405797101449" />
+        <entry key="..\:/Tape/app/src/main/res/layout/artist_item.xml" value="0.33" />
+        <entry key="..\:/Tape/app/src/main/res/layout/artists_fragment.xml" value="0.32518115942028986" />
         <entry key="..\:/Tape/app/src/main/res/layout/compositions_fragment.xml" value="0.3432971014492754" />
         <entry key="..\:/Tape/app/src/main/res/layout/open_dir.xml" value="0.3378623188405797" />
         <entry key="..\:/Tape/app/src/main/res/layout/song_item.xml" value="0.3432971014492754" />

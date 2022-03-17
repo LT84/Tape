@@ -116,8 +116,5 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
     }
 
 
-
-
-
 }
 
