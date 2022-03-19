@@ -11,8 +11,8 @@ import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongInfoTab.shuffleBtnClicked;
 import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.artistList;
-import static com.project.tape.SongsFragment.staticArtistSongs;
 import static com.project.tape.SongsFragment.staticCurrentSongsInAlbum;
+import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
 
 import android.content.ContentResolver;
@@ -111,14 +111,6 @@ public abstract class FragmentGeneral extends Fragment {
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = getRandom(staticCurrentSongsInAlbum.size() - 1);
                 }
-            } else if (!shuffleBtnClicked && repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
-                } else if (songSearchWasOpened) {
-                    uri = Uri.parse(songsFromSearch.get(position).getData());
-                } else {
-                    uri = Uri.parse(songsList.get(position).getData());
-                }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
@@ -127,7 +119,7 @@ public abstract class FragmentGeneral extends Fragment {
                     position = position + 1 == songsFromSearch.size() ? (0)
                             : (position + 1);
                 } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticArtistSongs.size()
+                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
                             ? (0) : (positionInInfoAboutItem + 1);
                 } else {
                     position = position + 1 == songsList.size() ? (0)
@@ -150,14 +142,6 @@ public abstract class FragmentGeneral extends Fragment {
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = getRandom(staticCurrentSongsInAlbum.size() - 1);
                 }
-            } else if (!shuffleBtnClicked && repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
-                } else if (songSearchWasOpened) {
-                    uri = Uri.parse(songsFromSearch.get(position).getData());
-                } else {
-                    uri = Uri.parse(songsList.get(position).getData());
-                }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
@@ -166,7 +150,7 @@ public abstract class FragmentGeneral extends Fragment {
                     position = position + 1 == songsFromSearch.size() ? (0)
                             : (position + 1);
                 } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticArtistSongs.size()
+                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
                             ? (0) : (positionInInfoAboutItem + 1);
                 } else {
                     position = position + 1 == songsList.size() ? (0)
@@ -192,9 +176,9 @@ public abstract class FragmentGeneral extends Fragment {
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();
         } else if (fromArtistInfo) {
-            uri = Uri.parse(staticArtistSongs.get(positionInInfoAboutItem).getData());
-            songNameStr = staticArtistSongs.get(positionInInfoAboutItem).getTitle();
-            artistNameStr = staticArtistSongs.get(positionInInfoAboutItem).getArtist();
+            uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
+            songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
+            artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();

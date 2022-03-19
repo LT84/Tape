@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,6 +52,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.artists_fragment, container, false);
+
         fromArtistsFragment = true;
 
         artist_name = v.findViewById(R.id.artist_name_artistsFragment);
@@ -100,12 +102,14 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         artistList.addAll(mArtistsList);
 
         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
+
         if (searchOpenedInArtistsFragments) {
             intent.putExtra("artistName", mArtistsList.get(position).getArtist());
         } else {
             intent.putExtra("artistName", artistList.get(position).getArtist());
         }
 
+        Toast.makeText(getContext(), artistList.get(position).getArtist(), Toast.LENGTH_SHORT).show();
         startActivityForResult(intent, REQUEST_CODE);
         sortArtistsList();
     }
@@ -145,6 +149,13 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             artist_name_main.setText(" ");
         }
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        getContext().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
+        super.onPause();
     }
 
 

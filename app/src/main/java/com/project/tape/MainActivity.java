@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     ViewPager2 pager2;
     FragmentAdapter adapter;
     Button fullInformationTabB;
+    SearchView searchView;
+    MenuItem menuItem;
     static String songNameStr, artistNameStr;
 
     static ArrayList<Song> songsFromSearch = new ArrayList<>();
@@ -44,12 +46,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     public static final int REQUEST_CODE = 1;
 
-    boolean albumsFragmentSelected, artistsFragmentSelected;
+    boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
 
     static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments, searchSongsFragmentSelected;
 
-    SearchView searchView;
-    MenuItem menuItem;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.darkGrey));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setElevation(0);
+
+        songsFragmentSelected = true;
 
         permission();
 
@@ -84,14 +86,22 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (searchView != null) {
-                if (tab.getPosition() == 1) {
-                    searchView.setQueryHint("Find your album");
-                    albumsFragmentSelected = true;
-                } else if (tab.getPosition() == 2) {
-                    searchView.setQueryHint("Find your artist");
-                    artistsFragmentSelected = true;
+                    if (tab.getPosition() == 1) {
+                        searchView.setQueryHint("Find your album");
+                        songsFragmentSelected = false;
+                        albumsFragmentSelected = true;
+                        artistsFragmentSelected = false;
+                    } else if (tab.getPosition() == 2) {
+                        searchView.setQueryHint("Find your artist");
+                        songsFragmentSelected = false;
+                        artistsFragmentSelected = true;
+                        albumsFragmentSelected = false;
+                    } else if (tab.getPosition() == 0) {
+                        songsFragmentSelected = true;
+                        artistsFragmentSelected = false;
+                        albumsFragmentSelected = false;
+                    }
                 }
-            }
                 pager2.setCurrentItem(tab.getPosition());
             }
 
@@ -103,14 +113,14 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             public void onTabReselected(TabLayout.Tab tab) {
 
             }
-            });
+        });
 
         pager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-                @Override
-                public void onPageSelected(int position) {
-                    tabLayout.selectTab(tabLayout.getTabAt(position));
-                }
-           });
+            @Override
+            public void onPageSelected(int position) {
+                tabLayout.selectTab(tabLayout.getTabAt(position));
+            }
+        });
     }
 
     //Sets play button image in main
@@ -127,26 +137,21 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     //Permission to read data from phone
     private void permission() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED)
-        {
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}
-                    ,REQUEST_CODE);
+                    , REQUEST_CODE);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE)
-        {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Do what you want permission related
-            }
-            else
-            {
+            } else {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}
-                        ,REQUEST_CODE);
+                        , REQUEST_CODE);
             }
         }
     }
@@ -223,15 +228,18 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         ArrayList<Song> mySearch = new ArrayList<>();
         if (albumsFragmentSelected) {
             searchOpenedInAlbumFragments = true;
+            songSearchWasOpened = true;
             userInput = newText.toLowerCase();
             for (Song song : albumList) {
                 if (song.getAlbum().toLowerCase().contains(userInput)) {
                     mySearch.add(song);
                 }
             }
-            AlbumsFragment.albumAdapter.updateSongList(mySearch);
-        }  if (artistsFragmentSelected) {
+            AlbumsFragment.albumAdapter.updateAlbumList(mySearch);
+        }
+        if (artistsFragmentSelected) {
             searchOpenedInArtistsFragments = true;
+            songSearchWasOpened = false;
             userInput = newText.toLowerCase();
             for (Song song : artistList) {
                 if (song.getArtist().toLowerCase().contains(userInput)) {
@@ -239,8 +247,9 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                 }
             }
             ArtistsFragment.artistsAdapter.updateArtistsList(mySearch);
-        } else {
+        } else if (songsFragmentSelected) {
             searchSongsFragmentSelected = true;
+            songSearchWasOpened = true;
             userInput = newText.toLowerCase();
             for (Song song : songsList) {
                 if (song.getTitle().toLowerCase().contains(userInput)) {

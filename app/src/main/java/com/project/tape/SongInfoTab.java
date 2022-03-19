@@ -11,7 +11,6 @@ import static com.project.tape.MainActivity.songSearchWasOpened;
 import static com.project.tape.MainActivity.songsFromSearch;
 import static com.project.tape.SongsFragment.mediaPlayer;
 import static com.project.tape.SongsFragment.position;
-import static com.project.tape.SongsFragment.previousArtistName;
 import static com.project.tape.SongsFragment.songsList;
 import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
@@ -58,15 +57,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
         positionInInfoAboutItem = this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE)
                 .getInt("positionInInfoAboutItem", positionInInfoAboutItem);
-
-        staticPreviousArtistSongs.clear();
-        int a = 0;
-        for (int i = 0; i < songsList.size(); i++) {
-            if (previousArtistName.equals(songsList.get(i).getArtist())) {
-                staticPreviousArtistSongs.add(a, songsList.get(i));
-                a++;
-            }
-        }
+        fromArtistInfo = this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
+                .getBoolean("fromArtistInfo", false);
 
         initViews();
 
@@ -295,17 +287,14 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
             //Checking is shuffle or repeat button clicked
             if (shuffleBtnClicked && !repeatBtnClicked) {
-                position = getRandom(songsList.size() - 1);
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                }
-            } else if (!shuffleBtnClicked && repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
                 } else if (songSearchWasOpened) {
-                    uri = Uri.parse(songsFromSearch.get(position).getData());
+                    position = getRandom(songsFromSearch.size() - 1);
+                } else if (fromArtistInfo) {
+                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
                 } else {
-                    uri = Uri.parse(songsList.get(position).getData());
+                    position = getRandom(songsList.size() - 1);
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
@@ -334,17 +323,14 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
             //Checking is shuffle or repeat button clicked
             if (shuffleBtnClicked && !repeatBtnClicked) {
-                position = getRandom(songsList.size() - 1);
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                }
-            } else if (!shuffleBtnClicked && repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
                 } else if (songSearchWasOpened) {
-                    uri = Uri.parse(songsFromSearch.get(position).getData());
+                    position = getRandom(songsFromSearch.size() - 1);
+                } else if (fromArtistInfo) {
+                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
                 } else {
-                    uri = Uri.parse(songsList.get(position).getData());
+                    position = getRandom(songsList.size() - 1);
                 }
             } else if (!shuffleBtnClicked && !repeatBtnClicked) {
                 if (fromAlbumInfo) {
@@ -393,6 +379,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
         metaDataInInfoTab(uri);
 
+        mediaPlayer.start();
+
         song_title.setText(songNameStr);
         artist_name.setText(artistNameStr);
 
@@ -411,7 +399,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
         mediaPlayer.setOnCompletionListener(this);
         playPauseBtn.setBackgroundResource(R.drawable.pause_song);
-        mediaPlayer.start();
+        ;
 
         //SharedPreferences
         this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
@@ -469,9 +457,14 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
             //Checking is shuffle or repeat button clicked
             if (shuffleBtnClicked && !repeatBtnClicked) {
-                position = getRandom(songsList.size() - 1);
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+                } else if (songSearchWasOpened) {
+                    position = getRandom(songsFromSearch.size() - 1);
+                } else if (fromArtistInfo) {
+                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+                } else {
+                    position = getRandom(songsList.size() - 1);
                 }
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 if (fromAlbumInfo) {
@@ -508,9 +501,14 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
             //Checking is shuffle or repeat button clicked
             if (shuffleBtnClicked && !repeatBtnClicked) {
-                position = getRandom(songsList.size() - 1);
                 if (fromAlbumInfo) {
                     positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+                } else if (songSearchWasOpened) {
+                    position = getRandom(songsFromSearch.size() - 1);
+                } else if (fromArtistInfo) {
+                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+                } else {
+                    position = getRandom(songsList.size() - 1);
                 }
             } else if (!shuffleBtnClicked && repeatBtnClicked) {
                 if (fromAlbumInfo) {
@@ -649,6 +647,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .putBoolean("repeatBtnClicked", false).commit();
         }
 
+        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
         super.onPause();

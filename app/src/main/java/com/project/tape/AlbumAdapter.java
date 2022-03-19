@@ -89,12 +89,12 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
             super(itemView);
             this.onAlbumListener = onAlbumListener;
             tv_album_title = (TextView) itemView.findViewById(R.id.album_title_albumFragment);
-            album_cover_albumFragment = (ImageView)itemView.findViewById(R.id.album_cover_albumFragment);
+            album_cover_albumFragment = (ImageView) itemView.findViewById(R.id.album_cover_albumFragment);
             itemView.setOnClickListener(this);
         }
 
         @Override
-        public void onClick(View v)  {
+        public void onClick(View v) {
             try {
                 onAlbumListener.onAlbumClick(getAdapterPosition());
             } catch (IOException e) {
@@ -104,7 +104,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     }
 
-    void updateSongList(ArrayList<Song> albumsArrayList) {
+    void updateAlbumList(ArrayList<Song> albumsArrayList) {
         mAlbumList = new ArrayList<>();
         mAlbumList.addAll(albumsArrayList);
         notifyDataSetChanged();

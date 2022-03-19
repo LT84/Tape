@@ -2,6 +2,7 @@ package com.project.tape;
 
 import static android.app.Activity.RESULT_OK;
 import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.AlbumAdapter.mAlbumList;
 import static com.project.tape.MainActivity.artistNameStr;
@@ -10,7 +11,6 @@ import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.previousAlbumName;
-import static com.project.tape.SongsFragment.previousArtistName;
 
 import android.content.Context;
 import android.content.Intent;
@@ -98,7 +98,9 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     public void onAlbumClick(int position) throws IOException {
         fromAlbumsFragment = true;
 
-        albumList.addAll(mAlbumList);
+        if (searchOpenedInAlbumFragments) {
+            albumList.addAll(mAlbumList);
+        }
 
         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
 
@@ -122,11 +124,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
                     songNameStr = data.getStringExtra("titleToMain");
                     artistNameStr = data.getStringExtra("ArtistNameToMain");
                     previousAlbumName = data.getStringExtra("previousAlbumName");
-                    previousArtistName = data.getStringExtra("previousArtistName");
                     getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
                             .putString("previousAlbumName", previousAlbumName);
-                    getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
-                            .putString("previousArtistName",  previousArtistName);
                     break;
             }
         }
@@ -146,6 +145,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
             getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
         }
+        getContext().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         super.onPause();
     }
 

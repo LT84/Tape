@@ -34,7 +34,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     static ArrayList<Song> artistList = new ArrayList<>();
     static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
     static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
-    static ArrayList<Song> staticArtistSongs = new ArrayList<>();
+    static ArrayList<Song> staticCurrentArtistSongs = new ArrayList<>();
     static ArrayList<Song> staticPreviousArtistSongs = new ArrayList<>();
 
     static String albumName;
@@ -55,7 +55,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         albumList.addAll(songsList);
         artistList.addAll(songsList);
 
-
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
         song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
@@ -75,10 +74,12 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .getString("songNameStr", " ");
         fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromAlbumInfo", false);
+        fromArtistInfo = getActivity().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
+                .getBoolean("fromArtistInfo", false);
         uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                 .getString("uri", songsList.get(0).getData()));
 
-          //uri = Uri.parse(songsList.get(0).getData());
+        //uri = Uri.parse(songsList.get(0).getData());
 
         //Fills up staticCurrentSongsInAlbum to pass it to SongInfoTab
         int a = 0;
@@ -100,13 +101,14 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 b++;
             }
         }
+
         //Fills up staticArtistSongs to pass it to SongInfoTab
         artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
                 .getString("artistNameStr", " ");
         int c = 0;
         for (int i = 0; i < songsList.size(); i++) {
             if (artistNameStr.equals(songsList.get(i).getArtist())) {
-                staticArtistSongs.add(c, songsList.get(i));
+                staticCurrentArtistSongs.add(c, songsList.get(i));
                 c++;
             }
         }
@@ -136,7 +138,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
         myRecyclerView.setAdapter(songAdapter);
 
-        //Sorting albums in albumsFragment
+        //Sorting albums and artists arrays
         sortArtistsList();
         sortAlbumsList();
 
@@ -180,8 +182,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
         getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromAlbumInfo", false).commit();
-
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
 
         mediaPlayer.setOnCompletionListener(this);
         song_title_main.setText(songsList.get(position).getTitle());
@@ -245,6 +246,12 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putString("artistNameStr", artistNameStr).commit();
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
+        getActivity().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", false).commit();
+        getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
+                .putString("previousArtistName", previousArtistName).commit();
+        getContext().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         super.onStop();
     }
 
