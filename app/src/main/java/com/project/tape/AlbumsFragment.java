@@ -178,7 +178,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        switchSongInFragment();
+        switchNextSongInFragment();
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
         if (fromAlbumInfo) {
             getContext().getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()

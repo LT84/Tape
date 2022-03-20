@@ -214,6 +214,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         playThread.start();
     }
 
+    private int getRandom(int i) {
+        Random random = new Random();
+        return random.nextInt(i + 1);
+    }
+
     //Sets play button image and sets progress of seekBar
     public void playPauseBtnClicked() {
         if (mediaPlayer.isPlaying()) {
@@ -280,79 +285,40 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
      artist name, album cover and seekBar position when SongInfoTab is fully opened*/
     public void nextBtnClicked() {
         coverLoaded = false;
+        mediaPlayer.stop();
+        mediaPlayer.release();
 
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-
-            //Checking is shuffle or repeat button clicked
-            if (shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                } else if (songSearchWasOpened) {
-                    position = getRandom(songsFromSearch.size() - 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
-                } else {
-                    position = getRandom(songsList.size() - 1);
-                }
-            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else if (songSearchWasOpened) {
-                    position = position + 1 == songsFromSearch.size() ? (0)
-                            : (position + 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else {
-                    position = position + 1 == songsList.size() ? (0)
-                            : (position + 1);
-                }
-            } else if (shuffleBtnClicked && repeatBtnClicked) {
+        //Checking is shuffle or repeat button clicked
+        if (shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+            } else if (songSearchWasOpened) {
+                position = getRandom(songsFromSearch.size() - 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+            } else {
                 position = getRandom(songsList.size() - 1);
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                }
-                repeatBtnClicked = false;
             }
-        } else {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-
-            //Checking is shuffle or repeat button clicked
-            if (shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                } else if (songSearchWasOpened) {
-                    position = getRandom(songsFromSearch.size() - 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
-                } else {
-                    position = getRandom(songsList.size() - 1);
-                }
-            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else if (songSearchWasOpened) {
-                    position = position + 1 == songsFromSearch.size() ? (0)
-                            : (position + 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else {
-                    position = position + 1 == songsList.size() ? (0)
-                            : (position + 1);
-                }
-            } else if (shuffleBtnClicked && repeatBtnClicked) {
-                position = getRandom(songsList.size() - 1);
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                }
-                repeatBtnClicked = false;
+        } else if (!shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
+                        ? (0) : (positionInInfoAboutItem + 1);
+            } else if (songSearchWasOpened) {
+                position = position + 1 == songsFromSearch.size() ? (0)
+                        : (position + 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
+                        ? (0) : (positionInInfoAboutItem + 1);
+            } else {
+                position = position + 1 == songsList.size() ? (0)
+                        : (position + 1);
             }
+        } else if (shuffleBtnClicked && repeatBtnClicked) {
+            position = getRandom(songsList.size() - 1);
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+            }
+            repeatBtnClicked = false;
         }
 
         //Sets song and artist strings
@@ -377,9 +343,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
         //Creates mediaPlayer, sets song and artist name, sets seekBar
         mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
-        metaDataInInfoTab(uri);
 
         mediaPlayer.start();
+
+        metaDataInInfoTab(uri);
 
         song_title.setText(songNameStr);
         artist_name.setText(artistNameStr);
@@ -398,8 +365,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         });
 
         mediaPlayer.setOnCompletionListener(this);
-        playPauseBtn.setBackgroundResource(R.drawable.pause_song);
-        ;
 
         //SharedPreferences
         this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
@@ -414,11 +379,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .putInt("position", position).commit();
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
-    }
-
-    private int getRandom(int i) {
-        Random random = new Random();
-        return random.nextInt(i + 1);
     }
 
     //Creates new Thread for previous song

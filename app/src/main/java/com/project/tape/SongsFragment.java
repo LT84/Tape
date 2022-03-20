@@ -9,8 +9,11 @@ import static com.project.tape.SongAdapter.mSongsList;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.ArrayList;
 
@@ -54,6 +59,14 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
         albumList.addAll(songsList);
         artistList.addAll(songsList);
+
+
+        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
+            createChannel();
+            getActivity().registerReceiver(broadcastReceiver, new IntentFilter("SONGS_SONGS"));
+            getActivity().startService(new Intent(getContext(), OnClearFromRecentService.class));
+        }
+
 
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -163,6 +176,14 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     public void onSongClick(int position) {
         this.position = position;
 
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
+        CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
+                1, songsList.size() - 1);
+
         songsList = mSongsList;
 
         fromAlbumInfo = false;
@@ -257,7 +278,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        switchSongInFragment();
+        //switchNextSongInFragment();
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
     }

@@ -1,13 +1,19 @@
 package com.project.tape;
 
+import static com.project.tape.FragmentGeneral.position;
 import static com.project.tape.FragmentGeneral.songsList;
 import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.artistList;
 import static com.project.tape.SongsFragment.mediaPlayer;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +36,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
@@ -44,11 +50,15 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     static ArrayList<Song> songsFromSearch = new ArrayList<>();
     static boolean songSearchWasOpened;
 
-    public static final int REQUEST_CODE = 1;
+    static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments, searchSongsFragmentSelected;
 
     boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
 
-    static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments, searchSongsFragmentSelected;
+    boolean isPlaying = false;
+
+    public static final int REQUEST_CODE = 1;
+
+    NotificationManager notificationManager;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.darkGrey));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setElevation(0);
+
+        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
+            createChannel();
+        }
 
         songsFragmentSelected = true;
 
@@ -125,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     //Sets play button image in main
     public void playPauseBtnClicked() {
+        CreateNotification.createNotification(MainActivity.this, songsList.get(position), R.drawable.pause_song,
+                1, songsList.size() - 1);
         if (mediaPlayer.isPlaying()) {
             playPauseBtn.setImageResource(R.drawable.play_song);
             mediaPlayer.pause();
@@ -260,6 +276,63 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             SongsFragment.songAdapter.updateSongList(mySearch);
         }
         return true;
+    }
+
+
+    private void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
+                    "Tape", NotificationManager.IMPORTANCE_LOW);
+
+            notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action  = intent.getExtras().getString("actionName");
+
+            switch (action) {
+                case CreateNotification.ACTION_PREVIOUS:
+                    onTrackPrevious();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPlaying) {
+                        onTrackPause();
+                    } else {
+                        onTrackPlay();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    onTrackNext();
+                    break;
+            }
+        }
+    };
+
+    @Override
+    public void onTrackPrevious() {}
+
+    @Override
+    public void onTrackNext() {}
+
+    @Override
+    public void onTrackPlay() {}
+
+    @Override
+    public void onTrackPause() {}
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
+            notificationManager.cancelAll();
+        }
+        unregisterReceiver(broadcastReceiver);
     }
 
 

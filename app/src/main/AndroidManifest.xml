@@ -43,10 +43,10 @@
             </intent-filter>
         </activity>
 
+          <receiver android:name=".Services.NotificationActionService"/>
+          <service android:name=".Services.OnClearFromRecentService"/>
 
     </application>
-
-
 
 
     </manifest>

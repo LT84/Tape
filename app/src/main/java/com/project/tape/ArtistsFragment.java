@@ -85,7 +85,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public void onCompletion(MediaPlayer mp) {
         mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
-        switchSongInFragment();
+        switchNextSongInFragment();
         if (fromAlbumInfo | fromArtistInfo) {
             getContext().getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
                     .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
