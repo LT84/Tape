@@ -22,30 +22,40 @@ import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.SongsFragment.uri;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.project.tape.Services.OnClearFromRecentService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAdapter.OnAlbumListener, MediaPlayer.OnCompletionListener {
+public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAdapter.OnAlbumListener
+        ,MediaPlayer.OnCompletionListener, Playable {
 
     TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
     ImageView album_cover_in_itemInfo;
@@ -58,14 +68,34 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
     ArrayList<Song> currentSongsInAlbum = new ArrayList<>();
     ArrayList<Song> currentArtistSongs = new ArrayList<>();
 
-    public static boolean fromAlbumInfo, fromArtistInfo;
+    public static boolean fromAlbumInfo, fromArtistInfo, AboutItemOpened;
+
+    NotificationManager notificationManager;
+
+    ImageButton aboutFragmentItemPlayPauseBtn;
+
+    boolean isPlaying = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.about_fragment_item);
-        getSupportActionBar().hide();
+        this.setContentView(R.layout.about_fragment_item);
+        this.getSupportActionBar().hide();
+
+        AboutItemOpened = true;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createChannel();
+            this.registerReceiver(broadcastReceiverFragment, new IntentFilter("SONGS_SONGS"));
+            this.startService(new Intent(this, OnClearFromRecentService.class));
+        }
+
+        if (mediaPlayer.isPlaying()) {
+            isPlaying = true;
+        } else {
+            isPlaying = false;
+        }
 
         backBtn = findViewById(R.id.backBtn_fragmentItemInfo);
         backBtn.setOnClickListener(btnListener);
@@ -80,11 +110,13 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         playPauseBtn = findViewById(R.id.pause_button_in_itemInfo);
         playPauseBtn.setOnClickListener(btnListener);
 
+        aboutFragmentItemPlayPauseBtn = findViewById(R.id.pause_button_in_itemInfo);
+
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
         if (fromAlbumInfo) {
-            AboutFragmentItem.this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+            this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                     .putBoolean("fromAlbumInfo", false).commit();
         }
 
@@ -92,26 +124,25 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
 
         //Getting albumName to fill the list
         if (fromAlbumsFragment) {
-            album_title_albumInfo.setText(getIntent().getStringExtra("albumName"));
+            album_title_albumInfo.setText(this.getIntent().getStringExtra("albumName"));
         } else {
-            album_title_albumInfo.setText(getIntent().getStringExtra("artistName"));
+            album_title_albumInfo.setText(this.getIntent().getStringExtra("artistName"));
         }
 
         //Sets information
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
         if (art != null) {
-            Glide.with(AboutFragmentItem.this)
+            Glide.with(this)
                     .asBitmap()
                     .load(art)
                     .into(album_cover_in_itemInfo);
         } else {
-            Glide.with(AboutFragmentItem.this)
+            Glide.with(this)
                     .asBitmap()
                     .load(R.drawable.default_cover)
                     .into(album_cover_in_itemInfo);
         }
-        mediaPlayer.setOnCompletionListener(this);
 
         //Filling up arrayLists depending where its from
         if (fromAlbumsFragment) {
@@ -143,7 +174,31 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             myRecyclerView.setAdapter(albumInfoAdapter);
         }
+
+        mediaPlayer.setOnCompletionListener(this);
     }
+
+    BroadcastReceiver broadcastReceiverFragment = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionName");
+            switch (action) {
+                case CreateNotification.ACTION_PREVIOUS:
+                    onTrackPrevious();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPlaying) {
+                        onTrackPause();
+                    } else {
+                        onTrackPlay();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    onTrackNext();
+                    break;
+            }
+        }
+    };
 
     private void getIntentMethod() {
         if (songsList != null) {
@@ -206,14 +261,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
                 .putString("uri", uri.toString()).commit();
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
+        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
+                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
         intent.putExtra("previousAlbumName", previousAlbumName);
         intent.putExtra("previousArtistName", previousArtistName);
-
-        staticPreviousSongsInAlbum.clear();
-        staticPreviousSongsInAlbum.addAll(staticCurrentSongsInAlbum);
-        staticPreviousArtistSongs.clear();
-        staticPreviousArtistSongs.addAll(staticCurrentArtistSongs);
-
         super.onPause();
     }
 
@@ -222,16 +273,21 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         this.positionInInfoAboutItem = position;
 
         if (fromAlbumsFragment) {
+            previousAlbumName = albumName;
             staticCurrentSongsInAlbum = currentSongsInAlbum;
+            staticPreviousSongsInAlbum.clear();
+            staticPreviousSongsInAlbum.addAll(currentSongsInAlbum);
             this.getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
                     .putString("previousAlbumName", previousAlbumName).commit();
-            songNameStr = currentSongsInAlbum.get(positionInInfoAboutItem).getTitle();
-            artistNameStr = currentSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            songNameStr = currentSongsInAlbum.get(position).getTitle();
+            artistNameStr = currentSongsInAlbum.get(position).getArtist();
             fromAlbumInfo = true;
             fromArtistInfo = false;
             coverLoaded = false;
         } else {
             staticCurrentArtistSongs = currentArtistSongs;
+            staticPreviousSongsInAlbum.clear();
+            staticPreviousSongsInAlbum.addAll(currentSongsInAlbum);
             this.getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
                     .putString("previousArtistName", previousArtistName).commit();
             songNameStr = currentArtistSongs.get(positionInInfoAboutItem).getTitle();
@@ -239,6 +295,14 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             fromArtistInfo = true;
             fromAlbumInfo = false;
             coverLoaded = false;
+        }
+
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, currentSongsInAlbum.get(position),
+                    R.drawable.pause_song, position, currentSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticCurrentArtistSongs.get(position),
+                    R.drawable.pause_song, position, staticCurrentArtistSongs.size() - 1);
         }
 
         playMusic();
@@ -253,8 +317,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
                 .putString("songNameStr", songNameStr).commit();
         this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
-        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
-                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
 
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
@@ -262,88 +324,50 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         playPauseBtn.setImageResource(R.drawable.pause_song);
 
         metaDataInAboutFragmentItem(uri);
-
-        mediaPlayer.setOnCompletionListener(this);
     }
 
     public void switchSong() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
+        mediaPlayer.stop();
+        mediaPlayer.release();
 
-            if (shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                } else if (songSearchWasOpened) {
-                    position = getRandom(songsFromSearch.size() - 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
-                } else {
-                    position = getRandom(songsList.size() - 1);
-                }
-            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else if (songSearchWasOpened) {
-                    position = position + 1 == songsFromSearch.size() ? (0)
-                            : (position + 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else {
-                    position = position + 1 == songsList.size() ? (0)
-                            : (position + 1);
-                }
-            } else if (shuffleBtnClicked && repeatBtnClicked) {
+        //Checking is shuffle or repeat button clicked
+        if (shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(currentSongsInAlbum.size() - 1);
+            } else if (songSearchWasOpened) {
+                position = getRandom(songsFromSearch.size() - 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+            } else {
                 position = getRandom(songsList.size() - 1);
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                }
-                repeatBtnClicked = false;
             }
-        } else {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-
-            if (shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                } else if (songSearchWasOpened) {
-                    position = getRandom(songsFromSearch.size() - 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
-                } else {
-                    position = getRandom(songsList.size() - 1);
-                }
-            } else if (!shuffleBtnClicked && !repeatBtnClicked) {
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else if (songSearchWasOpened) {
-                    position = position + 1 == songsFromSearch.size() ? (0)
-                            : (position + 1);
-                } else if (fromArtistInfo) {
-                    positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
-                            ? (0) : (positionInInfoAboutItem + 1);
-                } else {
-                    position = position + 1 == songsList.size() ? (0)
-                            : (position + 1);
-                }
-            } else if (shuffleBtnClicked && repeatBtnClicked) {
-                position = getRandom(songsList.size() - 1);
-                if (fromAlbumInfo) {
-                    positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-                }
-                repeatBtnClicked = false;
+        } else if (!shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
+                        ? (positionInInfoAboutItem = 0) : (positionInInfoAboutItem + 1);
+            } else if (songSearchWasOpened) {
+                position = position + 1 == songsFromSearch.size() ? (0)
+                        : (position + 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
+                        ? (0) : (positionInInfoAboutItem + 1);
+            } else {
+                position = position + 1 == songsList.size() ? (0)
+                        : (position + 1);
             }
+        } else if (shuffleBtnClicked && repeatBtnClicked) {
+            position = getRandom(songsList.size() - 1);
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+            }
+            repeatBtnClicked = false;
         }
 
         //Sets song, artist string and uri depending where its from
         if (fromAlbumInfo) {
-            uri = Uri.parse(currentSongsInAlbum.get(positionInInfoAboutItem).getData());
-            songNameStr = currentSongsInAlbum.get(positionInInfoAboutItem).getTitle();
-            artistNameStr = currentSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
+            songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
+            artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
         } else if (songSearchWasOpened) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -358,8 +382,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             artistNameStr = songsList.get(position).getArtist();
         }
 
-        metaDataInAboutFragmentItem(uri);
+        // metaDataInAboutFragmentItem(uri);
         mediaPlayer = MediaPlayer.create(this, uri);
+
+        mediaPlayer.start();
 
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
@@ -370,15 +396,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
                 .putString("songNameStr", songNameStr).commit();
         this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
                 .putString("artistNameStr", artistNameStr).commit();
-        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
-                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
         this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
         this.getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
                 .putString("previousArtistName", previousArtistName).commit();
-
-        mediaPlayer.start();
-        mediaPlayer.setOnCompletionListener(this);
     }
 
     //Gets random number
@@ -389,6 +410,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
 
     @Override
     protected void onResume() {
+        this.registerReceiver(broadcastReceiverFragment, new IntentFilter("SONGS_SONGS"));
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
         if (art != null) {
@@ -428,8 +450,82 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         }
     }
 
+
+    private void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
+                    "Tape", NotificationManager.IMPORTANCE_HIGH);
+
+            notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
     @Override
-    public void onCompletion(MediaPlayer mp) {
+    public void onTrackPrevious() {
+        isPlaying = true;
+        switchSong();
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        }
+    }
+
+    @Override
+    public void onTrackNext() {
+        isPlaying = true;
+        switchSong();
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+    }
+
+    @Override
+    public void onTrackPlay() {
+        isPlaying = true;
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+        }
+        Toast.makeText(this, Integer.toString(positionInInfoAboutItem), Toast.LENGTH_SHORT).show();
+        aboutFragmentItemPlayPauseBtn.setImageResource(R.drawable.pause_song);
+        mediaPlayer.start();
+    }
+
+    @Override
+    public void onTrackPause() {
+        isPlaying = false;
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticCurrentArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+        }
+        aboutFragmentItemPlayPauseBtn.setImageResource(R.drawable.play_song);
+        mediaPlayer.pause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(broadcastReceiverFragment);
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
         switchSong();
     }
 

@@ -9,8 +9,6 @@ import static com.project.tape.SongsFragment.mediaPlayer;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -22,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,13 +35,13 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable {
+public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
     ViewPager2 pager2;
     FragmentAdapter adapter;
-    Button fullInformationTabB;
+    Button fullInformationTab;
     SearchView searchView;
     MenuItem menuItem;
     static String songNameStr, artistNameStr;
@@ -53,8 +52,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments, searchSongsFragmentSelected;
 
     boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
-
-    boolean isPlaying = false;
 
     public static final int REQUEST_CODE = 1;
 
@@ -69,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setElevation(0);
 
+
         if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
             createChannel();
         }
@@ -78,10 +76,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         permission();
 
         playPauseBtn = findViewById(R.id.pause_button);
-        fullInformationTabB = (Button) findViewById(R.id.open_information_tab);
+        fullInformationTab = (Button) findViewById(R.id.open_information_tab);
 
         playPauseBtn.setOnClickListener(btnListener);
-        fullInformationTabB.setOnClickListener(btnListener);
+        fullInformationTab.setOnClickListener(btnListener);
 
         //Tab Layout
         tabLayout = findViewById(R.id.tab_layout);
@@ -282,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
-                    "Tape", NotificationManager.IMPORTANCE_LOW);
+                    "Tape", NotificationManager.IMPORTANCE_HIGH);
 
             notificationManager = getSystemService(NotificationManager.class);
             if (notificationManager != null) {
@@ -291,49 +289,19 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     }
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action  = intent.getExtras().getString("actionName");
 
-            switch (action) {
-                case CreateNotification.ACTION_PREVIOUS:
-                    onTrackPrevious();
-                    break;
-                case CreateNotification.ACTION_PLAY:
-                    if (isPlaying) {
-                        onTrackPause();
-                    } else {
-                        onTrackPlay();
-                    }
-                    break;
-                case CreateNotification.ACTION_NEXT:
-                    onTrackNext();
-                    break;
-            }
-        }
-    };
-
-    @Override
-    public void onTrackPrevious() {}
-
-    @Override
-    public void onTrackNext() {}
-
-    @Override
-    public void onTrackPlay() {}
-
-    @Override
-    public void onTrackPause() {}
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
             notificationManager.cancelAll();
+            notificationManager.cancel(1);
         }
-        unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 }

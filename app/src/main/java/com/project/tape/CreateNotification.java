@@ -32,38 +32,32 @@ public class CreateNotification {
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
             MediaSessionCompat mediaSessionCompat = new MediaSessionCompat(context, "tag");
 
-            Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.id.album_cover_main);
+            Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_cover);
 
+            //Previous btn
             PendingIntent pendingIntentPrevious;
             int drw_previous;
-            if (position == 0) {
-                pendingIntentPrevious = null;
-                drw_previous = 0;
-            } else {
-                Intent intentPrevious = new Intent(context, NotificationActionService.class)
-                        .setAction(ACTION_PREVIOUS);
-                pendingIntentPrevious = PendingIntent.getBroadcast(context, 0,
-                        intentPrevious, PendingIntent.FLAG_UPDATE_CURRENT);
-                drw_previous = R.drawable.previous_song;
-            }
+            Intent intentPrevious = new Intent(context, NotificationActionService.class)
+                    .setAction(ACTION_PREVIOUS);
+            pendingIntentPrevious = PendingIntent.getBroadcast(context, 0,
+                    intentPrevious, PendingIntent.FLAG_UPDATE_CURRENT);
+            drw_previous = R.drawable.previous_song;
 
+            //Play btn
             Intent intentPlay = new Intent(context, NotificationActionService.class)
                     .setAction(ACTION_PLAY);
             PendingIntent pendingIntentPlay = PendingIntent.getBroadcast(context, 0,
                     intentPlay, PendingIntent.FLAG_UPDATE_CURRENT);
 
+            //Next btn
             PendingIntent pendingIntentNext;
             int drw_next;
-            if (position == 0) {
-                pendingIntentNext = null;
-                drw_next = 0;
-            } else {
-                Intent intentNext = new Intent(context, NotificationActionService.class)
-                        .setAction(ACTION_NEXT);
-                pendingIntentNext = PendingIntent.getBroadcast(context, 0,
-                        intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
-                drw_next = R.drawable.next_song;
-            }
+            Intent intentNext = new Intent(context, NotificationActionService.class)
+                    .setAction(ACTION_NEXT);
+            pendingIntentNext = PendingIntent.getBroadcast(context, 0,
+                    intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
+            drw_next = R.drawable.next_song;
+
 
             //Create notification
             notification = new NotificationCompat.Builder(context, CHANNEL_ID)
@@ -79,7 +73,8 @@ public class CreateNotification {
                     .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                     .setShowActionsInCompactView(0, 1, 2)
                             .setMediaSession(mediaSessionCompat.getSessionToken()))
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setOngoing(true)
                     .build();
 
             notificationManagerCompat.notify(1, notification);

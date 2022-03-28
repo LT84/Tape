@@ -109,7 +109,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             intent.putExtra("artistName", artistList.get(position).getArtist());
         }
 
-        Toast.makeText(getContext(), artistList.get(position).getArtist(), Toast.LENGTH_SHORT).show();
         startActivityForResult(intent, REQUEST_CODE);
         sortArtistsList();
     }

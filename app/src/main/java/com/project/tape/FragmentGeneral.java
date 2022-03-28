@@ -4,6 +4,8 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.AlbumsFragment.albumsFragmentOpened;
+import static com.project.tape.AlbumsFragment.fromAlbumsFragment;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.MainActivity.songSearchWasOpened;
@@ -12,6 +14,7 @@ import static com.project.tape.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.SongInfoTab.shuffleBtnClicked;
 import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.artistList;
+import static com.project.tape.SongsFragment.staticCurrentArtistSongs;
 import static com.project.tape.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
@@ -22,6 +25,7 @@ import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
@@ -31,10 +35,12 @@ import android.provider.MediaStore;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +53,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     ImageView album_cover_main;
     TextView song_title_main, artist_name_main;
     ImageButton mainPlayPauseBtn;
+
 
     public static int position = 0;
     static Uri uri;
@@ -61,6 +68,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     boolean isPlaying = false;
 
     NotificationManager notificationManager;
+
 
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {
@@ -320,19 +328,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     }
 
 
-    //Notification methods
-    public void createChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
-                    "Tape", NotificationManager.IMPORTANCE_LOW);
-
-            notificationManager = getSystemService(getContext(), NotificationManager.class);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
-    }
-
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -355,46 +350,83 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         }
     };
 
+    //Notification methods
+    public void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
+                    "Tape", NotificationManager.IMPORTANCE_HIGH);
+
+            notificationManager = getSystemService(getContext(), NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+        getActivity().registerReceiver(broadcastReceiver, new IntentFilter("SONGS_SONGS"));
+        getActivity().startService(new Intent(getContext(), OnClearFromRecentService.class));
+    }
+
     @Override
     public void onTrackPrevious() {
         switchPreviousSongInFragment();
-        CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
-                1, songsList.size() - 1);
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else {
+            CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
+                    1, songsList.size() - 1);
+        }
     }
 
     @Override
     public void onTrackNext() {
         switchNextSongInFragment();
-        CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
-                1, songsList.size() - 1);
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else {
+            CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
+                    1, songsList.size() - 1);
+        }
     }
 
     @Override
     public void onTrackPlay() {
-        CreateNotification.createNotification(getActivity(), songsList.get(position),
-                R.drawable.pause_song, position, songsList.size() - 1);
-        if (mediaPlayer.isPlaying()) {
-            mainPlayPauseBtn.setImageResource(R.drawable.play_song);
-            mediaPlayer.pause();
-        } else {
-            mediaPlayer.start();
-            mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
-        }
         isPlaying = true;
+        mediaPlayer.start();
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(getActivity(), staticCurrentArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(getActivity(), songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
     }
 
     @Override
     public void onTrackPause() {
-        CreateNotification.createNotification(getActivity(), songsList.get(position),
-                R.drawable.pause_song, position, songsList.size() - 1);
-        if (mediaPlayer.isPlaying()) {
-            mainPlayPauseBtn.setImageResource(R.drawable.play_song);
-            mediaPlayer.pause();
-        } else {
-            mediaPlayer.start();
-            mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
-        }
         isPlaying = false;
+        mediaPlayer.pause();
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+                    R.drawable.play_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(getActivity(), staticCurrentArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(getActivity(), songsList.get(position),
+                    R.drawable.play_song, position, songsList.size() - 1);
+        }
+        mainPlayPauseBtn.setImageResource(R.drawable.play_song);
     }
 
 

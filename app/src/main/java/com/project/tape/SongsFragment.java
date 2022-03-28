@@ -5,9 +5,12 @@ import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
+import static com.project.tape.MainActivity.songSearchWasOpened;
+import static com.project.tape.MainActivity.songsFromSearch;
 import static com.project.tape.SongAdapter.mSongsList;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -59,14 +63,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
         albumList.addAll(songsList);
         artistList.addAll(songsList);
-
-
-        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
-            createChannel();
-            getActivity().registerReceiver(broadcastReceiver, new IntentFilter("SONGS_SONGS"));
-            getActivity().startService(new Intent(getContext(), OnClearFromRecentService.class));
-        }
-
 
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -181,8 +177,14 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         } else {
             onTrackPlay();
         }
-        CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
-                1, songsList.size() - 1);
+
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else {
+            CreateNotification.createNotification(getActivity(), songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
 
         songsList = mSongsList;
 
@@ -227,13 +229,15 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
        title and artist when SongsFragment is opened*/
     @Override
     public void onResume() {
+        super.onResume();
+        createChannel();
+
         if (!coverLoaded) {
             if (uri != null) {
                 metaDataInFragment(uri);
                 coverLoaded = true;
             }
         }
-
         if (mediaPlayer != null) {
             song_title_main.setText(songNameStr);
             artist_name_main.setText(artistNameStr);
@@ -244,9 +248,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 mainPlayPauseBtn.setImageResource(R.drawable.play_song);
             }
         }
-
         mediaPlayer.setOnCompletionListener(SongsFragment.this);
-        super.onResume();
     }
 
     @Override
@@ -276,12 +278,25 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         super.onStop();
     }
 
+
     @Override
     public void onCompletion(MediaPlayer mp) {
-        //switchNextSongInFragment();
+        switchNextSongInFragment();
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
+            notificationManager.cancel(1);
+        }
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(broadcastReceiver);
+    }
 }

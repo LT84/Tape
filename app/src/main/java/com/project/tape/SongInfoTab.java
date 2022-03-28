@@ -11,6 +11,7 @@ import static com.project.tape.MainActivity.songSearchWasOpened;
 import static com.project.tape.MainActivity.songsFromSearch;
 import static com.project.tape.SongsFragment.mediaPlayer;
 import static com.project.tape.SongsFragment.position;
+import static com.project.tape.SongsFragment.previousAlbumName;
 import static com.project.tape.SongsFragment.songsList;
 import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
@@ -59,6 +60,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .getInt("positionInInfoAboutItem", positionInInfoAboutItem);
         fromArtistInfo = this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromArtistInfo", false);
+
+
 
         initViews();
 
