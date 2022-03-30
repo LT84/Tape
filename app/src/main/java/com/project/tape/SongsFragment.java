@@ -3,7 +3,6 @@ package com.project.tape;
 import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
-import static com.project.tape.AlbumsFragment.toDeleteBroadcastInSongs;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.MainActivity.songSearchWasOpened;
@@ -19,7 +18,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+
 
 public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
 
@@ -53,7 +52,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
     static SongAdapter songAdapter;
 
-    private boolean oneTime;
 
     @Nullable
     @Override
@@ -64,14 +62,11 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
         albumList.addAll(songsList);
         artistList.addAll(songsList);
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
 
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
         song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
         artist_name_main = (TextView) getActivity().findViewById(R.id.artist_name_main);
-
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
 
@@ -93,7 +88,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
         //uri = Uri.parse(songsList.get(0).getData());
 
-        //Fills up staticCurrentSongsInAlbum to pass it to SongInfoTab
+        //Fills up staticCurrentSongsInAlbum
         int a = 0;
         albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
                 .getString("albumName", " ");
@@ -103,7 +98,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 a++;
             }
         }
-        //Fills up staticPreviousSongsInAlbum to pass it to SongInfoTab
+        //Fills up staticPreviousSongsInAlbum
         previousAlbumName = getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE)
                 .getString("previousAlbumName", " ");
         int b = 0;
@@ -114,7 +109,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
             }
         }
 
-        //Fills up staticArtistSongs to pass it to SongInfoTab
+        //Fills up staticArtistSongs
         artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
                 .getString("artistNameStr", " ");
         int c = 0;
@@ -125,6 +120,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
             }
         }
 
+        //Fills up staticPreviousArtistSongs
         int d = 0;
         previousArtistName = getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE)
                 .getString("previousArtistName", " ");
@@ -228,18 +224,11 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
     /*Switches next composition, sets album cover in main, sets
            title and artist when SongsFragment is opened*/
     @Override
     public void onResume() {
         super.onResume();
-
-        Toast.makeText(getActivity(), "broadcstCreated", Toast.LENGTH_SHORT).show();
         createChannel();
 
         if (!coverLoaded) {
@@ -248,10 +237,10 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 coverLoaded = true;
             }
         }
+
         if (mediaPlayer != null) {
             song_title_main.setText(songNameStr);
             artist_name_main.setText(artistNameStr);
-
             if (mediaPlayer.isPlaying()) {
                 mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
             } else {
@@ -263,6 +252,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
     @Override
     public void onStop() {
+        super.onStop();
         if (repeatBtnClicked) {
             getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", true).commit();
@@ -284,7 +274,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putString("previousArtistName", previousArtistName).commit();
         getContext().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
-        super.onStop();
     }
 
     @Override
@@ -297,7 +286,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.cancel(1);
         }
     }
@@ -305,18 +294,16 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     @Override
     public void onPause() {
         super.onPause();
-
+        //Checking is lockscreen locked
         KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {
-            //it is locked
+            //if locked
         } else {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Toast.makeText(getActivity(), "broadcastUnreg", Toast.LENGTH_SHORT).show();
         }
-
     }
 
 
-    }
+}
 
 

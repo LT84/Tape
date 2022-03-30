@@ -54,7 +54,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAdapter.OnAlbumListener
+public class AboutFragmentItem extends AppCompatActivity implements AboutFragmentItemAdapter.OnItemListener
         ,MediaPlayer.OnCompletionListener, Playable {
 
     TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
@@ -63,18 +63,15 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
     Button openFullInfoTab;
     RecyclerView myRecyclerView;
 
-    public static int positionInInfoAboutItem;
-
     ArrayList<Song> currentSongsInAlbum = new ArrayList<>();
     ArrayList<Song> currentArtistSongs = new ArrayList<>();
 
-    public static boolean fromAlbumInfo, fromArtistInfo, aboutFragmentItemOpened;
-
     NotificationManager notificationManager;
 
-    ImageButton aboutFragmentItemPlayPauseBtn;
-
     boolean isPlaying = false;
+    public static boolean fromAlbumInfo, fromArtistInfo, aboutFragmentItemOpened;
+
+    public static int positionInInfoAboutItem;
 
 
     @Override
@@ -82,7 +79,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.about_fragment_item);
         this.getSupportActionBar().hide();
-
+        //Booleans
         aboutFragmentItemOpened = true;
 
         if (mediaPlayer.isPlaying()) {
@@ -91,20 +88,18 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             isPlaying = false;
         }
 
+        //Init views
         backBtn = findViewById(R.id.backBtn_fragmentItemInfo);
         backBtn.setOnClickListener(btnListener);
         openFullInfoTab = findViewById(R.id.open_information_tab_in_itemInfo);
         openFullInfoTab.setOnClickListener(btnListener);
-        playPauseBtnInTab = findViewById(R.id.pause_button_in_itemInfo);
 
         album_title_albumInfo = findViewById(R.id.item_title_fragmentItemInfo);
         song_title_in_album = findViewById(R.id.song_title_in_itemInfo);
         artist_name_in_album = findViewById(R.id.artist_name_in_album);
         album_cover_in_itemInfo = findViewById(R.id.album_cover_in_itemInfo);
-        playPauseBtn = findViewById(R.id.pause_button_in_itemInfo);
-        playPauseBtn.setOnClickListener(btnListener);
-
-        aboutFragmentItemPlayPauseBtn = findViewById(R.id.pause_button_in_itemInfo);
+        playPauseBtnInTab = findViewById(R.id.pause_button_in_itemInfo);
+        playPauseBtnInTab.setOnClickListener(btnListener);
 
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
@@ -149,10 +144,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
                 }
             }
 
-            AlbumInfoAdapter albumInfoAdapter = new AlbumInfoAdapter(this, currentSongsInAlbum, this);
+            AboutFragmentItemAdapter aboutFragmentItemAdapter = new AboutFragmentItemAdapter(this, currentSongsInAlbum, this);
             myRecyclerView = findViewById(R.id.itemSongs_recyclerview);
             myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            myRecyclerView.setAdapter(albumInfoAdapter);
+            myRecyclerView.setAdapter(aboutFragmentItemAdapter);
         } else {
             artistName = getIntent().getStringExtra("artistName");
             int b = 0;
@@ -163,43 +158,39 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
                 }
             }
 
-            AlbumInfoAdapter albumInfoAdapter = new AlbumInfoAdapter(this, currentArtistSongs, this);
+            AboutFragmentItemAdapter aboutFragmentItemAdapter = new AboutFragmentItemAdapter(this, currentArtistSongs, this);
             myRecyclerView = findViewById(R.id.itemSongs_recyclerview);
             myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            myRecyclerView.setAdapter(albumInfoAdapter);
+            myRecyclerView.setAdapter(aboutFragmentItemAdapter);
         }
 
         mediaPlayer.setOnCompletionListener(this);
     }
 
-    BroadcastReceiver broadcastReceiverFragment = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getExtras().getString("actionName");
-            switch (action) {
-                case CreateNotification.ACTION_PREVIOUS:
-                    onTrackPrevious();
-                    break;
-                case CreateNotification.ACTION_PLAY:
-                    if (isPlaying) {
-                        onTrackPause();
-                    } else {
-                        onTrackPlay();
-                    }
-                    break;
-                case CreateNotification.ACTION_NEXT:
-                    onTrackNext();
-                    break;
-            }
+    public void metaDataInAboutFragmentItem(Uri uri) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(uri.toString());
+        art = retriever.getEmbeddedPicture();
+        if (art != null) {
+            Glide.with(AboutFragmentItem.this)
+                    .asBitmap()
+                    .load(art)
+                    .into(album_cover_in_itemInfo);
+        } else {
+            Glide.with(AboutFragmentItem.this)
+                    .asBitmap()
+                    .load(R.drawable.default_cover)
+                    .into(album_cover_in_itemInfo);
         }
-    };
+        coverLoaded = false;
+    }
 
     private void getIntentMethod() {
         if (songsList != null) {
             if (mediaPlayer.isPlaying()) {
-                playPauseBtn.setImageResource(R.drawable.pause_song);
+                playPauseBtnInTab.setImageResource(R.drawable.pause_song);
             } else {
-                playPauseBtn.setImageResource(R.drawable.play_song);
+                playPauseBtnInTab.setImageResource(R.drawable.play_song);
             }
         }
     }
@@ -207,7 +198,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
     private void playMusic() {
         if (currentSongsInAlbum != null && fromAlbumsFragment) {
             uri = Uri.parse(currentSongsInAlbum.get(positionInInfoAboutItem).getData());
-        } else {
+        } else if (currentArtistSongs != null) {
             uri = Uri.parse(currentArtistSongs.get(positionInInfoAboutItem).getData());
         }
 
@@ -240,37 +231,19 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
     //Sets play button image
     public void playPauseBtnClicked() {
         if (mediaPlayer.isPlaying()) {
-            playPauseBtn.setImageResource(R.drawable.play_song);
             mediaPlayer.pause();
+            playPauseBtnInTab.setImageResource(R.drawable.play_song);
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
             mediaPlayer.start();
-            playPauseBtn.setImageResource(R.drawable.pause_song);
+            playPauseBtnInTab.setImageResource(R.drawable.pause_song);
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         }
     }
 
-    @Override
-    protected void onPause() {
-        Intent intent = new Intent();
-        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
-        if( myKM.inKeyguardRestrictedInputMode()) {
-            //it is locked
-        } else {
-            this.unregisterReceiver(broadcastReceiverFragment);
-            Toast.makeText(this, "broadcastUnreg", Toast.LENGTH_SHORT).show();
-        }
-        /*this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("uri", uri.toString()).commit();*/
-        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
-        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
-                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
-        intent.putExtra("previousAlbumName", previousAlbumName);
-        intent.putExtra("previousArtistName", previousArtistName);
-        super.onPause();
-    }
-
-    @Override
-    public void onAlbumClick(int position) throws IOException {
+    public void onItemClick(int position) throws IOException {
         this.positionInInfoAboutItem = position;
         if (fromAlbumsFragment) {
             previousAlbumName = albumName;
@@ -302,8 +275,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             CreateNotification.createNotification(this, currentSongsInAlbum.get(position),
                     R.drawable.pause_song, position, currentSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(this, staticCurrentArtistSongs.get(position),
-                    R.drawable.pause_song, position, staticCurrentArtistSongs.size() - 1);
+            CreateNotification.createNotification(this, currentArtistSongs.get(position),
+                    R.drawable.pause_song, position, currentArtistSongs.size() - 1);
         }
 
         playMusic();
@@ -322,7 +295,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
-        playPauseBtn.setImageResource(R.drawable.pause_song);
+        playPauseBtnInTab.setImageResource(R.drawable.pause_song);
 
         metaDataInAboutFragmentItem(uri);
     }
@@ -492,9 +465,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
-            this.registerReceiver(broadcastReceiverFragment, new IntentFilter("SONGS_SONGS"));
-            this.startService(new Intent(this, OnClearFromRecentService.class));
-            Toast.makeText(this, "broadcstCreated", Toast.LENGTH_SHORT).show();
         }
 
         if (art != null) {
@@ -517,23 +487,55 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         super.onResume();
     }
 
-    public void metaDataInAboutFragmentItem(Uri uri) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(uri.toString());
-        art = retriever.getEmbeddedPicture();
-        if (art != null) {
-            Glide.with(AboutFragmentItem.this)
-                    .asBitmap()
-                    .load(art)
-                    .into(album_cover_in_itemInfo);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Intent intent = new Intent();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
+        intent.putExtra("previousAlbumName", previousAlbumName);
+        intent.putExtra("previousArtistName", previousArtistName);
+        //Checking is screen locked
+        if( myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
         } else {
-            Glide.with(AboutFragmentItem.this)
-                    .asBitmap()
-                    .load(R.drawable.default_cover)
-                    .into(album_cover_in_itemInfo);
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Toast.makeText(this, "broadcastUnreg", Toast.LENGTH_SHORT).show();
         }
-        coverLoaded = false;
+
+        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
+        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
+                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
     }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        switchToNextSong();
+    }
+
+    //Notification
+    BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionName");
+            switch (action) {
+                case CreateNotification.ACTION_PREVIOUS:
+                    onTrackPrevious();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPlaying) {
+                        onTrackPause();
+                    } else {
+                        onTrackPlay();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    onTrackNext();
+                    break;
+            }
+        }
+    };
 
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -544,6 +546,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
+            this.registerReceiver(broadcastReceiverAboutFragmentInfo, new IntentFilter("SONGS_SONGS"));
+            this.startService(new Intent(this, OnClearFromRecentService.class));
         }
     }
 
@@ -592,8 +596,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
-        Toast.makeText(this, Integer.toString(positionInInfoAboutItem), Toast.LENGTH_SHORT).show();
-        aboutFragmentItemPlayPauseBtn.setImageResource(R.drawable.pause_song);
+        playPauseBtnInTab.setImageResource(R.drawable.pause_song);
         mediaPlayer.start();
     }
 
@@ -602,26 +605,16 @@ public class AboutFragmentItem extends AppCompatActivity implements AlbumInfoAda
         isPlaying = false;
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.play_song, position, songsList.size() - 1);
         }
-        aboutFragmentItemPlayPauseBtn.setImageResource(R.drawable.play_song);
+        playPauseBtnInTab.setImageResource(R.drawable.play_song);
         mediaPlayer.pause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mediaPlayer) {
-        switchToNextSong();
     }
 
 

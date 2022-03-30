@@ -1,18 +1,14 @@
 package com.project.tape;
 
 import static android.app.Activity.RESULT_OK;
-import static com.project.tape.AboutFragmentItem.fromArtistInfo;
-import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AlbumsFragment.fromAlbumsFragment;
-import static com.project.tape.AlbumsFragment.toDeleteBroadcastInArtist;
-import static com.project.tape.AlbumsFragment.toDeleteBroadcastInSongs;
 import static com.project.tape.ArtistsAdapter.mArtistsList;
 import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.MainActivity.searchOpenedInArtistsFragments;
 import static com.project.tape.MainActivity.songNameStr;
+import static com.project.tape.SongsFragment.albumName;
 import static com.project.tape.SongsFragment.artistList;
-
+import static com.project.tape.SongsFragment.artistName;
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -39,18 +35,17 @@ import java.io.IOException;
 public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.OnArtistListener, MediaPlayer.OnCompletionListener {
 
     TextView artist_name;
-    private RecyclerView myRecyclerView;
     LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
+    private RecyclerView myRecyclerView;
     private Parcelable listState;
 
-    private static final int VERTICAL_ITEM_SPACE = 25;
     final int REQUEST_CODE = 1;
+    private static final int VERTICAL_ITEM_SPACE = 25;
 
     static ArtistsAdapter artistsAdapter;
 
-    static boolean fromArtistsFragment;
-
     boolean oneTime = false;
+    static boolean fromArtistsFragment;
 
     @Nullable
     @Override
@@ -67,11 +62,10 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
-
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
 
-        artistsAdapter = new ArtistsAdapter(getContext(), artistList, this);
 
+        artistsAdapter = new ArtistsAdapter(getContext(), artistList, this);
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(LLMAlbumFragment);
         myRecyclerView.setAdapter(artistsAdapter);
@@ -82,13 +76,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             listState = savedInstanceState.getParcelable("ListState");
         }
         return v;
-    }
-
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        switchNextSongInFragment();
-        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
     }
 
     @Override
@@ -106,16 +93,15 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         } else {
             intent.putExtra("artistName", artistList.get(position).getArtist());
         }
-
+        getActivity().getSharedPreferences("artistName", Context.MODE_PRIVATE).edit()
+                .putString("artistName", artistName).commit();
 
         if (oneTime) {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Toast.makeText(getActivity(), "broadcstUnreg", Toast.LENGTH_SHORT).show();
         }
 
-
         startActivityForResult(intent, REQUEST_CODE);
-
+        //Sorting artistsList
         sortArtistsList();
     }
 
@@ -134,8 +120,8 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public void onResume() {
         super.onResume();
-        Toast.makeText(getActivity(), "broadcstCreated", Toast.LENGTH_SHORT).show();
         createChannel();
+
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
         if (mediaPlayer != null) {
@@ -161,15 +147,20 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public void onPause() {
         super.onPause();
+        //Checking is screen locked
         KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
-        if( myKM.inKeyguardRestrictedInputMode()) {
+        if (myKM.inKeyguardRestrictedInputMode()) {
             //it is locked
         } else {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Toast.makeText(getActivity(), "broadcastUnreg", Toast.LENGTH_SHORT).show();
         }
     }
 
-    //Не то название в notification при взаимодействии с ним
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        switchNextSongInFragment();
+        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
+    }
+
 
 }

@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         getSupportActionBar().setElevation(0);
         songsFragmentSelected = true;
 
-        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
         }
 
@@ -291,10 +291,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.cancel(1);
         }
-        super.onDestroy();
     }
 
 

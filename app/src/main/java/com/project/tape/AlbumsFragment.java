@@ -1,7 +1,6 @@
 package com.project.tape;
 
 import static android.app.Activity.RESULT_OK;
-import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AlbumAdapter.mAlbumList;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.searchOpenedInAlbumFragments;
@@ -11,7 +10,6 @@ import static com.project.tape.SongsFragment.albumList;
 import static com.project.tape.SongsFragment.albumName;
 import static com.project.tape.SongsFragment.previousAlbumName;
 import static com.project.tape.ArtistsFragment.fromArtistsFragment;
-
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -25,7 +23,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,13 +31,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
 
+
 public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAlbumListener, MediaPlayer.OnCompletionListener {
 
     TextView album_title_albumFragments;
     ImageView album_cover_albumFragment;
+    LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
     private Parcelable listState;
     private RecyclerView myRecyclerView;
-    LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
 
     int positionIndex, topView;
     final int REQUEST_CODE = 1;
@@ -48,9 +46,9 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
 
     static AlbumAdapter albumAdapter;
 
-    static boolean fromAlbumsFragment, albumsFragmentOpened, toDeleteBroadcastInSongs, toDeleteBroadcastInArtist;
-
     private boolean oneTime = false;
+
+    static boolean fromAlbumsFragment;
 
 
     @Nullable
@@ -58,9 +56,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.albums_fragment, container, false);
+        //Booleans
         coverLoaded = false;
-        albumsFragmentOpened = true;
-        toDeleteBroadcastInSongs = true;
 
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
@@ -109,25 +106,20 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         }
 
         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
-
         if (searchOpenedInAlbumFragments) {
             intent.putExtra("albumName", mAlbumList.get(position).getAlbum());
         } else {
             intent.putExtra("albumName", albumList.get(position).getAlbum());
         }
-        getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromAlbumInfo", true).commit();
         getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
                 .putString("albumName", albumName).commit();
 
         if (oneTime) {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Toast.makeText(getActivity(), "broadcstUnreg", Toast.LENGTH_SHORT).show();
         }
 
         startActivityForResult(intent, REQUEST_CODE);
-
-        //Sorting albums in albumsFragment
+        //Sorting albumsFragment
         sortAlbumsList();
     }
 
@@ -147,37 +139,10 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        albumsFragmentOpened = false;
-
-        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
-        if( myKM.inKeyguardRestrictedInputMode()) {
-            //it is locked
-        } else {
-            getActivity().unregisterReceiver(broadcastReceiver);
-            Toast.makeText(getActivity(), "broadcastUnreg", Toast.LENGTH_SHORT).show();
-        }
-
-        positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
-        View startView = myRecyclerView.getChildAt(0);
-        topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());
-        if (repeatBtnClicked) {
-            repeatBtnClicked = true;
-            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
-                    .putBoolean("repeatBtnClicked", true).commit();
-        } else {
-            repeatBtnClicked = false;
-            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
-                    .putBoolean("repeatBtnClicked", false).commit();
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        Toast.makeText(getActivity(), "broadcstCreated", Toast.LENGTH_SHORT).show();
         createChannel();
+
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
         if (mediaPlayer != null) {
@@ -198,6 +163,30 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
             artist_name_main.setText(" ");
         }
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+        }
+
+        positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
+        View startView = myRecyclerView.getChildAt(0);
+        topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());
+
+        if (repeatBtnClicked) {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", true).commit();
+        } else {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", false).commit();
+        }
     }
 
     @Override

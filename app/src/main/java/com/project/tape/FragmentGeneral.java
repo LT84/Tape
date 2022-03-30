@@ -4,8 +4,6 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
-import static com.project.tape.AlbumsFragment.albumsFragmentOpened;
-import static com.project.tape.AlbumsFragment.fromAlbumsFragment;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.MainActivity.songSearchWasOpened;
@@ -35,7 +33,6 @@ import android.provider.MediaStore;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -54,20 +51,20 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     TextView song_title_main, artist_name_main;
     ImageButton mainPlayPauseBtn;
 
+    NotificationManager notificationManager;
 
-    public static int position = 0;
     static Uri uri;
     static MediaPlayer mediaPlayer = new MediaPlayer();
+
+    public static int position = 0;
 
     public static ArrayList<Song> songsList = new ArrayList<>();
 
     static byte[] art;
 
-    static boolean coverLoaded;
-
     boolean isPlaying = false;
 
-    NotificationManager notificationManager;
+    static boolean coverLoaded;
 
 
     //Searches for mp3 files on phone and puts information about them in columns
@@ -327,7 +324,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         }
     }
 
-
+    //Notification methods
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -350,7 +347,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         }
     };
 
-    //Notification methods
     public void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
