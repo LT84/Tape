@@ -1,16 +1,20 @@
 package com.project.tape;
 
 import static android.app.Activity.RESULT_OK;
-import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AboutFragmentItem.fromArtistInfo;
-import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AlbumsFragment.fromAlbumsFragment;
+import static com.project.tape.AlbumsFragment.toDeleteBroadcastInArtist;
+import static com.project.tape.AlbumsFragment.toDeleteBroadcastInSongs;
 import static com.project.tape.ArtistsAdapter.mArtistsList;
 import static com.project.tape.MainActivity.artistNameStr;
+import static com.project.tape.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.MainActivity.searchOpenedInArtistsFragments;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.SongsFragment.artistList;
 
+
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -46,13 +50,14 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
 
     static boolean fromArtistsFragment;
 
+    boolean oneTime = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.artists_fragment, container, false);
-
+        coverLoaded = false;
         fromArtistsFragment = true;
 
         artist_name = v.findViewById(R.id.artist_name_artistsFragment);
@@ -76,30 +81,23 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             myRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
             listState = savedInstanceState.getParcelable("ListState");
         }
-
-        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
         return v;
     }
 
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
         switchNextSongInFragment();
-        if (fromAlbumInfo | fromArtistInfo) {
-            getContext().getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
-                    .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
-        } else {
-            getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
-                    .putInt("position", position).commit();
-        }
+        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
     }
 
     @Override
     public void OnArtistsClick(int position) throws IOException {
+        fromArtistsFragment = true;
         fromAlbumsFragment = false;
-        fromAlbumInfo = false;
-        artistList.addAll(mArtistsList);
+        if (searchOpenedInArtistsFragments) {
+            artistList.addAll(mArtistsList);
+        }
 
         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
 
@@ -109,7 +107,15 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             intent.putExtra("artistName", artistList.get(position).getArtist());
         }
 
+
+        if (oneTime) {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Toast.makeText(getActivity(), "broadcstUnreg", Toast.LENGTH_SHORT).show();
+        }
+
+
         startActivityForResult(intent, REQUEST_CODE);
+
         sortArtistsList();
     }
 
@@ -127,9 +133,11 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
 
     @Override
     public void onResume() {
+        super.onResume();
+        Toast.makeText(getActivity(), "broadcstCreated", Toast.LENGTH_SHORT).show();
+        createChannel();
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
-        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
         if (mediaPlayer != null) {
             if (!coverLoaded) {
                 if (uri != null) {
@@ -147,15 +155,21 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             song_title_main.setText(" ");
             artist_name_main.setText(" ");
         }
-        super.onResume();
+        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
     }
 
     @Override
     public void onPause() {
-        getContext().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         super.onPause();
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if( myKM.inKeyguardRestrictedInputMode()) {
+            //it is locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Toast.makeText(getActivity(), "broadcastUnreg", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    //Не то название в notification при взаимодействии с ним
 
 }

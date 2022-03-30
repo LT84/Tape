@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +33,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
@@ -65,13 +65,11 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.darkGrey));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setElevation(0);
-
+        songsFragmentSelected = true;
 
         if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
             createChannel();
         }
-
-        songsFragmentSelected = true;
 
         permission();
 
@@ -216,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             @Override
             public boolean onClose() {
                 pager2.setUserInputEnabled(true);
+                songSearchWasOpened = false;
                 LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
                 for (int i = 0; i < tabStrip.getChildCount(); i++) {
                     tabStrip.getChildAt(i).setOnTouchListener(new View.OnTouchListener() {
@@ -290,18 +289,13 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     }
 
 
-
     @Override
     public void onDestroy() {
-        if (Build.VERSION.SDK_INT  >= Build.VERSION_CODES.O) {
-            notificationManager.cancelAll();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.cancel(1);
         }
         super.onDestroy();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
+
 }

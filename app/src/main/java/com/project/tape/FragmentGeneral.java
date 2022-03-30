@@ -222,7 +222,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
                 positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousSongsInAlbum.size() - 1)
                         : (positionInInfoAboutItem - 1);
             } else if (songSearchWasOpened) {
-                position = position - 1 < 0 ? (songsFromSearch.size())
+                position = position - 1 < 0 ? (songsFromSearch.size() - 1)
                         : (position - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousArtistSongs.size() - 1)
@@ -371,6 +371,9 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         if (fromAlbumInfo) {
             CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position), R.drawable.pause_song,
+                    1,  songsFromSearch.size() - 1);
         } else {
             CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
                     1, songsList.size() - 1);
@@ -383,6 +386,9 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         if (fromAlbumInfo) {
             CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+        } else if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position), R.drawable.pause_song,
+                    1,  songsFromSearch.size() - 1);
         } else {
             CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
                     1, songsList.size() - 1);
