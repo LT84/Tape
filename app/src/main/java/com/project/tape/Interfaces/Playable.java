@@ -1,4 +1,4 @@
-package com.project.tape;
+package com.project.tape.Interfaces;
 
 public interface Playable {
     void onTrackPrevious();

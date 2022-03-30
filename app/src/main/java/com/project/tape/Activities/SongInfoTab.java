@@ -1,21 +1,20 @@
-package com.project.tape;
+package com.project.tape.Activities;
 
-import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
-import static com.project.tape.AboutFragmentItem.fromArtistInfo;
-import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
-import static com.project.tape.FragmentGeneral.art;
-import static com.project.tape.FragmentGeneral.coverLoaded;
-import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.songNameStr;
-import static com.project.tape.MainActivity.songSearchWasOpened;
-import static com.project.tape.MainActivity.songsFromSearch;
-import static com.project.tape.SongsFragment.mediaPlayer;
-import static com.project.tape.SongsFragment.position;
-import static com.project.tape.SongsFragment.previousAlbumName;
-import static com.project.tape.SongsFragment.songsList;
-import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
-import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
-import static com.project.tape.SongsFragment.uri;
+import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
+import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Fragments.FragmentGeneral.art;
+import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
+import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
+import static com.project.tape.Fragments.SongsFragment.position;
+import static com.project.tape.Fragments.SongsFragment.songsList;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
+import static com.project.tape.Fragments.SongsFragment.uri;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.project.tape.R;
 
 import java.util.Random;
 
@@ -47,7 +47,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     private SeekBar seekBar;
     private final Handler handler = new Handler();
 
-    static boolean repeatBtnClicked, shuffleBtnClicked;
+    public static boolean repeatBtnClicked;
+    public static boolean shuffleBtnClicked;
 
 
     @Override

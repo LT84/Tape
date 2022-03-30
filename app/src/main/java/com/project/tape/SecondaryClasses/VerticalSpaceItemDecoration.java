@@ -1,4 +1,4 @@
-package com.project.tape;
+package com.project.tape.SecondaryClasses;
 
 import android.graphics.Rect;
 import android.view.View;

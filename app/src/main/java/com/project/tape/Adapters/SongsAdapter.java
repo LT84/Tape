@@ -1,4 +1,4 @@
-package com.project.tape;
+package com.project.tape.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,17 +9,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Song;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
+public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> {
 
     private Context mContext;
-    static ArrayList<Song> mSongsList;
+    public static ArrayList<Song> mSongsList;
     private OnSongListener mOnSongListener;
 
 
-    public SongAdapter(Context mContext, ArrayList<Song> mSongsList, OnSongListener mOnSongListener) {
+    public SongsAdapter(Context mContext, ArrayList<Song> mSongsList, OnSongListener mOnSongListener) {
         this.mContext = mContext;
         this.mSongsList = mSongsList;
         this.mOnSongListener = mOnSongListener;
@@ -72,7 +75,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     }
 
-    void updateSongList(ArrayList<Song> songsArrayList) {
+    public void updateSongList(ArrayList<Song> songsArrayList) {
         mSongsList = new ArrayList<>();
         mSongsList.addAll(songsArrayList);
         notifyDataSetChanged();

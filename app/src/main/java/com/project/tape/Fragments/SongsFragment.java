@@ -1,19 +1,17 @@
-package com.project.tape;
+package com.project.tape.Fragments;
 
-import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
-import static com.project.tape.AboutFragmentItem.fromArtistInfo;
-import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
-import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.songNameStr;
-import static com.project.tape.MainActivity.songSearchWasOpened;
-import static com.project.tape.MainActivity.songsFromSearch;
-import static com.project.tape.SongAdapter.mSongsList;
-import static com.project.tape.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
+import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
+import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Adapters.SongsAdapter.mSongsList;
+import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -24,33 +22,38 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.tape.Adapters.SongsAdapter;
+import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
+
 import java.util.ArrayList;
 
 
-public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
+public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
 
     private RecyclerView myRecyclerView;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
-    static ArrayList<Song> albumList = new ArrayList<>();
-    static ArrayList<Song> artistList = new ArrayList<>();
-    static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
-    static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
-    static ArrayList<Song> staticCurrentArtistSongs = new ArrayList<>();
-    static ArrayList<Song> staticPreviousArtistSongs = new ArrayList<>();
+    public static ArrayList<Song> albumList = new ArrayList<>();
+    public static ArrayList<Song> artistList = new ArrayList<>();
+    public static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
+    public static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
+    public static ArrayList<Song> staticCurrentArtistSongs = new ArrayList<>();
+    public static ArrayList<Song> staticPreviousArtistSongs = new ArrayList<>();
 
-    static String albumName;
-    static String previousAlbumName;
-    static String artistName;
-    static String previousArtistName;
+    public static String albumName;
+    public static String previousAlbumName;
+    public static String artistName;
+    public static String previousArtistName;
 
-    static SongAdapter songAdapter;
+    public static SongsAdapter songsAdapter;
 
 
     @Nullable
@@ -140,11 +143,11 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         mediaPlayer.setOnCompletionListener(SongsFragment.this);
 
         //Sets adapter to list and applies settings to recyclerView
-        songAdapter = new SongAdapter(getContext(), songsList, this);
+        songsAdapter = new SongsAdapter(getContext(), songsList, this);
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        myRecyclerView.setAdapter(songAdapter);
+        myRecyclerView.setAdapter(songsAdapter);
 
         //Sorting albums and artists arrays
         sortArtistsList();

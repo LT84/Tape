@@ -1,4 +1,4 @@
-package com.project.tape;
+package com.project.tape.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;

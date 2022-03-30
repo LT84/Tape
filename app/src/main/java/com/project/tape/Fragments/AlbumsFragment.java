@@ -1,15 +1,15 @@
-package com.project.tape;
+package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
-import static com.project.tape.AlbumAdapter.mAlbumList;
-import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.searchOpenedInAlbumFragments;
-import static com.project.tape.MainActivity.songNameStr;
-import static com.project.tape.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.SongsFragment.albumList;
-import static com.project.tape.SongsFragment.albumName;
-import static com.project.tape.SongsFragment.previousAlbumName;
-import static com.project.tape.ArtistsFragment.fromArtistsFragment;
+import static com.project.tape.Adapters.AlbumsAdapter.mAlbumList;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Fragments.SongsFragment.albumList;
+import static com.project.tape.Fragments.SongsFragment.albumName;
+import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
+import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -29,10 +29,16 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.tape.Activities.AboutFragmentItem;
+import com.project.tape.Adapters.AlbumsAdapter;
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
+
 import java.io.IOException;
 
 
-public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAlbumListener, MediaPlayer.OnCompletionListener {
+public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnAlbumListener, MediaPlayer.OnCompletionListener {
+
 
     TextView album_title_albumFragments;
     ImageView album_cover_albumFragment;
@@ -44,11 +50,11 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
     final int REQUEST_CODE = 1;
     private static final int VERTICAL_ITEM_SPACE = 10;
 
-    static AlbumAdapter albumAdapter;
+    public static AlbumsAdapter albumsAdapter;
 
     private boolean oneTime = false;
 
-    static boolean fromAlbumsFragment;
+    public static boolean fromAlbumsFragment;
 
 
     @Nullable
@@ -72,11 +78,11 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumAdapter.OnAl
         artist_name_main.setText(artistNameStr);
 
         //Sets adapter to list and applies settings to recyclerView
-        albumAdapter = new AlbumAdapter(getContext(), albumList, this);
+        albumsAdapter = new AlbumsAdapter(getContext(), albumList, this);
 
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(LLMAlbumFragment);
-        myRecyclerView.setAdapter(albumAdapter);
+        myRecyclerView.setAdapter(albumsAdapter);
         myRecyclerView.setItemViewCacheSize(300);
         myRecyclerView.setDrawingCacheEnabled(true);
         myRecyclerView.setHasFixedSize(true);

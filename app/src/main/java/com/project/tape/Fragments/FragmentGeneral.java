@@ -1,21 +1,21 @@
-package com.project.tape;
+package com.project.tape.Fragments;
 
 import static androidx.core.content.ContextCompat.getSystemService;
-import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
-import static com.project.tape.AboutFragmentItem.fromArtistInfo;
-import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
-import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.songNameStr;
-import static com.project.tape.MainActivity.songSearchWasOpened;
-import static com.project.tape.MainActivity.songsFromSearch;
-import static com.project.tape.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.SongInfoTab.shuffleBtnClicked;
-import static com.project.tape.SongsFragment.albumList;
-import static com.project.tape.SongsFragment.artistList;
-import static com.project.tape.SongsFragment.staticCurrentArtistSongs;
-import static com.project.tape.SongsFragment.staticCurrentSongsInAlbum;
-import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
-import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
+import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
+import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
+import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
+import static com.project.tape.Fragments.SongsFragment.albumList;
+import static com.project.tape.Fragments.SongsFragment.artistList;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -37,7 +37,11 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.Interfaces.Playable;
+import com.project.tape.R;
 import com.project.tape.Services.OnClearFromRecentService;
+import com.project.tape.SecondaryClasses.Song;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,18 +57,18 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
 
     NotificationManager notificationManager;
 
-    static Uri uri;
-    static MediaPlayer mediaPlayer = new MediaPlayer();
+    public static Uri uri;
+    public static MediaPlayer mediaPlayer = new MediaPlayer();
 
     public static int position = 0;
 
     public static ArrayList<Song> songsList = new ArrayList<>();
 
-    static byte[] art;
+    public static byte[] art;
 
     boolean isPlaying = false;
 
-    static boolean coverLoaded;
+    public static boolean coverLoaded;
 
 
     //Searches for mp3 files on phone and puts information about them in columns

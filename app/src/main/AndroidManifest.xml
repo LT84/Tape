@@ -24,15 +24,15 @@
         >
 
         <activity
-            android:name=".AboutFragmentItem"
+            android:name=".Activities.AboutFragmentItem"
             android:exported="false"
             android:theme="@style/Theme.MyOwnSize" />
         <activity
-            android:name=".SongInfoTab"
+            android:name=".Activities.SongInfoTab"
             android:exported="false"
             android:theme="@style/Theme.MyOwnSize" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MyOwnSize"
             >

@@ -1,10 +1,10 @@
-package com.project.tape;
+package com.project.tape.Activities;
 
-import static com.project.tape.FragmentGeneral.position;
-import static com.project.tape.FragmentGeneral.songsList;
-import static com.project.tape.SongsFragment.albumList;
-import static com.project.tape.SongsFragment.artistList;
-import static com.project.tape.SongsFragment.mediaPlayer;
+import static com.project.tape.Fragments.FragmentGeneral.position;
+import static com.project.tape.Fragments.FragmentGeneral.songsList;
+import static com.project.tape.Fragments.SongsFragment.albumList;
+import static com.project.tape.Fragments.SongsFragment.artistList;
+import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -31,6 +31,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
+import com.project.tape.Adapters.FragmentsAdapter;
+import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.Fragments.AlbumsFragment;
+import com.project.tape.Fragments.ArtistsFragment;
+import com.project.tape.Fragments.SongsFragment;
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Song;
 
 import java.util.ArrayList;
 
@@ -40,16 +47,19 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     ImageButton playPauseBtn;
     TabLayout tabLayout;
     ViewPager2 pager2;
-    FragmentAdapter adapter;
+    FragmentsAdapter adapter;
     Button fullInformationTab;
     SearchView searchView;
     MenuItem menuItem;
-    static String songNameStr, artistNameStr;
+    public static String songNameStr;
+    public static String artistNameStr;
 
-    static ArrayList<Song> songsFromSearch = new ArrayList<>();
-    static boolean songSearchWasOpened;
+    public static ArrayList<Song> songsFromSearch = new ArrayList<>();
+    public static boolean songSearchWasOpened;
 
-    static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments, searchSongsFragmentSelected;
+    public static boolean searchOpenedInAlbumFragments;
+    public static boolean searchOpenedInArtistsFragments;
+    static boolean searchSongsFragmentSelected;
 
     boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
 
@@ -84,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         pager2 = findViewById(R.id.viewpager2);
 
         FragmentManager fm = getSupportFragmentManager();
-        adapter = new FragmentAdapter(fm, getLifecycle());
+        adapter = new FragmentsAdapter(fm, getLifecycle());
         pager2.setAdapter(adapter);
 
         tabLayout.addTab(tabLayout.newTab().setText("Songs"));
@@ -248,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                     mySearch.add(song);
                 }
             }
-            AlbumsFragment.albumAdapter.updateAlbumList(mySearch);
+            AlbumsFragment.albumsAdapter.updateAlbumList(mySearch);
         }
         if (artistsFragmentSelected) {
             searchOpenedInArtistsFragments = true;
@@ -270,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                     songsFromSearch.add(song);
                 }
             }
-            SongsFragment.songAdapter.updateSongList(mySearch);
+            SongsFragment.songsAdapter.updateSongList(mySearch);
         }
         return true;
     }

@@ -1,4 +1,4 @@
-package com.project.tape;
+package com.project.tape.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,13 +9,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Song;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ArtistsViewHolder> {
 
     private Context mContext;
-    static ArrayList<Song> mArtistsList;
+    public static ArrayList<Song> mArtistsList;
     private OnArtistListener onArtistListener;
 
 
@@ -69,7 +72,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ArtistsV
 
     }
 
-    void updateArtistsList(ArrayList<Song> artistsArrayList) {
+    public void updateArtistsList(ArrayList<Song> artistsArrayList) {
         mArtistsList = new ArrayList<>();
         mArtistsList.addAll(artistsArrayList);
         notifyDataSetChanged();

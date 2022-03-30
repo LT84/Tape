@@ -1,27 +1,27 @@
-package com.project.tape;
+package com.project.tape.Activities;
 
-import static com.project.tape.AlbumsFragment.fromAlbumsFragment;
-import static com.project.tape.ArtistsFragment.fromArtistsFragment;
-import static com.project.tape.FragmentGeneral.coverLoaded;
-import static com.project.tape.FragmentGeneral.position;
-import static com.project.tape.FragmentGeneral.songsList;
-import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.songNameStr;
-import static com.project.tape.MainActivity.songSearchWasOpened;
-import static com.project.tape.MainActivity.songsFromSearch;
-import static com.project.tape.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.SongInfoTab.shuffleBtnClicked;
-import static com.project.tape.SongsFragment.albumName;
-import static com.project.tape.SongsFragment.art;
-import static com.project.tape.SongsFragment.artistName;
-import static com.project.tape.SongsFragment.mediaPlayer;
-import static com.project.tape.SongsFragment.previousAlbumName;
-import static com.project.tape.SongsFragment.previousArtistName;
-import static com.project.tape.SongsFragment.staticCurrentArtistSongs;
-import static com.project.tape.SongsFragment.staticCurrentSongsInAlbum;
-import static com.project.tape.SongsFragment.staticPreviousArtistSongs;
-import static com.project.tape.SongsFragment.staticPreviousSongsInAlbum;
-import static com.project.tape.SongsFragment.uri;
+import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
+import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
+import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
+import static com.project.tape.Fragments.FragmentGeneral.position;
+import static com.project.tape.Fragments.FragmentGeneral.songsList;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
+import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
+import static com.project.tape.Fragments.SongsFragment.albumName;
+import static com.project.tape.Fragments.SongsFragment.art;
+import static com.project.tape.Fragments.SongsFragment.artistName;
+import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
+import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
+import static com.project.tape.Fragments.SongsFragment.previousArtistName;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
+import static com.project.tape.Fragments.SongsFragment.uri;
 
 import android.app.KeyguardManager;
 import android.app.NotificationChannel;
@@ -40,14 +40,18 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.project.tape.Adapters.AboutFragmentItemAdapter;
+import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.Interfaces.Playable;
+import com.project.tape.R;
 import com.project.tape.Services.OnClearFromRecentService;
+import com.project.tape.SecondaryClasses.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -500,7 +504,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-            Toast.makeText(this, "broadcastUnreg", Toast.LENGTH_SHORT).show();
         }
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()

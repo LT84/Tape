@@ -1,4 +1,4 @@
-package com.project.tape;
+package com.project.tape.SecondaryClasses;
 
 
 import android.app.Notification;
@@ -13,6 +13,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.project.tape.R;
 import com.project.tape.Services.NotificationActionService;
 
 public class CreateNotification {

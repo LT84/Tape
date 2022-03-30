@@ -1,4 +1,4 @@
-package com.project.tape;
+package com.project.tape.Adapters;
 
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
@@ -14,26 +14,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder> {
+public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.AlbumViewHolder> {
 
     private Context mContext;
-    static ArrayList<Song> mAlbumList;
+    public static ArrayList<Song> mAlbumList;
     private OnAlbumListener onAlbumListener;
     private Uri uri;
     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 
     byte[] art;
 
-    public AlbumAdapter(Context mContext, ArrayList<Song> mAlbumList, OnAlbumListener onAlbumListener) {
+
+    public AlbumsAdapter(Context mContext, ArrayList<Song> mAlbumList, OnAlbumListener onAlbumListener) {
         this.mContext = mContext;
         this.mAlbumList = mAlbumList;
         this.onAlbumListener = onAlbumListener;
     }
-
 
     @NonNull
     @Override
@@ -104,7 +106,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     }
 
-    void updateAlbumList(ArrayList<Song> albumsArrayList) {
+    public void updateAlbumList(ArrayList<Song> albumsArrayList) {
         mAlbumList = new ArrayList<>();
         mAlbumList.addAll(albumsArrayList);
         notifyDataSetChanged();

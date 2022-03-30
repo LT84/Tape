@@ -1,14 +1,13 @@
-package com.project.tape;
+package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
-import static com.project.tape.AlbumsFragment.fromAlbumsFragment;
-import static com.project.tape.ArtistsAdapter.mArtistsList;
-import static com.project.tape.MainActivity.artistNameStr;
-import static com.project.tape.MainActivity.searchOpenedInArtistsFragments;
-import static com.project.tape.MainActivity.songNameStr;
-import static com.project.tape.SongsFragment.albumName;
-import static com.project.tape.SongsFragment.artistList;
-import static com.project.tape.SongsFragment.artistName;
+import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
+import static com.project.tape.Adapters.ArtistsAdapter.mArtistsList;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.searchOpenedInArtistsFragments;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Fragments.SongsFragment.artistList;
+import static com.project.tape.Fragments.SongsFragment.artistName;
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -22,12 +21,16 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.project.tape.Activities.AboutFragmentItem;
+import com.project.tape.Adapters.ArtistsAdapter;
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
 import java.io.IOException;
 
@@ -42,10 +45,10 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     final int REQUEST_CODE = 1;
     private static final int VERTICAL_ITEM_SPACE = 25;
 
-    static ArtistsAdapter artistsAdapter;
+    public static ArtistsAdapter artistsAdapter;
 
     boolean oneTime = false;
-    static boolean fromArtistsFragment;
+    public static boolean fromArtistsFragment;
 
     @Nullable
     @Override
