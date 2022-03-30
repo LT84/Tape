@@ -3,6 +3,7 @@ package com.project.tape;
 import static com.project.tape.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.AlbumsFragment.toDeleteBroadcastInSongs;
 import static com.project.tape.MainActivity.artistNameStr;
 import static com.project.tape.MainActivity.songNameStr;
 import static com.project.tape.MainActivity.songSearchWasOpened;
@@ -10,7 +11,7 @@ import static com.project.tape.MainActivity.songsFromSearch;
 import static com.project.tape.SongAdapter.mSongsList;
 import static com.project.tape.SongInfoTab.repeatBtnClicked;
 
-import android.content.BroadcastReceiver;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,6 +19,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +31,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.ArrayList;
 
@@ -53,6 +53,7 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
 
     static SongAdapter songAdapter;
 
+    private boolean oneTime;
 
     @Nullable
     @Override
@@ -63,7 +64,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
         albumList.addAll(songsList);
         artistList.addAll(songsList);
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
 
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
         song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
@@ -172,6 +175,9 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     public void onSongClick(int position) {
         this.position = position;
 
+        fromAlbumInfo = false;
+        fromArtistInfo = false;
+
         if (isPlaying) {
             onTrackPause();
         } else {
@@ -187,9 +193,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         }
 
         songsList = mSongsList;
-
-        fromAlbumInfo = false;
-        fromArtistInfo = false;
 
         songNameStr = songsList.get(position).getTitle();
         artistNameStr = songsList.get(position).getArtist();
@@ -225,11 +228,18 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
         loadAudio();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
     /*Switches next composition, sets album cover in main, sets
-       title and artist when SongsFragment is opened*/
+           title and artist when SongsFragment is opened*/
     @Override
     public void onResume() {
         super.onResume();
+
+        Toast.makeText(getActivity(), "broadcstCreated", Toast.LENGTH_SHORT).show();
         createChannel();
 
         if (!coverLoaded) {
@@ -260,7 +270,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
             getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
         }
-
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
         getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
@@ -277,7 +286,6 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         super.onStop();
     }
-
 
     @Override
     public void onCompletion(MediaPlayer mp) {
@@ -297,6 +305,18 @@ public class SongsFragment extends FragmentGeneral implements SongAdapter.OnSong
     @Override
     public void onPause() {
         super.onPause();
-        getActivity().unregisterReceiver(broadcastReceiver);
+
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //it is locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Toast.makeText(getActivity(), "broadcastUnreg", Toast.LENGTH_SHORT).show();
+        }
+
     }
-}
+
+
+    }
+
+
