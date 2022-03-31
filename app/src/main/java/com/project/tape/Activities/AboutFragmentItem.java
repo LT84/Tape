@@ -108,9 +108,12 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
-        if (fromAlbumInfo) {
-            this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
-                    .putBoolean("fromAlbumInfo", false).commit();
+        if (fromAlbumsFragment) {
+            fromAlbumInfo = true;
+            fromArtistInfo = false;
+        } else if (fromArtistsFragment) {
+            fromArtistInfo = true;
+            fromAlbumInfo = false;
         }
 
         getIntentMethod();
@@ -236,14 +239,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     public void playPauseBtnClicked() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-            playPauseBtnInTab.setImageResource(R.drawable.play_song);
-            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+            onTrackPause();
         } else {
             mediaPlayer.start();
-            playPauseBtnInTab.setImageResource(R.drawable.pause_song);
-            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+            onTrackPlay();
         }
     }
 
@@ -275,6 +274,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             coverLoaded = false;
         }
 
+        playMusic();
+
+        metaDataInAboutFragmentItem(uri);
+
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, currentSongsInAlbum.get(position),
                     R.drawable.pause_song, position, currentSongsInAlbum.size() - 1);
@@ -282,8 +285,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             CreateNotification.createNotification(this, currentArtistSongs.get(position),
                     R.drawable.pause_song, position, currentArtistSongs.size() - 1);
         }
-
-        playMusic();
 
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
@@ -300,8 +301,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         artist_name_in_album.setText(artistNameStr);
 
         playPauseBtnInTab.setImageResource(R.drawable.pause_song);
-
-        metaDataInAboutFragmentItem(uri);
     }
 
     public void switchToNextSong() {

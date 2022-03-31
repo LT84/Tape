@@ -12,6 +12,7 @@ import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -55,6 +56,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
     public static SongsAdapter songsAdapter;
 
+    public static Bitmap notificationBackground;
 
     @Nullable
     @Override
@@ -65,7 +67,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         loadAudio();
         albumList.addAll(songsList);
         artistList.addAll(songsList);
-
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
         song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
@@ -173,9 +174,17 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     @Override
     public void onSongClick(int position) {
         this.position = position;
-
         fromAlbumInfo = false;
         fromArtistInfo = false;
+
+        songsList = mSongsList;
+
+        songNameStr = songsList.get(position).getTitle();
+        artistNameStr = songsList.get(position).getArtist();
+
+        playMusic();
+
+        metaDataInFragment(uri);
 
         if (isPlaying) {
             onTrackPause();
@@ -190,15 +199,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             CreateNotification.createNotification(getActivity(), songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
-
-        songsList = mSongsList;
-
-        songNameStr = songsList.get(position).getTitle();
-        artistNameStr = songsList.get(position).getArtist();
-
-        playMusic();
-
-        metaDataInFragment(uri);
 
         getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
                 .putString("songNameStr", songNameStr).commit();

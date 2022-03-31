@@ -1,6 +1,10 @@
 package com.project.tape.SecondaryClasses;
 
 
+import static com.project.tape.Fragments.FragmentGeneral.art;
+import static com.project.tape.Fragments.SongsFragment.notificationBackground;
+import static com.project.tape.Fragments.FragmentGeneral.uri;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -8,13 +12,20 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+
 import com.project.tape.R;
 import com.project.tape.Services.NotificationActionService;
+
+
+import java.io.ByteArrayOutputStream;
+
 
 public class CreateNotification {
 
@@ -59,25 +70,40 @@ public class CreateNotification {
                     intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
             drw_next = R.drawable.next_song;
 
-
             //Create notification
-            notification = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.default_cover)
-                    .setContentTitle(song.getTitle())
-                    .setContentText(song.getArtist())
-                    .setLargeIcon(icon)
-                    .setOnlyAlertOnce(true)
-                    .setShowWhen(false)
-                    .addAction(drw_previous, "Previous", pendingIntentPrevious)
-                    .addAction(playButton, "Play", pendingIntentPlay)
-                    .addAction(drw_next, "Next", pendingIntentNext)
-                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                    .setShowActionsInCompactView(0, 1, 2)
-                            .setMediaSession(mediaSessionCompat.getSessionToken()))
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setOngoing(true)
-                    .build();
-
+            if (art != null) {
+                notification = new NotificationCompat.Builder(context, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.default_cover)
+                        .setContentTitle(song.getTitle())
+                        .setContentText(song.getArtist())
+                        .setLargeIcon(BitmapFactory.decodeByteArray(art, 0, art.length, null))
+                        .setOnlyAlertOnce(true)
+                        .setShowWhen(false)
+                        .addAction(drw_previous, "Previous", pendingIntentPrevious)
+                        .addAction(playButton, "Play", pendingIntentPlay)
+                        .addAction(drw_next, "Next", pendingIntentNext)
+                        .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                                .setShowActionsInCompactView(0, 1, 2))
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setOngoing(true)
+                        .build();
+            } else {
+                notification = new NotificationCompat.Builder(context, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.default_cover)
+                        .setContentTitle(song.getTitle())
+                        .setContentText(song.getArtist())
+                        .setLargeIcon(icon)
+                        .setOnlyAlertOnce(true)
+                        .setShowWhen(false)
+                        .addAction(drw_previous, "Previous", pendingIntentPrevious)
+                        .addAction(playButton, "Play", pendingIntentPlay)
+                        .addAction(drw_next, "Next", pendingIntentNext)
+                        .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                                .setShowActionsInCompactView(0, 1, 2))
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setOngoing(true)
+                        .build();
+            }
             notificationManagerCompat.notify(1, notification);
         }
     }

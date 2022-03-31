@@ -1,14 +1,21 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
+import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -32,6 +39,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
+import com.project.tape.Interfaces.Playable;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Fragments.AlbumsFragment;
 import com.project.tape.Fragments.ArtistsFragment;
@@ -42,7 +50,7 @@ import com.project.tape.SecondaryClasses.Song;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
@@ -57,9 +65,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public static ArrayList<Song> songsFromSearch = new ArrayList<>();
     public static boolean songSearchWasOpened;
 
-    public static boolean searchOpenedInAlbumFragments;
-    public static boolean searchOpenedInArtistsFragments;
-    static boolean searchSongsFragmentSelected;
+    public static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments,
+            searchSongsFragmentSelected;
+
+
 
     boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
 
@@ -145,14 +154,12 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     //Sets play button image in main
     public void playPauseBtnClicked() {
-        CreateNotification.createNotification(MainActivity.this, songsList.get(position), R.drawable.pause_song,
-                1, songsList.size() - 1);
         if (mediaPlayer.isPlaying()) {
-            playPauseBtn.setImageResource(R.drawable.play_song);
             mediaPlayer.pause();
+            onTrackPause();
         } else {
             mediaPlayer.start();
-            playPauseBtn.setImageResource(R.drawable.pause_song);
+            onTrackPlay();
         }
     }
 
@@ -307,5 +314,45 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     }
 
+    @Override
+    public void onTrackPrevious() {
 
+    }
+
+    @Override
+    public void onTrackNext() {
+
+    }
+
+    @Override
+    public void onTrackPlay() {
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        playPauseBtn.setImageResource(R.drawable.pause_song);
+        mediaPlayer.start();
+    }
+
+    @Override
+    public void onTrackPause() {
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.play_song, position, songsList.size() - 1);
+        }
+        playPauseBtn.setImageResource(R.drawable.play_song);
+        mediaPlayer.pause();
+    }
 }
