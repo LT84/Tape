@@ -73,7 +73,7 @@ public class CreateNotification {
             //Create notification
             if (art != null) {
                 notification = new NotificationCompat.Builder(context, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.default_cover)
+                        .setSmallIcon(R.drawable.tape_icon)
                         .setContentTitle(song.getTitle())
                         .setContentText(song.getArtist())
                         .setLargeIcon(BitmapFactory.decodeByteArray(art, 0, art.length, null))
@@ -89,7 +89,7 @@ public class CreateNotification {
                         .build();
             } else {
                 notification = new NotificationCompat.Builder(context, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.default_cover)
+                        .setSmallIcon(R.drawable.tape_icon)
                         .setContentTitle(song.getTitle())
                         .setContentText(song.getArtist())
                         .setLargeIcon(icon)

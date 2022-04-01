@@ -25,6 +25,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -66,10 +69,26 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
 
     public static byte[] art;
 
-    boolean isPlaying = false;
+    public static boolean isPlaying = false;
 
     public static boolean coverLoaded;
 
+
+    AudioManager audioManager;
+    AudioAttributes playbackAttributes;
+
+    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                onTrackPlay();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                onTrackPause();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                onTrackPause();
+            }
+        }
+    };
 
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {
@@ -368,30 +387,36 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     @Override
     public void onTrackPrevious() {
         switchPreviousSongInFragment();
-        if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
-        } else if (songSearchWasOpened) {
-            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position), R.drawable.pause_song,
-                    1,  songsFromSearch.size() - 1);
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
-            CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
-                    1, songsList.size() - 1);
+            CreateNotification.createNotification(getActivity(), songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
         }
     }
 
     @Override
     public void onTrackNext() {
         switchNextSongInFragment();
-        if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
-        } else if (songSearchWasOpened) {
-            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position), R.drawable.pause_song,
-                    1,  songsFromSearch.size() - 1);
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
-            CreateNotification.createNotification(getActivity(), songsList.get(position), R.drawable.pause_song,
-                    1, songsList.size() - 1);
+            CreateNotification.createNotification(getActivity(), songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
         }
     }
 

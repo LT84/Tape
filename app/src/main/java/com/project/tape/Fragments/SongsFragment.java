@@ -13,6 +13,9 @@ import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -34,6 +37,7 @@ import com.project.tape.R;
 import com.project.tape.SecondaryClasses.Song;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -58,6 +62,11 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
     public static Bitmap notificationBackground;
 
+    AudioFocusRequest focusRequest;
+
+    int audioFocusRequest = 0;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException {
@@ -73,6 +82,21 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         artist_name_main = (TextView) getActivity().findViewById(R.id.artist_name_main);
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
+
+
+        audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+
+        playbackAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
+
+        focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(playbackAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(audioFocusChangeListener)
+                .build();
+
 
         //sharedPreferences
         repeatBtnClicked = getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE)
@@ -157,40 +181,29 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         return v;
     }
 
-    //Creates mediaPlayer
-    private void playMusic() {
-        if (songsList != null) {
-            uri = Uri.parse(songsList.get(position).getData());
-        }
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
-        mediaPlayer = MediaPlayer.create(getContext(), uri);
-        mediaPlayer.start();
-    }
-
     //Plays song after it clicked in RecyclerView
     @Override
     public void onSongClick(int position) {
         this.position = position;
         fromAlbumInfo = false;
         fromArtistInfo = false;
+        uri = Uri.parse(songsList.get(position).getData());
 
         songsList = mSongsList;
 
         songNameStr = songsList.get(position).getTitle();
         artistNameStr = songsList.get(position).getArtist();
 
-        playMusic();
+        //Gets audioFocus, then creates mediaPlayer
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(getContext(), uri);
+            onTrackPlay();
+
+        }
 
         metaDataInFragment(uri);
-
-        if (isPlaying) {
-            onTrackPause();
-        } else {
-            onTrackPlay();
-        }
 
         if (songSearchWasOpened) {
             CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
@@ -209,7 +222,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
 
-        mediaPlayer.setOnCompletionListener(this);
+        // mediaPlayer.setOnCompletionListener(this);
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
         mainPlayPauseBtn.setImageResource(R.drawable.pause_song);

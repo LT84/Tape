@@ -10,14 +10,17 @@ import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
+import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -68,14 +71,30 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments,
             searchSongsFragmentSelected;
 
-
-
     boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
 
     public static final int REQUEST_CODE = 1;
 
     NotificationManager notificationManager;
 
+
+    AudioFocusRequest focusRequest;
+    AudioManager audioManager;
+    AudioAttributes playbackAttributes;
+    int audioFocusRequest = 0;
+
+    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                onTrackPlay();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                onTrackPause();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                onTrackPause();
+            }
+        }
+    };
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +108,20 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
         }
+
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        playbackAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
+
+        focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(playbackAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(audioFocusChangeListener)
+                .build();
 
         permission();
 
@@ -126,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                         artistsFragmentSelected = true;
                         albumsFragmentSelected = false;
                     } else if (tab.getPosition() == 0) {
+                        searchView.setQueryHint("Find your song");
                         songsFragmentSelected = true;
                         artistsFragmentSelected = false;
                         albumsFragmentSelected = false;
@@ -154,14 +188,16 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     //Sets play button image in main
     public void playPauseBtnClicked() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            onTrackPause();
-        } else {
-            mediaPlayer.start();
-            onTrackPlay();
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            if (mediaPlayer.isPlaying()) {
+                onTrackPause();
+            } else {
+                onTrackPlay();
+            }
         }
     }
+
 
     //Permission to read data from phone
     private void permission() {
@@ -326,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     @Override
     public void onTrackPlay() {
+        isPlaying = true;
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
@@ -342,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     @Override
     public void onTrackPause() {
+        isPlaying = false;
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);

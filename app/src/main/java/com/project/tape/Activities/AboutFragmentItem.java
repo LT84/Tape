@@ -30,6 +30,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -59,7 +62,7 @@ import java.util.Random;
 
 
 public class AboutFragmentItem extends AppCompatActivity implements AboutFragmentItemAdapter.OnItemListener
-        ,MediaPlayer.OnCompletionListener, Playable {
+        , MediaPlayer.OnCompletionListener, Playable {
 
     TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
     ImageView album_cover_in_itemInfo;
@@ -77,6 +80,24 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     public static int positionInInfoAboutItem;
 
+    AudioFocusRequest focusRequest;
+    AudioManager audioManager;
+    int audioFocusRequest = 0;
+    AudioAttributes playbackAttributes;
+
+    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                onTrackPlay();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                onTrackPause();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                onTrackPause();
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +112,19 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         } else {
             isPlaying = false;
         }
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        playbackAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
+
+        focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(playbackAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(audioFocusChangeListener)
+                .build();
 
         //Init views
         backBtn = findViewById(R.id.backBtn_fragmentItemInfo);
@@ -237,12 +271,13 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     //Sets play button image
     public void playPauseBtnClicked() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            onTrackPause();
-        } else {
-            mediaPlayer.start();
-            onTrackPlay();
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            if (mediaPlayer.isPlaying()) {
+                onTrackPause();
+            } else {
+                onTrackPlay();
+            }
         }
     }
 
@@ -274,7 +309,19 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             coverLoaded = false;
         }
 
-        playMusic();
+        if (currentSongsInAlbum != null && fromAlbumsFragment) {
+            uri = Uri.parse(currentSongsInAlbum.get(positionInInfoAboutItem).getData());
+        } else if (currentArtistSongs != null) {
+            uri = Uri.parse(currentArtistSongs.get(positionInInfoAboutItem).getData());
+        }
+
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(AboutFragmentItem.this, uri);
+            onTrackPlay();
+
+        }
 
         metaDataInAboutFragmentItem(uri);
 
@@ -499,7 +546,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         intent.putExtra("previousAlbumName", previousAlbumName);
         intent.putExtra("previousArtistName", previousArtistName);
         //Checking is screen locked
-        if( myKM.inKeyguardRestrictedInputMode()) {
+        if (myKM.inKeyguardRestrictedInputMode()) {
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
