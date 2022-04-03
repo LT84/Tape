@@ -11,7 +11,10 @@ import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 
 import android.app.KeyguardManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -61,10 +64,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     public static SongsAdapter songsAdapter;
 
     public static Bitmap notificationBackground;
-
-    AudioFocusRequest focusRequest;
-
-    int audioFocusRequest = 0;
 
 
     @Nullable
@@ -200,7 +199,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             mediaPlayer.release();
             mediaPlayer = MediaPlayer.create(getContext(), uri);
             onTrackPlay();
-
         }
 
         metaDataInFragment(uri);
@@ -240,12 +238,17 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         loadAudio();
     }
 
+
     /*Switches next composition, sets album cover in main, sets
            title and artist when SongsFragment is opened*/
     @Override
     public void onResume() {
         super.onResume();
         createChannel();
+
+
+        trackAudioSource();
+
 
         if (!coverLoaded) {
             if (uri != null) {

@@ -124,6 +124,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
             getActivity().unregisterReceiver(broadcastReceiver);
         }
 
+        getActivity().unregisterReceiver(audioSourceChangedReceiver);
+
         startActivityForResult(intent, REQUEST_CODE);
         //Sorting albumsFragment
         sortAlbumsList();
@@ -148,6 +150,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
     public void onResume() {
         super.onResume();
         createChannel();
+
+        trackAudioSource();
 
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);

@@ -125,6 +125,8 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         super.onResume();
         createChannel();
 
+        trackAudioSource();
+
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
         if (mediaPlayer != null) {

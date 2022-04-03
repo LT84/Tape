@@ -74,8 +74,11 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     public static boolean coverLoaded;
 
 
-    AudioManager audioManager;
-    AudioAttributes playbackAttributes;
+    public static int audioFocusRequest = 0;
+    public static AudioFocusRequest focusRequest;
+
+    public static AudioManager audioManager;
+    public static AudioAttributes playbackAttributes;
 
     AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
@@ -89,6 +92,9 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             }
         }
     };
+
+    BroadcastReceiver audioSourceChangedReceiver;
+
 
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {
@@ -370,6 +376,21 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         }
     };
 
+
+    public void trackAudioSource() {
+            audioSourceChangedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                    onTrackPause();
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        getActivity().registerReceiver(audioSourceChangedReceiver, intentFilter);
+    }
+
     public void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
@@ -428,15 +449,16 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
                     R.drawable.pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(getActivity(), staticCurrentArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(getActivity(), songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
     }
 
@@ -448,11 +470,11 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
                     R.drawable.play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(getActivity(), staticCurrentArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(getActivity(), songsList.get(position),
                     R.drawable.play_song, position, songsList.size() - 1);

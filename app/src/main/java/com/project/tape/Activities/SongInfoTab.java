@@ -4,11 +4,15 @@ import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Fragments.FragmentGeneral.art;
+import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.position;
 import static com.project.tape.Fragments.SongsFragment.songsList;
@@ -16,11 +20,18 @@ import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.uri;
 
+import android.app.KeyguardManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -33,11 +44,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.Random;
 
-public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnCompletionListener {
+public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnCompletionListener, Playable {
 
     TextView song_title, artist_name, time_duration_passed, time_duration_total, song_title_main, artist_name_main;
     ImageView album_cover, shuffleBtn, previousBtn, nextBtn, repeatBtn;
@@ -49,6 +63,19 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     public static boolean repeatBtnClicked;
     public static boolean shuffleBtnClicked;
+
+
+    NotificationManager notificationManager;
+
+    BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                onTrackPause();
+            }
+        }
+    };
 
 
     @Override
@@ -226,9 +253,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     //Sets play button image and sets progress of seekBar
     public void playPauseBtnClicked() {
         if (mediaPlayer.isPlaying()) {
-            playPauseBtn.setImageResource(R.drawable.play_song);
+           onTrackPause();
 
-            mediaPlayer.pause();
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
 
             SongInfoTab.this.runOnUiThread(new Runnable() {
@@ -242,8 +268,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 }
             });
         } else {
-            playPauseBtn.setImageResource(R.drawable.pause_song);
-            mediaPlayer.start();
+            onTrackPlay();
+
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
 
             SongInfoTab.this.runOnUiThread(new Runnable() {
@@ -270,11 +296,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     public void onClick(View v) {
                         if (repeatBtnClicked) {
                             repeatBtnClicked = false;
-                            nextBtnClicked();
+                            onTrackNext();
                             sentIntent();
                             repeatBtnClicked = true;
                         } else {
-                            nextBtnClicked();
+                            onTrackNext();
                             sentIntent();
                         }
                     }
@@ -396,11 +422,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     public void onClick(View v) {
                         if (repeatBtnClicked) {
                             repeatBtnClicked = false;
-                            previousBtnClicked();
+                            onTrackPrevious();
                             sentIntent();
                             repeatBtnClicked = true;
                         } else {
-                            previousBtnClicked();
+                            onTrackPrevious();
                             sentIntent();
                         }
                     }
@@ -564,10 +590,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (repeatBtnClicked) {
-            nextBtnClicked();
+            onTrackNext();
             mediaPlayer.setOnCompletionListener(this);
         } else {
-            nextBtnClicked();
+            onTrackNext();
             mediaPlayer.setOnCompletionListener(this);
             SongInfoTab.this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                     .putInt("position", position).commit();
@@ -593,6 +619,9 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     @Override
     protected void onResume() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createChannel();
+        }
         nextThreadBtn();
         playThreadBtn();
         previousThreadBtn();
@@ -609,6 +638,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         } else {
             this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
+        }
+
+        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
         }
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
@@ -676,5 +712,112 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         }
     };
 
+
+    BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionName");
+            switch (action) {
+                case CreateNotification.ACTION_PREVIOUS:
+                    onTrackPrevious();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPlaying) {
+                        onTrackPause();
+                    } else {
+                        onTrackPlay();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    onTrackNext();
+                    break;
+            }
+        }
+    };
+
+    private void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
+                    "Tape", NotificationManager.IMPORTANCE_HIGH);
+
+            notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+            this.registerReceiver(broadcastReceiverAboutFragmentInfo, new IntentFilter("SONGS_SONGS"));
+            this.startService(new Intent(this, OnClearFromRecentService.class));
+        }
+    }
+
+    @Override
+    public void onTrackPrevious() {
+        isPlaying = true;
+        previousBtnClicked();
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        playPauseBtn.setImageResource(R.drawable.pause_song);
+    }
+
+    @Override
+    public void onTrackNext() {
+        isPlaying = true;
+        nextBtnClicked();
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        playPauseBtn.setImageResource(R.drawable.pause_song);
+    }
+
+    @Override
+    public void onTrackPlay() {
+        isPlaying = true;
+        mediaPlayer.start();
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        playPauseBtn.setImageResource(R.drawable.pause_song);
+    }
+
+    @Override
+    public void onTrackPause() {
+        isPlaying = false;
+        mediaPlayer.pause();
+        if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.play_song, position, songsList.size() - 1);
+        }
+        playPauseBtn.setImageResource(R.drawable.play_song);
+    }
 
 }

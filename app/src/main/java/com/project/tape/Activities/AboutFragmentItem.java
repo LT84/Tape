@@ -2,9 +2,12 @@ package com.project.tape.Activities;
 
 import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
 import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
+import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
 import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
+import static com.project.tape.Fragments.FragmentGeneral.audioManager;
+import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
@@ -30,8 +33,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
@@ -80,23 +81,20 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     public static int positionInInfoAboutItem;
 
-    AudioFocusRequest focusRequest;
-    AudioManager audioManager;
-    int audioFocusRequest = 0;
-    AudioAttributes playbackAttributes;
 
-    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+    BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
         @Override
-        public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                onTrackPlay();
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                onTrackPause();
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
                 onTrackPause();
             }
         }
     };
+    public void trackAudioSource() {
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        this.registerReceiver(audioSourceChangedReceiver, intentFilter);
+    }
 
 
     @Override
@@ -112,19 +110,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         } else {
             isPlaying = false;
         }
-
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        playbackAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_GAME)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build();
-
-        focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(playbackAttributes)
-                .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener(audioFocusChangeListener)
-                .build();
 
         //Init views
         backBtn = findViewById(R.id.backBtn_fragmentItemInfo);
@@ -204,8 +189,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             myRecyclerView.setAdapter(aboutFragmentItemAdapter);
         }
-
-        mediaPlayer.setOnCompletionListener(this);
     }
 
     public void metaDataInAboutFragmentItem(Uri uri) {
@@ -236,21 +219,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
     }
 
-    private void playMusic() {
-        if (currentSongsInAlbum != null && fromAlbumsFragment) {
-            uri = Uri.parse(currentSongsInAlbum.get(positionInInfoAboutItem).getData());
-        } else if (currentArtistSongs != null) {
-            uri = Uri.parse(currentArtistSongs.get(positionInInfoAboutItem).getData());
-        }
-
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
-        mediaPlayer = MediaPlayer.create(AboutFragmentItem.this, uri);
-        mediaPlayer.start();
-    }
-
     View.OnClickListener btnListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -271,18 +239,17 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     //Sets play button image
     public void playPauseBtnClicked() {
-        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            if (mediaPlayer.isPlaying()) {
+            if (isPlaying) {
                 onTrackPause();
             } else {
+                audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
                 onTrackPlay();
             }
-        }
     }
 
     public void onItemClick(int position) throws IOException {
         this.positionInInfoAboutItem = position;
+
         if (fromAlbumsFragment) {
             previousAlbumName = albumName;
             staticCurrentSongsInAlbum = currentSongsInAlbum;
@@ -315,13 +282,11 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(currentArtistSongs.get(positionInInfoAboutItem).getData());
         }
 
-        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            mediaPlayer.release();
-            mediaPlayer = MediaPlayer.create(AboutFragmentItem.this, uri);
-            onTrackPlay();
 
-        }
+        mediaPlayer.release();
+        mediaPlayer = MediaPlayer.create(AboutFragmentItem.this, uri);
+        onTrackPlay();
+
 
         metaDataInAboutFragmentItem(uri);
 
@@ -513,6 +478,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
+        trackAudioSource();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
         }
@@ -562,7 +529,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     public void onCompletion(MediaPlayer mediaPlayer) {
         switchToNextSong();
     }
-
     //Notification
     BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
         @Override
@@ -614,6 +580,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
     }
 
     @Override
@@ -630,11 +597,13 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
     }
 
     @Override
     public void onTrackPlay() {
         isPlaying = true;
+        mediaPlayer.start();
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
@@ -645,13 +614,14 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         playPauseBtnInTab.setImageResource(R.drawable.pause_song);
-        mediaPlayer.start();
     }
 
     @Override
     public void onTrackPause() {
         isPlaying = false;
+        mediaPlayer.pause();
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
@@ -663,7 +633,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     R.drawable.play_song, position, songsList.size() - 1);
         }
         playPauseBtnInTab.setImageResource(R.drawable.play_song);
-        mediaPlayer.pause();
     }
 
 

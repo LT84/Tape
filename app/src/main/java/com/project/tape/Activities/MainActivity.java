@@ -3,23 +3,25 @@ package com.project.tape.Activities;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
+import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -78,24 +80,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     NotificationManager notificationManager;
 
 
-    AudioFocusRequest focusRequest;
-    AudioManager audioManager;
-    AudioAttributes playbackAttributes;
-    int audioFocusRequest = 0;
-
-    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                onTrackPlay();
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                onTrackPause();
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                onTrackPause();
-            }
-        }
-    };
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -108,20 +92,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
         }
-
-
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        playbackAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_GAME)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build();
-
-        focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(playbackAttributes)
-                .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener(audioFocusChangeListener)
-                .build();
 
         permission();
 
@@ -190,14 +160,13 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public void playPauseBtnClicked() {
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            if (mediaPlayer.isPlaying()) {
+            if (isPlaying) {
                 onTrackPause();
             } else {
                 onTrackPlay();
             }
         }
     }
-
 
     //Permission to read data from phone
     private void permission() {
@@ -328,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         return true;
     }
 
-
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
@@ -340,7 +308,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             }
         }
     }
-
 
     @Override
     public void onDestroy() {
@@ -363,34 +330,43 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     @Override
     public void onTrackPlay() {
         isPlaying = true;
-        if (fromAlbumInfo) {
+        mediaPlayer.start();
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+            CreateNotification.createNotification(this, staticCurrentArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         playPauseBtn.setImageResource(R.drawable.pause_song);
-        mediaPlayer.start();
     }
 
     @Override
     public void onTrackPause() {
         isPlaying = false;
-        if (fromAlbumInfo) {
-            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        mediaPlayer.pause();
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.play_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+            CreateNotification.createNotification(this, staticCurrentArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.play_song, position, songsList.size() - 1);
         }
         playPauseBtn.setImageResource(R.drawable.play_song);
-        mediaPlayer.pause();
     }
+
+
 }
