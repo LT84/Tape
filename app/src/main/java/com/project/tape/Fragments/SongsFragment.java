@@ -7,6 +7,7 @@ import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 
@@ -23,6 +24,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,6 +84,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
 
+        createChannel();
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
@@ -186,7 +189,12 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         this.position = position;
         fromAlbumInfo = false;
         fromArtistInfo = false;
-        uri = Uri.parse(songsList.get(position).getData());
+
+        if (songSearchWasOpened) {
+            uri = Uri.parse(songsFromSearch.get(position).getData());
+        } else {
+            uri = Uri.parse(songsList.get(position).getData());
+        }
 
         songsList = mSongsList;
 
@@ -245,10 +253,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     public void onResume() {
         super.onResume();
         createChannel();
-
-
         trackAudioSource();
-
 
         if (!coverLoaded) {
             if (uri != null) {
@@ -313,7 +318,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     @Override
     public void onPause() {
         super.onPause();
-        //Checking is lockscreen locked
+        //Checking is screen locked
         KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {
             //if locked

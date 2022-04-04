@@ -155,7 +155,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         //Checking is screen locked
         KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {
-            //it is locked
+            //if locked
         } else {
             getActivity().unregisterReceiver(broadcastReceiver);
         }

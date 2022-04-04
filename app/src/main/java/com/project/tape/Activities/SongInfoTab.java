@@ -640,6 +640,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .putBoolean("repeatBtnClicked", false).commit();
         }
 
+        //Checking is screen locked
         KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {
             //if locked

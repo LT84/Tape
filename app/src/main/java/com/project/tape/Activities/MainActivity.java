@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public static boolean songSearchWasOpened;
 
     public static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments,
-            searchSongsFragmentSelected;
+            searchSongsFragmentSelected, fromSearch;
 
     boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
 
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
         if (artistsFragmentSelected) {
             searchOpenedInArtistsFragments = true;
-            songSearchWasOpened = false;
+            songSearchWasOpened = true;
             userInput = newText.toLowerCase();
             for (Song song : artistList) {
                 if (song.getArtist().toLowerCase().contains(userInput)) {
@@ -285,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         } else if (songsFragmentSelected) {
             searchSongsFragmentSelected = true;
             songSearchWasOpened = true;
+            fromSearch = true;
             userInput = newText.toLowerCase();
             for (Song song : songsList) {
                 if (song.getTitle().toLowerCase().contains(userInput)) {

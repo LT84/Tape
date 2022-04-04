@@ -5,14 +5,13 @@ import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
-import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
 import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.artistList;
-import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
@@ -151,7 +150,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
@@ -162,7 +161,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
                         ? (0) : (positionInInfoAboutItem + 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = position + 1 == songsFromSearch.size() ? (0)
                         : (position + 1);
             } else if (fromArtistInfo) {
@@ -186,7 +185,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-        } else if (songSearchWasOpened) {
+        } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();
@@ -228,7 +227,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
@@ -238,7 +237,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         } else if (!shuffleBtnClicked && repeatBtnClicked) {
             if (fromAlbumInfo) {
                 uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 uri = Uri.parse(songsFromSearch.get(position).getData());
             } else {
                 uri = Uri.parse(songsList.get(position).getData());
@@ -247,7 +246,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousSongsInAlbum.size() - 1)
                         : (positionInInfoAboutItem - 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = position - 1 < 0 ? (songsFromSearch.size() - 1)
                         : (position - 1);
             } else if (fromArtistInfo) {
@@ -271,7 +270,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-        } else if (songSearchWasOpened) {
+        } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();
@@ -408,7 +407,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     @Override
     public void onTrackPrevious() {
         switchPreviousSongInFragment();
-        if (songSearchWasOpened) {
+        if (fromSearch) {
             CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
                     R.drawable.pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
@@ -426,7 +425,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     @Override
     public void onTrackNext() {
         switchNextSongInFragment();
-        if (songSearchWasOpened) {
+        if (fromSearch) {
             CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
                     R.drawable.pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
@@ -445,7 +444,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     public void onTrackPlay() {
         isPlaying = true;
         mediaPlayer.start();
-        if (songSearchWasOpened) {
+        if (fromSearch) {
             CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
                     R.drawable.pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
@@ -466,7 +465,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     public void onTrackPause() {
         isPlaying = false;
         mediaPlayer.pause();
-        if (songSearchWasOpened) {
+        if (fromSearch) {
             CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
                     R.drawable.play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {

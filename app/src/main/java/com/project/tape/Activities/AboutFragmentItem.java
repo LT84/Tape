@@ -1,5 +1,6 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
 import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
@@ -10,7 +11,6 @@ import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
-import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
@@ -127,14 +127,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
-        if (fromAlbumsFragment) {
-            fromAlbumInfo = true;
-            fromArtistInfo = false;
-        } else if (fromArtistsFragment) {
-            fromArtistInfo = true;
-            fromAlbumInfo = false;
-        }
-
         getIntentMethod();
 
         //Getting albumName to fill the list
@@ -249,6 +241,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     public void onItemClick(int position) throws IOException {
         this.positionInInfoAboutItem = position;
+        fromSearch = false;
 
         if (fromAlbumsFragment) {
             previousAlbumName = albumName;
@@ -323,7 +316,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = getRandom(currentSongsInAlbum.size() - 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
@@ -334,7 +327,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
                         ? (positionInInfoAboutItem = 0) : (positionInInfoAboutItem + 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = position + 1 == songsFromSearch.size() ? (0)
                         : (position + 1);
             } else if (fromArtistInfo) {
@@ -357,7 +350,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-        } else if (songSearchWasOpened) {
+        } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();
@@ -399,7 +392,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = getRandom(currentSongsInAlbum.size() - 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
@@ -410,7 +403,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousSongsInAlbum.size() - 1)
                         : (positionInInfoAboutItem - 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = position - 1 < 0 ? (songsFromSearch.size())
                         : (position - 1);
             } else if (fromArtistInfo) {
@@ -433,7 +426,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-        } else if (songSearchWasOpened) {
+        } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();
@@ -478,11 +471,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
+        createChannel();
         trackAudioSource();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChannel();
-        }
 
         if (art != null) {
             Glide.with(AboutFragmentItem.this)
@@ -508,11 +498,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     protected void onPause() {
         super.onPause();
         Intent intent = new Intent();
-        //Checking is screen locked
-        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
         intent.putExtra("previousAlbumName", previousAlbumName);
         intent.putExtra("previousArtistName", previousArtistName);
         //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {
             //if locked
         } else {
@@ -529,6 +518,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     public void onCompletion(MediaPlayer mediaPlayer) {
         switchToNextSong();
     }
+
     //Notification
     BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
         @Override
@@ -540,9 +530,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     break;
                 case CreateNotification.ACTION_PLAY:
                     if (isPlaying) {
-                        onTrackPause();
+                       onTrackPause();
                     } else {
-                        onTrackPlay();
+                       onTrackPlay();
                     }
                     break;
                 case CreateNotification.ACTION_NEXT:
@@ -566,11 +556,15 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
     }
 
+
     @Override
     public void onTrackPrevious() {
         isPlaying = true;
         switchToPreviousSong();
-        if (fromAlbumInfo) {
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
@@ -587,7 +581,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     public void onTrackNext() {
         isPlaying = true;
         switchToNextSong();
-        if (fromAlbumInfo) {
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
@@ -604,7 +601,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     public void onTrackPlay() {
         isPlaying = true;
         mediaPlayer.start();
-        if (fromAlbumInfo) {
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
@@ -622,7 +622,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     public void onTrackPause() {
         isPlaying = false;
         mediaPlayer.pause();
-        if (fromAlbumInfo) {
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.play_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
