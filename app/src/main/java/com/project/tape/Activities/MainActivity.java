@@ -12,7 +12,6 @@ import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
-import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
@@ -320,12 +319,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     @Override
     public void onTrackPrevious() {
-
     }
 
     @Override
     public void onTrackNext() {
-
     }
 
     @Override

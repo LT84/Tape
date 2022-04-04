@@ -79,24 +79,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     public static AudioManager audioManager;
     public static AudioAttributes playbackAttributes;
 
-    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                onTrackPlay();
-                Log.i("info", "playInGeneralFragment");
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                onTrackPause();
-                Log.i("info", "pauseInGeneralFragment");
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                onTrackPause();
-                Log.i("info", "pauseInGeneralFragment");
-            }
-        }
-    };
-
-    BroadcastReceiver audioSourceChangedReceiver;
-
 
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {
@@ -355,6 +337,35 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         }
     }
 
+
+    AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                onTrackPlay();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                onTrackPause();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                onTrackPause();
+            }
+        }
+    };
+
+    BroadcastReceiver audioSourceChangedReceiver;
+    public void trackAudioSource() {
+        audioSourceChangedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                    onTrackPause();
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        getActivity().registerReceiver(audioSourceChangedReceiver, intentFilter);
+    }
+
     //Notification methods
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -377,21 +388,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
             }
         }
     };
-
-
-    public void trackAudioSource() {
-        audioSourceChangedReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-                    onTrackPause();
-                }
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        getActivity().registerReceiver(audioSourceChangedReceiver, intentFilter);
-    }
 
     public void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

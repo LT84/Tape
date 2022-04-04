@@ -64,8 +64,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class AboutFragmentItem extends AppCompatActivity implements AboutFragmentItemAdapter.OnItemListener
-        , MediaPlayer.OnCompletionListener, Playable {
+public class AboutFragmentItem extends AppCompatActivity implements AboutFragmentItemAdapter.OnItemListener,
+        MediaPlayer.OnCompletionListener, Playable {
 
     TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
     ImageView album_cover_in_itemInfo;
@@ -81,21 +81,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     public static boolean fromAlbumInfo, fromArtistInfo, aboutFragmentItemOpened;
 
     public static int positionInInfoAboutItem;
-
-    BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-                onTrackPause();
-            }
-        }
-    };
-
-    public void trackAudioSource() {
-        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        this.registerReceiver(audioSourceChangedReceiver, intentFilter);
-    }
 
 
     @Override
@@ -276,11 +261,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(currentArtistSongs.get(positionInInfoAboutItem).getData());
         }
 
-
         mediaPlayer.release();
         mediaPlayer = MediaPlayer.create(AboutFragmentItem.this, uri);
         onTrackPlay();
-
 
         metaDataInAboutFragmentItem(uri);
 
@@ -520,6 +503,23 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         switchToNextSong();
     }
 
+    //Calls when audio source changed
+    BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                onTrackPause();
+            }
+        }
+    };
+
+    //To register audioSourceChangedReceiver
+    public void trackAudioSource() {
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        this.registerReceiver(audioSourceChangedReceiver, intentFilter);
+    }
+
     //Notification
     BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
         @Override
@@ -532,9 +532,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                 case CreateNotification.ACTION_PLAY:
                     if (isPlaying) {
                         onTrackPause();
-                        Log.i("info", "pause");
                     } else {
-                        Log.i("info", "play");
                         onTrackPlay();
                     }
                     break;

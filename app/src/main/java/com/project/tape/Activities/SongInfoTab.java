@@ -67,16 +67,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     NotificationManager notificationManager;
 
-    BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-                onTrackPause();
-            }
-        }
-    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +79,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         fromArtistInfo = this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromArtistInfo", false);
 
+        trackAudioSource();
 
         initViews();
 
@@ -712,6 +703,23 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         }
     };
 
+
+    //Calls when audio source changed
+    BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                onTrackPause();
+            }
+        }
+    };
+
+    //To register audioSourceChangedReceiver
+    public void trackAudioSource() {
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        this.registerReceiver(audioSourceChangedReceiver, intentFilter);
+    }
 
     BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
         @Override
