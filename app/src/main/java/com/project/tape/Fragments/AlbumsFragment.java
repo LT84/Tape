@@ -122,7 +122,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
                 .putString("albumName", albumName).commit();
 
         if (oneTime) {
-            //getActivity().unregisterReceiver(broadcastReceiver);
+            getActivity().unregisterReceiver(broadcastReceiver);
         }
 
         getActivity().unregisterReceiver(audioSourceChangedReceiver);

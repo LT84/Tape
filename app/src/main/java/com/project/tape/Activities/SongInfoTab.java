@@ -90,7 +90,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .getBoolean("fromArtistInfo", false);
 
 
-
         initViews();
 
         getIntentMethod();
@@ -253,7 +252,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     //Sets play button image and sets progress of seekBar
     public void playPauseBtnClicked() {
         if (mediaPlayer.isPlaying()) {
-           onTrackPause();
+            onTrackPause();
 
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
 

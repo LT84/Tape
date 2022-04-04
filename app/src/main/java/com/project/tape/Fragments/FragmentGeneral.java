@@ -32,6 +32,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -72,7 +73,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
 
     public static boolean coverLoaded;
 
-
     public static int audioFocusRequest = 0;
     public static AudioFocusRequest focusRequest;
 
@@ -84,10 +84,13 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
         public void onAudioFocusChange(int focusChange) {
             if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
                 onTrackPlay();
+                Log.i("info", "playInGeneralFragment");
             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
                 onTrackPause();
+                Log.i("info", "pauseInGeneralFragment");
             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
                 onTrackPause();
+                Log.i("info", "pauseInGeneralFragment");
             }
         }
     };
@@ -377,7 +380,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
 
 
     public void trackAudioSource() {
-            audioSourceChangedReceiver = new BroadcastReceiver() {
+        audioSourceChangedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();

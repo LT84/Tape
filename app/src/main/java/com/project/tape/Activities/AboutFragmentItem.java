@@ -9,6 +9,7 @@ import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
@@ -39,6 +40,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -67,7 +69,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
     ImageView album_cover_in_itemInfo;
-    ImageButton backBtn, playPauseBtn, playPauseBtnInTab;
+    ImageButton backBtn, playPauseBtnInTab;
     Button openFullInfoTab;
     RecyclerView myRecyclerView;
 
@@ -76,11 +78,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     NotificationManager notificationManager;
 
-    boolean isPlaying = false;
     public static boolean fromAlbumInfo, fromArtistInfo, aboutFragmentItemOpened;
 
     public static int positionInInfoAboutItem;
-
 
     BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -91,6 +91,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             }
         }
     };
+
     public void trackAudioSource() {
         IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         this.registerReceiver(audioSourceChangedReceiver, intentFilter);
@@ -231,12 +232,12 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     //Sets play button image
     public void playPauseBtnClicked() {
-            if (isPlaying) {
-                onTrackPause();
-            } else {
-                audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-                onTrackPlay();
-            }
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+            onTrackPlay();
+        }
     }
 
     public void onItemClick(int position) throws IOException {
@@ -530,9 +531,11 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     break;
                 case CreateNotification.ACTION_PLAY:
                     if (isPlaying) {
-                       onTrackPause();
+                        onTrackPause();
+                        Log.i("info", "pause");
                     } else {
-                       onTrackPlay();
+                        Log.i("info", "play");
+                        onTrackPlay();
                     }
                     break;
                 case CreateNotification.ACTION_NEXT:
@@ -599,6 +602,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     @Override
     public void onTrackPlay() {
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         isPlaying = true;
         mediaPlayer.start();
         if (fromSearch) {
@@ -614,7 +618,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
-        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         playPauseBtnInTab.setImageResource(R.drawable.pause_song);
     }
 
