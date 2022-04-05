@@ -40,7 +40,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -56,6 +55,7 @@ import com.project.tape.Adapters.AboutFragmentItemAdapter;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.Services.OnClearFromRecentService;
 import com.project.tape.SecondaryClasses.Song;
 
@@ -65,7 +65,7 @@ import java.util.Random;
 
 
 public class AboutFragmentItem extends AppCompatActivity implements AboutFragmentItemAdapter.OnItemListener,
-        MediaPlayer.OnCompletionListener, Playable {
+        MediaPlayer.OnCompletionListener, Playable, HeadsetActionButtonReceiver.Delegate {
 
     TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
     ImageView album_cover_in_itemInfo;
@@ -455,6 +455,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
+
         createChannel();
         trackAudioSource();
 
@@ -637,6 +638,21 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     R.drawable.play_song, position, songsList.size() - 1);
         }
         playPauseBtnInTab.setImageResource(R.drawable.play_song);
+    }
+
+
+    @Override
+    public void onMediaButtonSingleClick() {
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
     }
 
 

@@ -46,6 +46,14 @@
           <receiver android:name=".Services.NotificationActionService"/>
           <service android:name=".Services.OnClearFromRecentService"/>
 
+        <receiver
+            android:name=".SecondaryClasses.HeadsetActionButtonReceiver"
+            android:exported="true">
+            <intent-filter android:priority="10000">
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 

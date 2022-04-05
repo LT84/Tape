@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.tape.Activities.AboutFragmentItem;
 import com.project.tape.Adapters.ArtistsAdapter;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
 import java.io.IOException;
@@ -124,7 +125,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     public void onResume() {
         super.onResume();
         createChannel();
-
         trackAudioSource();
 
         song_title_main.setText(songNameStr);
@@ -168,4 +168,17 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     }
 
 
+    @Override
+    public void onMediaButtonSingleClick() {
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
+    }
 }

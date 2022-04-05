@@ -12,6 +12,7 @@ import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
@@ -22,8 +23,14 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.media.MediaSession2;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -39,6 +46,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.media.session.MediaButtonReceiver;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
@@ -258,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        songsFromSearch.clear();
         String userInput = newText.toLowerCase();
         ArrayList<Song> mySearch = new ArrayList<>();
         if (albumsFragmentSelected) {
@@ -350,15 +359,16 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public void onTrackPause() {
         isPlaying = false;
         mediaPlayer.pause();
+
         if (songSearchWasOpened) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
                     R.drawable.play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
-            CreateNotification.createNotification(this, staticCurrentSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentSongsInAlbum.size() - 1);
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(this, staticCurrentArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.play_song, position, songsList.size() - 1);

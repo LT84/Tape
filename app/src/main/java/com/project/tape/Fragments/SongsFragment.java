@@ -4,18 +4,15 @@ import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
-import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 
 import android.app.KeyguardManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -39,10 +36,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.tape.Adapters.SongsAdapter;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.Song;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -190,16 +187,19 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         fromAlbumInfo = false;
         fromArtistInfo = false;
 
+
         if (songSearchWasOpened) {
+            songsList = songsFromSearch;
             uri = Uri.parse(songsFromSearch.get(position).getData());
+            Log.i("searchDebug", "fromSearch");
+            songNameStr = songsFromSearch.get(position).getTitle();
+            artistNameStr = songsFromSearch.get(position).getArtist();
         } else {
+            songsList = mSongsList;
             uri = Uri.parse(songsList.get(position).getData());
+            songNameStr = songsList.get(position).getTitle();
+            artistNameStr = songsList.get(position).getArtist();
         }
-
-        songsList = mSongsList;
-
-        songNameStr = songsList.get(position).getTitle();
-        artistNameStr = songsList.get(position).getArtist();
 
         //Gets audioFocus, then creates mediaPlayer
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
@@ -254,6 +254,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         super.onResume();
         createChannel();
         trackAudioSource();
+
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(getActivity());
 
         if (!coverLoaded) {
             if (uri != null) {
@@ -328,6 +331,19 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     }
 
 
+    @Override
+    public void onMediaButtonSingleClick() {
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
+    }
 }
 
 

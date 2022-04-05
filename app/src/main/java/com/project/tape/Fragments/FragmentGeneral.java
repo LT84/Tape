@@ -32,7 +32,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,6 +42,7 @@ import com.bumptech.glide.Glide;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.Services.OnClearFromRecentService;
 import com.project.tape.SecondaryClasses.Song;
 
@@ -52,7 +52,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Random;
 
-public abstract class FragmentGeneral extends Fragment implements Playable {
+public abstract class FragmentGeneral extends Fragment implements Playable, HeadsetActionButtonReceiver.Delegate {
 
     ImageView album_cover_main;
     TextView song_title_main, artist_name_main;
@@ -352,6 +352,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable {
     };
 
     BroadcastReceiver audioSourceChangedReceiver;
+
     public void trackAudioSource() {
         audioSourceChangedReceiver = new BroadcastReceiver() {
             @Override

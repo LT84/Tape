@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.tape.Activities.AboutFragmentItem;
 import com.project.tape.Adapters.AlbumsAdapter;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
 import java.io.IOException;
@@ -206,5 +207,18 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
     }
 
 
+    @Override
+    public void onMediaButtonSingleClick() {
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
+    }
 }
 
