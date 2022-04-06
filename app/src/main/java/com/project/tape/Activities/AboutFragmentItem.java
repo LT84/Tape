@@ -40,6 +40,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -69,7 +70,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     TextView song_title_in_album, artist_name_in_album, song_title_main, artist_name_main, album_title_albumInfo;
     ImageView album_cover_in_itemInfo;
-    ImageButton backBtn, playPauseBtnInTab;
+    ImageButton backBtn, playPauseBtnInItemInfo;
     Button openFullInfoTab;
     RecyclerView myRecyclerView;
 
@@ -107,8 +108,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album = findViewById(R.id.song_title_in_itemInfo);
         artist_name_in_album = findViewById(R.id.artist_name_in_album);
         album_cover_in_itemInfo = findViewById(R.id.album_cover_in_itemInfo);
-        playPauseBtnInTab = findViewById(R.id.pause_button_in_itemInfo);
-        playPauseBtnInTab.setOnClickListener(btnListener);
+        playPauseBtnInItemInfo = findViewById(R.id.pause_button_in_itemInfo);
+        playPauseBtnInItemInfo.setOnClickListener(btnListener);
 
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
@@ -190,9 +191,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     private void getIntentMethod() {
         if (songsList != null) {
             if (mediaPlayer.isPlaying()) {
-                playPauseBtnInTab.setImageResource(R.drawable.pause_song);
+                playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
             } else {
-                playPauseBtnInTab.setImageResource(R.drawable.play_song);
+                playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
             }
         }
     }
@@ -289,7 +290,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
-        playPauseBtnInTab.setImageResource(R.drawable.pause_song);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
     }
 
     public void switchToNextSong() {
@@ -454,10 +455,12 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     protected void onResume() {
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
-
-
         createChannel();
         trackAudioSource();
+
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(this);
 
         if (art != null) {
             Glide.with(AboutFragmentItem.this)
@@ -471,9 +474,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     .into(album_cover_in_itemInfo);
         }
         if (mediaPlayer.isPlaying()) {
-            playPauseBtnInTab.setImageResource(R.drawable.pause_song);
+            playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
         } else {
-            playPauseBtnInTab.setImageResource(R.drawable.play_song);
+            playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
         }
         mediaPlayer.setOnCompletionListener(this);
         super.onResume();
@@ -617,7 +620,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
-        playPauseBtnInTab.setImageResource(R.drawable.pause_song);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
     }
 
     @Override
@@ -637,10 +640,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.play_song, position, songsList.size() - 1);
         }
-        playPauseBtnInTab.setImageResource(R.drawable.play_song);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
     }
 
-
+    //Called when headphones button pressed
     @Override
     public void onMediaButtonSingleClick() {
         if (isPlaying) {

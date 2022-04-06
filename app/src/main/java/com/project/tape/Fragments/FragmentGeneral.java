@@ -39,6 +39,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;

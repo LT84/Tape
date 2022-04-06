@@ -127,6 +127,10 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         createChannel();
         trackAudioSource();
 
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(getActivity());
+
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
         if (mediaPlayer != null) {
@@ -179,6 +183,9 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
 
     @Override
     public void onMediaButtonDoubleClick() {
-
     }
+
+
 }
+
+

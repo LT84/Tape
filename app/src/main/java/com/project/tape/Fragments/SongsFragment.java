@@ -4,7 +4,6 @@ import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
-import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
@@ -255,6 +254,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         createChannel();
         trackAudioSource();
 
+        //Register headphones buttons
         HeadsetActionButtonReceiver.delegate = this;
         HeadsetActionButtonReceiver.register(getActivity());
 
@@ -330,7 +330,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         }
     }
 
-
+    //Called when headphones button pressed
     @Override
     public void onMediaButtonSingleClick() {
         if (isPlaying) {
@@ -342,8 +342,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
     @Override
     public void onMediaButtonDoubleClick() {
-
     }
+
+
 }
 
 

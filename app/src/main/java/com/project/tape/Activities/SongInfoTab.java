@@ -34,8 +34,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -49,11 +47,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.Random;
 
-public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnCompletionListener, Playable {
+public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnCompletionListener, Playable,
+        HeadsetActionButtonReceiver.Delegate {
 
     TextView song_title, artist_name, time_duration_passed, time_duration_total, song_title_main, artist_name_main;
     ImageView album_cover, shuffleBtn, previousBtn, nextBtn, repeatBtn;
@@ -63,9 +63,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     private SeekBar seekBar;
     private final Handler handler = new Handler();
 
-    public static boolean repeatBtnClicked;
-    public static boolean shuffleBtnClicked;
-
+    public static boolean repeatBtnClicked, shuffleBtnClicked;
 
     NotificationManager notificationManager;
 
@@ -80,8 +78,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .getInt("positionInInfoAboutItem", positionInInfoAboutItem);
         fromArtistInfo = this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromArtistInfo", false);
-
-        trackAudioSource();
 
         initViews();
 
@@ -345,7 +341,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
         //Sets song and artist strings
         if (fromAlbumInfo) {
-            //Sets song uri, name and album title if it's from albumInfo
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
@@ -611,9 +606,13 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     @Override
     protected void onResume() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChannel();
-        }
+        createChannel();
+        trackAudioSource();
+
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(this);
+
         nextThreadBtn();
         playThreadBtn();
         previousThreadBtn();
@@ -704,7 +703,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             }
         }
     };
-
 
 
     //Calls when audio source changed
@@ -831,4 +829,18 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         playPauseBtn.setImageResource(R.drawable.play_song);
     }
 
+    //Called when headphones button pressed
+    @Override
+    public void onMediaButtonSingleClick() {
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
+    }
 }

@@ -12,16 +12,15 @@
 
     <application
         android:allowBackup="true"
-        android:hardwareAccelerated="true"
         android:fullBackupContent="false"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
-        tools:ignore="GoogleAppIndexingWarning"
-        >
+        tools:ignore="GoogleAppIndexingWarning">
 
         <activity
             android:name=".Activities.AboutFragmentItem"
@@ -34,8 +33,7 @@
         <activity
             android:name=".Activities.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyOwnSize"
-            >
+            android:theme="@style/Theme.MyOwnSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,8 +41,7 @@
             </intent-filter>
         </activity>
 
-          <receiver android:name=".Services.NotificationActionService"/>
-          <service android:name=".Services.OnClearFromRecentService"/>
+        <receiver android:name=".Services.NotificationActionService" />
 
         <receiver
             android:name=".SecondaryClasses.HeadsetActionButtonReceiver"
@@ -54,7 +51,9 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".Services.OnClearFromRecentService" />
+
     </application>
 
 
-    </manifest>
+</manifest>

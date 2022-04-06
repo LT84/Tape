@@ -154,6 +154,10 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
         createChannel();
         trackAudioSource();
 
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(getActivity());
+
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
         if (mediaPlayer != null) {
@@ -218,7 +222,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
 
     @Override
     public void onMediaButtonDoubleClick() {
-
     }
+
+
 }
 
