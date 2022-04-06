@@ -4,6 +4,7 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.MainActivity.SORT_PREF;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
@@ -23,6 +24,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -83,12 +85,23 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
 
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {
-        ContentResolver contentResolver = getActivity().getContentResolver();
+        SharedPreferences preferences = getActivity().getSharedPreferences(SORT_PREF, Context.MODE_PRIVATE);
+        String sortArrayOrder = preferences.getString("sort", "sortByDate");
+
+        String sortOrder = null;
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-        Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
 
+        switch (sortArrayOrder) {
+            case "sortByName":
+                sortOrder = MediaStore.MediaColumns.DISPLAY_NAME;
+                break;
+            case "sortByDate":
+                sortOrder = MediaStore.MediaColumns.DATE_ADDED;
+                break;
+        }
+
+        Cursor cursor = getActivity().getContentResolver().query(uri, null, selection, null, sortOrder);
         if (cursor != null && cursor.getCount() > 0) {
             songsList = new ArrayList<>();
             while (cursor.moveToNext()) {
@@ -102,6 +115,9 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             }
         }
         cursor.close();
+        if (sortArrayOrder.equals("sortByDate")) {
+            Collections.reverse(songsList);
+        }
     }
 
     //Gets random number

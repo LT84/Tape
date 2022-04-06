@@ -21,6 +21,7 @@ import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaSession2;
@@ -30,6 +31,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +40,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     MenuItem menuItem;
     public static String songNameStr;
     public static String artistNameStr;
+    public static String SORT_PREF = "SortOrder";
 
     public static ArrayList<Song> songsFromSearch = new ArrayList<>();
     public static boolean songSearchWasOpened;
@@ -215,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     };
 
-
     //Functions for search
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -306,11 +309,29 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         return true;
     }
 
+    //Select sort order
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+            SharedPreferences.Editor editor = getSharedPreferences(SORT_PREF, MODE_PRIVATE).edit();
+            switch (item.getItemId()) {
+                case R.id.sort_by_date:
+                    editor.putString("sort", "sortByDate");
+                    editor.apply();
+                    this.recreate();
+                    break;
+                case R.id.sort_by_name:
+                    editor.putString("sort", "sortByName");
+                    editor.apply();
+                    this.recreate();
+                    break;
+            }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
                     "Tape", NotificationManager.IMPORTANCE_HIGH);
-
             notificationManager = getSystemService(NotificationManager.class);
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
