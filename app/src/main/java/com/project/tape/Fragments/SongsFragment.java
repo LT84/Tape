@@ -10,7 +10,6 @@ import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.Fragments.FragmentGeneral.position;
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -31,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,7 +45,7 @@ import java.util.ArrayList;
 
 public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
 
-    private RecyclerView myRecyclerView;
+    public static RecyclerView myRecyclerView;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
     public static ArrayList<Song> albumList = new ArrayList<>();
@@ -189,7 +187,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         fromAlbumInfo = false;
         fromArtistInfo = false;
 
-        if (songSearchWasOpened) {
+       if (songSearchWasOpened) {
             songsList = songsFromSearch;
             uri = Uri.parse(songsFromSearch.get(position).getData());
             Log.i("searchDebug", "fromSearch");
