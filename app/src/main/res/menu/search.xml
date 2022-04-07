@@ -16,8 +16,6 @@
         android:icon="@drawable/ic_dots"
         android:title="sort by"
         app:showAsAction="always"
-        >
-    </item>
-
+        />
 
 </menu>

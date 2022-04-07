@@ -24,7 +24,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
         android:text="Choose sorting mode"
-        android:textColor="@color/white"
+        android:textColor="@color/secondaryColor"
         android:textSize="18sp" />
 
 

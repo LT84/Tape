@@ -23,6 +23,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.media.MediaSession2;
 import android.media.session.MediaSession;
@@ -39,6 +40,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -48,6 +50,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.graphics.drawable.WrappedDrawable;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.media.session.MediaButtonReceiver;
@@ -229,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
-        sortBtn =  menu.findItem(R.id.sort_option);
+        sortBtn = menu.findItem(R.id.sort_option);
         menuItem = menu.findItem(R.id.search_option);
         sortBtn.getActionView();
         searchView = (SearchView) menuItem.getActionView();
@@ -333,7 +337,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     }
 
 
-
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
@@ -402,7 +405,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
         playPauseBtn.setImageResource(R.drawable.play_song);
     }
-
 
 
 }
