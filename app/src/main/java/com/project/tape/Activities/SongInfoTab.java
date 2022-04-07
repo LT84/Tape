@@ -3,6 +3,8 @@ package com.project.tape.Activities;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
+import static com.project.tape.Activities.SortChoice.switchBetweenSorts;
 import static com.project.tape.Fragments.FragmentGeneral.art;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
@@ -44,6 +46,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.project.tape.Fragments.FragmentGeneral;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
@@ -104,12 +107,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
 
@@ -183,7 +184,12 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             time_duration_total.setText(formattedTime(durationTotal));
         } else {
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
-            durationTotal = Integer.parseInt(songsList.get(position).getDuration()) / 1000;
+            if (switchBetweenSorts) {
+                durationTotal = getSharedPreferences("durationTotal", Context.MODE_PRIVATE)
+                        .getInt("durationTotal", 0);
+            } else {
+                durationTotal = Integer.parseInt(songsList.get(position).getDuration()) / 1000;
+            }
             time_duration_total.setText(formattedTime(durationTotal));
         }
         //Sets art in SongInfoTab

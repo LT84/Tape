@@ -31,6 +31,9 @@
             android:exported="false"
             android:theme="@style/Theme.MyOwnSize" />
         <activity
+            android:name=".Activities.SortChoice"
+            />
+        <activity
             android:name=".Activities.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MyOwnSize">
@@ -40,7 +43,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <receiver android:name=".Services.NotificationActionService" />
 
         <receiver

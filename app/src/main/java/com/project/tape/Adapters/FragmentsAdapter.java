@@ -37,4 +37,6 @@ public class FragmentsAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return 4;
     }
+
+
 }

@@ -363,13 +363,11 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
                 onTrackPause();
             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                onTrackPause();
             }
         }
     };
 
     BroadcastReceiver audioSourceChangedReceiver;
-
     public void trackAudioSource() {
         audioSourceChangedReceiver = new BroadcastReceiver() {
             @Override

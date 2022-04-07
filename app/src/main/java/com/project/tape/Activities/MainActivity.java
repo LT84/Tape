@@ -49,11 +49,14 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.media.session.MediaButtonReceiver;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
+import com.project.tape.Adapters.SongsAdapter;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Fragments.AlbumsFragment;
@@ -73,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     FragmentsAdapter adapter;
     Button fullInformationTab;
     SearchView searchView;
-    MenuItem menuItem;
+    MenuItem menuItem, sortBtn;
     public static String songNameStr;
     public static String artistNameStr;
     public static String SORT_PREF = "SortOrder";
@@ -134,16 +137,19 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                         songsFragmentSelected = false;
                         albumsFragmentSelected = true;
                         artistsFragmentSelected = false;
+                        sortBtn.setEnabled(false);
                     } else if (tab.getPosition() == 2) {
                         searchView.setQueryHint("Find your artist");
                         songsFragmentSelected = false;
                         artistsFragmentSelected = true;
                         albumsFragmentSelected = false;
+                        sortBtn.setEnabled(false);
                     } else if (tab.getPosition() == 0) {
                         searchView.setQueryHint("Find your song");
                         songsFragmentSelected = true;
                         artistsFragmentSelected = false;
                         albumsFragmentSelected = false;
+                        sortBtn.setEnabled(true);
                     }
                 }
                 pager2.setCurrentItem(tab.getPosition());
@@ -223,7 +229,9 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
+        sortBtn =  menu.findItem(R.id.sort_option);
         menuItem = menu.findItem(R.id.search_option);
+        sortBtn.getActionView();
         searchView = (SearchView) menuItem.getActionView();
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("Find your song");
@@ -231,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             @Override
             public void onClick(View v) {
                 pager2.setUserInputEnabled(false);
+                sortBtn.setVisible(false);
                 LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
                 for (int i = 0; i < tabStrip.getChildCount(); i++) {
                     tabStrip.getChildAt(i).setOnTouchListener(new View.OnTouchListener() {
@@ -247,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             public boolean onClose() {
                 pager2.setUserInputEnabled(true);
                 songSearchWasOpened = false;
+                sortBtn.setVisible(true);
                 LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
                 for (int i = 0; i < tabStrip.getChildCount(); i++) {
                     tabStrip.getChildAt(i).setOnTouchListener(new View.OnTouchListener() {
@@ -312,21 +322,17 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     //Select sort order
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-            SharedPreferences.Editor editor = getSharedPreferences(SORT_PREF, MODE_PRIVATE).edit();
-            switch (item.getItemId()) {
-                case R.id.sort_by_date:
-                    editor.putString("sort", "sortByDate");
-                    editor.apply();
-                    this.recreate();
-                    break;
-                case R.id.sort_by_name:
-                    editor.putString("sort", "sortByName");
-                    editor.apply();
-                    this.recreate();
-                    break;
-            }
+        SharedPreferences.Editor editor = getSharedPreferences(SORT_PREF, MODE_PRIVATE).edit();
+        switch (item.getItemId()) {
+            case R.id.sort_option:
+                Intent intent = new Intent(MainActivity.this, SortChoice.class);
+                startActivity(intent);
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -396,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
         playPauseBtn.setImageResource(R.drawable.play_song);
     }
+
 
 
 }

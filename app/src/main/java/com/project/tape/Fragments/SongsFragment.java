@@ -7,8 +7,10 @@ import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Fragments.FragmentGeneral.position;
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -29,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -186,7 +189,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         fromAlbumInfo = false;
         fromArtistInfo = false;
 
-
         if (songSearchWasOpened) {
             songsList = songsFromSearch;
             uri = Uri.parse(songsFromSearch.get(position).getData());
@@ -226,6 +228,8 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .putInt("position", position).commit();
         getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
+        getActivity().getSharedPreferences("durationTotal", Context.MODE_PRIVATE).edit()
+                .putInt("durationTotal", Integer.parseInt(songsList.get(position).getDuration()) / 1000).apply();
 
         // mediaPlayer.setOnCompletionListener(this);
         song_title_main.setText(songsList.get(position).getTitle());
@@ -253,6 +257,14 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         super.onResume();
         createChannel();
         trackAudioSource();
+
+        //Sets adapter after user sets sort preference
+        if (sortChoiceChanged) {
+            loadAudio();
+            songsAdapter = new SongsAdapter(getContext(), songsList, this);
+            myRecyclerView.setAdapter(songsAdapter);
+            sortChoiceChanged = false;
+        }
 
         //Register headphones buttons
         HeadsetActionButtonReceiver.delegate = this;
