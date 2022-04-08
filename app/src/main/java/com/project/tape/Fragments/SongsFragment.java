@@ -10,6 +10,7 @@ import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Adapters.SongsAdapter.myRecyclerView;
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -45,7 +46,7 @@ import java.util.ArrayList;
 
 public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
 
-    public static RecyclerView myRecyclerView;
+
     private static final int VERTICAL_ITEM_SPACE = 3;
 
     public static ArrayList<Song> albumList = new ArrayList<>();
@@ -229,7 +230,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         getActivity().getSharedPreferences("durationTotal", Context.MODE_PRIVATE).edit()
                 .putInt("durationTotal", Integer.parseInt(songsList.get(position).getDuration()) / 1000).apply();
 
-        // mediaPlayer.setOnCompletionListener(this);
+        mediaPlayer.setOnCompletionListener(this);
         song_title_main.setText(songsList.get(position).getTitle());
         artist_name_main.setText(songsList.get(position).getArtist());
         mainPlayPauseBtn.setImageResource(R.drawable.pause_song);

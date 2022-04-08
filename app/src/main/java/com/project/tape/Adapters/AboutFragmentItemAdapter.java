@@ -1,6 +1,8 @@
 package com.project.tape.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +65,7 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
             tv_title = (TextView) itemView.findViewById(R.id.song_title);
             tv_artist = (TextView) itemView.findViewById(R.id.artist_title);
             tv_album = (TextView) itemView.findViewById(R.id.album_title);
+            tv_title.setTextColor(Color.parseColor("#ffffff"));
             itemView.setOnClickListener(this);
         }
 
@@ -73,6 +76,21 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            //Changing color of item in recyclerView for a short time after it is clicked
+            tv_title.setTextColor(Color.parseColor("#66d9e0"));
+            tv_artist.setTextColor(Color.parseColor("#66d9e0"));
+            tv_album.setTextColor(Color.parseColor("#66d9e0"));
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    tv_title.setTextColor(Color.parseColor("#ffffff"));
+                    tv_artist.setTextColor(Color.parseColor("#ffffff"));
+                    tv_album.setTextColor(Color.parseColor("#ffffff"));
+                }
+            }, 300);
+
         }
 
     }

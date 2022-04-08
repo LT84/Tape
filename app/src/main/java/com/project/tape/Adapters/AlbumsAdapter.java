@@ -1,6 +1,7 @@
 package com.project.tape.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -84,7 +85,6 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.AlbumViewH
     public class AlbumViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tv_album_title;
         ImageView album_cover_albumFragment;
-
         OnAlbumListener onAlbumListener;
 
         public AlbumViewHolder(@NonNull View itemView, OnAlbumListener onAlbumListener) {
