@@ -316,9 +316,8 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        switchNextSongInFragment();
-        getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
-                .putInt("position", position).commit();
+        onTrackNext();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     @Override

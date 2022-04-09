@@ -206,7 +206,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        switchNextSongInFragment();
+        onTrackNext();
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
     }
 

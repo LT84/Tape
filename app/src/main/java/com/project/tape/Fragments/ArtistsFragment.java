@@ -167,7 +167,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        switchNextSongInFragment();
+        onTrackNext();
         mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
     }
 

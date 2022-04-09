@@ -504,8 +504,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
-        switchToNextSong();
+        onTrackNext();
+        mediaPlayer.setOnCompletionListener(this);
     }
+
 
     //Calls when audio source changed
     BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
