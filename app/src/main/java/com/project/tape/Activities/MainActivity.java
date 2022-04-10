@@ -18,6 +18,7 @@ import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -218,7 +219,10 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             switch (v.getId()) {
                 case R.id.open_information_tab:
                     Intent intent = new Intent(MainActivity.this, SongInfoTab.class);
-                    startActivity(intent);
+
+                    Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle();
+
+                    startActivity(intent, bundle);
                     break;
                 case R.id.pause_button:
                     playPauseBtnClicked();

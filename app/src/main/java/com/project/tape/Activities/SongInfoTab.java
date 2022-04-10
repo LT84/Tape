@@ -3,6 +3,7 @@ package com.project.tape.Activities;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
 import static com.project.tape.Activities.SortChoice.switchBetweenSorts;
 import static com.project.tape.Fragments.FragmentGeneral.art;
@@ -81,6 +82,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .getInt("positionInInfoAboutItem", positionInInfoAboutItem);
         fromArtistInfo = this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromArtistInfo", false);
+        shuffleBtnClicked = this.getSharedPreferences("shuffleBtnClicked", Context.MODE_PRIVATE)
+                .getBoolean("shuffleBtnClicked", false);
 
         initViews();
 
@@ -316,26 +319,34 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
-            } else if (songSearchWasOpened) {
+            } else if (fromSearch) {
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
             } else {
                 position = getRandom(songsList.size() - 1);
             }
+        } else if (!shuffleBtnClicked && repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
+            } else if (fromSearch) {
+                uri = Uri.parse(songsFromSearch.get(position).getData());
+            } else {
+                uri = Uri.parse(songsList.get(position).getData());
+            }
         } else if (!shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
-                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
-                        ? (0) : (positionInInfoAboutItem + 1);
-            } else if (songSearchWasOpened) {
-                position = position + 1 == songsFromSearch.size() ? (0)
-                        : (position + 1);
+                positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousSongsInAlbum.size() - 1)
+                        : (positionInInfoAboutItem - 1);
+            } else if (fromSearch) {
+                position = position - 1 < 0 ? (songsFromSearch.size() - 1)
+                        : (position - 1);
             } else if (fromArtistInfo) {
-                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
-                        ? (0) : (positionInInfoAboutItem + 1);
+                positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousArtistSongs.size() - 1)
+                        : (positionInInfoAboutItem - 1);
             } else {
-                position = position + 1 == songsList.size() ? (0)
-                        : (position + 1);
+                position = position - 1 < 0 ? (songsList.size() - 1)
+                        : (position - 1);
             }
         } else if (shuffleBtnClicked && repeatBtnClicked) {
             position = getRandom(songsList.size() - 1);
@@ -683,24 +694,38 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     if (shuffleBtnClicked) {
                         shuffleBtnClicked = false;
                         shuffleBtn.setImageResource(R.drawable.shuffle_songs_off);
+                        SongInfoTab.this.getSharedPreferences("shuffleBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("shuffleBtnClicked", shuffleBtnClicked).commit();
+                        SongInfoTab.this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("repeatBtnClicked", repeatBtnClicked).commit();
                     } else {
                         shuffleBtnClicked = true;
-                        shuffleBtn.setImageResource(R.drawable.shuffle_songs_on);
                         repeatBtnClicked = false;
+                        shuffleBtn.setImageResource(R.drawable.shuffle_songs_on);
                         repeatBtn.setImageResource(R.drawable.repeat_song_off);
+                        SongInfoTab.this.getSharedPreferences("shuffleBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("shuffleBtnClicked", shuffleBtnClicked).commit();
+                        SongInfoTab.this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("repeatBtnClicked", repeatBtnClicked).commit();
                     }
                     break;
                 case R.id.infoTab_repeat_button:
                     if (repeatBtnClicked) {
                         repeatBtnClicked = false;
+                        repeatBtn.setImageResource(R.drawable.repeat_song_off);
                         SongInfoTab.this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                                 .putBoolean("repeatBtnClicked", repeatBtnClicked).commit();
-                        repeatBtn.setImageResource(R.drawable.repeat_song_off);
+                        SongInfoTab.this.getSharedPreferences("shuffleBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("shuffleBtnClicked", shuffleBtnClicked).commit();
                     } else {
                         repeatBtnClicked = true;
+                        shuffleBtnClicked = false;
+                        repeatBtn.setImageResource(R.drawable.repeat_song_on);
+                        shuffleBtn.setImageResource(R.drawable.shuffle_songs_off);
                         SongInfoTab.this.getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                                 .putBoolean("repeatBtnClicked", repeatBtnClicked).commit();
-                        repeatBtn.setImageResource(R.drawable.repeat_song_on);
+                        SongInfoTab.this.getSharedPreferences("shuffleBtnClicked", Context.MODE_PRIVATE).edit()
+                                .putBoolean("shuffleBtnClicked", shuffleBtnClicked).commit();
                     }
                     break;
                 case R.id.backBtn_songInfo:
