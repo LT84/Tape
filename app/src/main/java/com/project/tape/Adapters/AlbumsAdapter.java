@@ -1,9 +1,12 @@
 package com.project.tape.Adapters;
 
+import static com.project.tape.Fragments.FragmentGeneral.position;
+
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.CancellationSignal;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +14,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.ListPreloader;
 import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.util.FixedPreloadSizeProvider;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.AlbumViewHolder> {
 
@@ -47,28 +54,30 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.AlbumViewH
         return vHolder;
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull AlbumViewHolder holder, int position) {
-        holder.tv_album_title.setText(mAlbumList.get(position).getAlbum());
-        uri = Uri.parse(mAlbumList.get(position).getData());
-        retriever.setDataSource(uri.toString());
-        art = retriever.getEmbeddedPicture();
-        if (art != null) {
-            Glide.with(mContext)
-                    .asBitmap()
-                    .load(art)
-                    .format(DecodeFormat.PREFER_RGB_565)
-                    .override(100, 100)
-                    .placeholder(R.drawable.default_cover)
-                    .into(holder.album_cover_albumFragment);
-        } else {
-            Glide.with(mContext)
-                    .asBitmap()
-                    .load(R.drawable.default_cover)
-                    .override(100, 100)
-                    .into(holder.album_cover_albumFragment);
-        }
+            holder.tv_album_title.setText(mAlbumList.get(position).getAlbum());
+            uri = Uri.parse(mAlbumList.get(holder.getAdapterPosition()).getData());
+            retriever.setDataSource(uri.toString());
+            art = retriever.getEmbeddedPicture();
+            if (art != null) {
+                Glide.with(mContext)
+                        .asBitmap()
+                        .load(art)
+                        .format(DecodeFormat.PREFER_RGB_565)
+                        .override(100, 100)
+                        .placeholder(R.drawable.default_cover)
+                        .into(holder.album_cover_albumFragment);
+            } else {
+                Glide.with(mContext)
+                        .asBitmap()
+                        .load(R.drawable.default_cover)
+                        .override(100, 100)
+                        .into(holder.album_cover_albumFragment);
+            }
     }
+
 
     @Override
     public void onViewRecycled(@NonNull AlbumViewHolder holder) {

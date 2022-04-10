@@ -62,6 +62,7 @@ public class SortChoice extends AppCompatActivity {
                 editor.apply();
                 getSharedPreferences("radioBtnIndex", Context.MODE_PRIVATE).edit()
                         .putInt("radioBtnIndex", 0).apply();
+                finish();
                 break;
             case R.id.sort_by_date:
                 if (checked)
@@ -70,6 +71,7 @@ public class SortChoice extends AppCompatActivity {
                 editor.apply();
                 getSharedPreferences("radioBtnIndex", Context.MODE_PRIVATE).edit()
                         .putInt("radioBtnIndex", 1).apply();
+                finish();
                 break;
         }
     }

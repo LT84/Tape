@@ -36,7 +36,8 @@
         <activity
             android:name=".Activities.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyOwnSize">
+            android:theme="@style/Theme.MyOwnSize"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
