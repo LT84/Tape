@@ -1,16 +1,17 @@
 package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
-import static com.project.tape.Adapters.AlbumsAdapter.mAlbumList;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Adapters.AlbumsAdapter.mAlbumList;
+import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
 import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
-import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
 
+import android.app.ActivityOptions;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -114,6 +115,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
         }
 
         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
+
         if (searchOpenedInAlbumFragments) {
             intent.putExtra("albumName", mAlbumList.get(position).getAlbum());
         } else {
@@ -128,7 +131,7 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
 
         getActivity().unregisterReceiver(audioSourceChangedReceiver);
 
-        startActivityForResult(intent, REQUEST_CODE);
+        startActivityForResult(intent, REQUEST_CODE, bundle);
         //Sorting albumsFragment
         sortAlbumsList();
     }

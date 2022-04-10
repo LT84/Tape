@@ -63,6 +63,7 @@ public class SortChoice extends AppCompatActivity {
                 getSharedPreferences("radioBtnIndex", Context.MODE_PRIVATE).edit()
                         .putInt("radioBtnIndex", 0).apply();
                 finish();
+                overridePendingTransition(0, R.anim.hold);
                 break;
             case R.id.sort_by_date:
                 if (checked)
@@ -72,6 +73,7 @@ public class SortChoice extends AppCompatActivity {
                 getSharedPreferences("radioBtnIndex", Context.MODE_PRIVATE).edit()
                         .putInt("radioBtnIndex", 1).apply();
                 finish();
+                overridePendingTransition(0, R.anim.hold);
                 break;
         }
     }
@@ -80,6 +82,7 @@ public class SortChoice extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             finish();
+            overridePendingTransition(0, R.anim.hold);
         }
     };
 

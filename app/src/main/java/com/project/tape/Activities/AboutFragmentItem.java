@@ -1,20 +1,20 @@
 package com.project.tape.Activities;
 
-import static com.project.tape.Activities.MainActivity.fromSearch;
-import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
-import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
-import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
-import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
-import static com.project.tape.Fragments.FragmentGeneral.position;
-import static com.project.tape.Fragments.FragmentGeneral.songsList;
-import static com.project.tape.Fragments.FragmentGeneral.audioManager;
-import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
-import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
+import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
+import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
+import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.audioManager;
+import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
+import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
+import static com.project.tape.Fragments.FragmentGeneral.position;
+import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.art;
 import static com.project.tape.Fragments.SongsFragment.artistName;
@@ -40,7 +40,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -53,12 +52,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.project.tape.Adapters.AboutFragmentItemAdapter;
-import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.Services.OnClearFromRecentService;
 import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.Services.OnClearFromRecentService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -204,6 +203,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             switch (v.getId()) {
                 case R.id.backBtn_fragmentItemInfo:
                     finish();
+                    overridePendingTransition(0, R.anim.hold);
                     break;
                 case R.id.pause_button_in_itemInfo:
                     playPauseBtnClicked();

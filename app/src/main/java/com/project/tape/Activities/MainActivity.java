@@ -4,18 +4,17 @@ import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
+import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
-import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
-import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
-import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 
 import android.Manifest;
 import android.app.ActivityOptions;
@@ -24,26 +23,16 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
 import android.media.AudioManager;
-import android.media.MediaSession2;
-import android.media.session.MediaSession;
-import android.media.session.PlaybackState;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,23 +40,17 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.graphics.drawable.WrappedDrawable;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.media.session.MediaButtonReceiver;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
-import com.project.tape.Adapters.SongsAdapter;
-import com.project.tape.Interfaces.Playable;
-import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Fragments.AlbumsFragment;
 import com.project.tape.Fragments.ArtistsFragment;
 import com.project.tape.Fragments.SongsFragment;
+import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.Song;
 
 import java.util.ArrayList;
@@ -219,9 +202,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             switch (v.getId()) {
                 case R.id.open_information_tab:
                     Intent intent = new Intent(MainActivity.this, SongInfoTab.class);
-
                     Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle();
-
                     startActivity(intent, bundle);
                     break;
                 case R.id.pause_button:
@@ -334,7 +315,8 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         switch (item.getItemId()) {
             case R.id.sort_option:
                 Intent intent = new Intent(MainActivity.this, SortChoice.class);
-                startActivity(intent);
+                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle();
+                startActivity(intent, bundle);
                 break;
         }
         return super.onOptionsItemSelected(item);

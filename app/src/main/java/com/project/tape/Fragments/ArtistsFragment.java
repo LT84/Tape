@@ -1,14 +1,15 @@
 package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
-import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
-import static com.project.tape.Adapters.ArtistsAdapter.mArtistsList;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInArtistsFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Adapters.ArtistsAdapter.mArtistsList;
+import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.artistName;
 
+import android.app.ActivityOptions;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -91,6 +92,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         }
 
         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
+        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
 
         if (searchOpenedInArtistsFragments) {
             intent.putExtra("artistName", mArtistsList.get(position).getArtist());
@@ -104,7 +106,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             getActivity().unregisterReceiver(broadcastReceiver);
         }
 
-        startActivityForResult(intent, REQUEST_CODE);
+        startActivityForResult(intent, REQUEST_CODE, bundle);
         //Sorting artistsList
         sortArtistsList();
     }

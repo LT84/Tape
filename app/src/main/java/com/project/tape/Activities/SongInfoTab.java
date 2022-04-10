@@ -3,17 +3,16 @@ package com.project.tape.Activities;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.fromSearch;
-import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
+import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SortChoice.switchBetweenSorts;
 import static com.project.tape.Fragments.FragmentGeneral.art;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
-import static com.project.tape.Activities.MainActivity.artistNameStr;
-import static com.project.tape.Activities.MainActivity.songNameStr;
-import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
-import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
@@ -47,7 +46,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.project.tape.Fragments.FragmentGeneral;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
@@ -730,11 +728,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     break;
                 case R.id.backBtn_songInfo:
                     finish();
+                    overridePendingTransition(0, R.anim.hold);
                     break;
             }
         }
     };
-
 
     //Calls when audio source changed
     BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
