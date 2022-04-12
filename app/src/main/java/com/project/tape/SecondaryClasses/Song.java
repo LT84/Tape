@@ -10,6 +10,7 @@ public class Song  {
     private String duration;
 
 
+
     public Song(String data, String title, String album, String artist, String duration) {
         this.data = data;
         this.title = title;

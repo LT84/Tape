@@ -5,7 +5,7 @@ import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.Adapters.AlbumsAdapter.mAlbumList;
+import static com.project.tape.Adapters.AlbumsAdapter.mAlbum;
 import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
 import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.albumName;
@@ -27,26 +27,32 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.tape.Activities.AboutFragmentItem;
 import com.project.tape.Adapters.AlbumsAdapter;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Album;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
+import com.project.tape.SecondaryClasses.MusicLoader;
+import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnAlbumListener, MediaPlayer.OnCompletionListener {
+public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCompletionListener, LoaderManager.LoaderCallbacks<List<Album>> {
 
 
     TextView album_title_albumFragments;
     ImageView album_cover_albumFragment;
     LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
     private Parcelable listState;
-    private RecyclerView myRecyclerView;
+    public static RecyclerView myRecyclerView;
 
     int positionIndex, topView;
     final int REQUEST_CODE = 1;
@@ -57,6 +63,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
     private boolean oneTime = false;
 
     public static boolean fromAlbumsFragment;
+
+    ArrayList<Album> albumLists = new ArrayList<>();
 
 
     @Nullable
@@ -80,14 +88,54 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
         artist_name_main.setText(artistNameStr);
 
         //Sets adapter to list and applies settings to recyclerView
-        albumsAdapter = new AlbumsAdapter(getContext(), albumList, this);
+        albumsAdapter = new AlbumsAdapter(getContext(), albumLists);
 
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
-        myRecyclerView.setLayoutManager(LLMAlbumFragment);
         myRecyclerView.setAdapter(albumsAdapter);
         myRecyclerView.setItemViewCacheSize(300);
         myRecyclerView.setDrawingCacheEnabled(true);
         myRecyclerView.setHasFixedSize(true);
+        myRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+
+        myRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), myRecyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        fromAlbumsFragment = true;
+                        fromArtistsFragment = false;
+
+
+
+                        Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
+                        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
+
+                        if (searchOpenedInAlbumFragments) {
+                            intent.putExtra("albumName", mAlbum.get(position).getAlbumName());
+                        } else {
+                            intent.putExtra("albumName", albumList.get(position).getAlbum());
+                        }
+                        getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
+                                .putString("albumName", albumName).commit();
+
+                        if (oneTime) {
+                            getActivity().unregisterReceiver(broadcastReceiver);
+                        }
+
+                       // getActivity().unregisterReceiver(audioSourceChangedReceiver);
+
+                        startActivityForResult(intent, REQUEST_CODE, bundle);
+                        //Sorting albumsFragment
+                        //sortAlbumsList();
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+                        // do whatever
+                    }
+                })
+
+        );
+
+        final LoaderManager supportLoaderManager = getActivity().getSupportLoaderManager();
+        supportLoaderManager.initLoader(1, null, this);
 
         //Opens place where recyclerView has stopped
         if (listState != null) {
@@ -97,43 +145,44 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
         return v;
     }
 
+    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
+
+        public WrapContentLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
+            super(context, orientation, reverseLayout);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+
+            }
+        }
+    }
+
+
+    public Loader<List<Album>> onCreateLoader(int id, Bundle args) {
+        return new MusicLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<Album>> loader, List<Album> data) {
+        // Add the newly loaded music to adapter.
+        albumsAdapter.addItems(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Album>> loader) {
+        // Clear the old music because a new list is going to be coming.
+        albumsAdapter.clearItem();
+    }
+
     //Saving place where recyclerView stopped
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
-    }
-
-    //ClickListener in recyclerView
-    @Override
-    public void onAlbumClick(int position) throws IOException {
-        fromAlbumsFragment = true;
-        fromArtistsFragment = false;
-
-        if (searchOpenedInAlbumFragments) {
-            albumList.addAll(mAlbumList);
-        }
-
-        Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
-        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
-
-        if (searchOpenedInAlbumFragments) {
-            intent.putExtra("albumName", mAlbumList.get(position).getAlbum());
-        } else {
-            intent.putExtra("albumName", albumList.get(position).getAlbum());
-        }
-        getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
-                .putString("albumName", albumName).commit();
-
-        if (oneTime) {
-            getActivity().unregisterReceiver(broadcastReceiver);
-        }
-
-        getActivity().unregisterReceiver(audioSourceChangedReceiver);
-
-        startActivityForResult(intent, REQUEST_CODE, bundle);
-        //Sorting albumsFragment
-        sortAlbumsList();
     }
 
     @Override
@@ -156,6 +205,8 @@ public class AlbumsFragment extends FragmentGeneral implements AlbumsAdapter.OnA
         super.onResume();
         createChannel();
         trackAudioSource();
+
+        myRecyclerView.swapAdapter(albumsAdapter, false);
 
         //Register headphones buttons
         HeadsetActionButtonReceiver.delegate = this;

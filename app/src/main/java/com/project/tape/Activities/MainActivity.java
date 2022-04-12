@@ -3,13 +3,13 @@ package com.project.tape.Activities;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Adapters.AlbumsAdapter.mAlbum;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
-import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
@@ -50,6 +50,7 @@ import com.project.tape.Fragments.ArtistsFragment;
 import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.Album;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.Song;
 
@@ -271,16 +272,17 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         songsFromSearch.clear();
         String userInput = newText.toLowerCase();
         ArrayList<Song> mySearch = new ArrayList<>();
+        ArrayList<Album> myAlbumSearch = new ArrayList<>();
         if (albumsFragmentSelected) {
             searchOpenedInAlbumFragments = true;
             songSearchWasOpened = true;
             userInput = newText.toLowerCase();
-            for (Song song : albumList) {
-                if (song.getAlbum().toLowerCase().contains(userInput)) {
-                    mySearch.add(song);
+            for (Album album : mAlbum) {
+                if (album.getAlbumName().toLowerCase().contains(userInput)) {
+                    myAlbumSearch.add(album);
                 }
             }
-            AlbumsFragment.albumsAdapter.updateAlbumList(mySearch);
+            AlbumsFragment.albumsAdapter.updateAlbumList(myAlbumSearch);
         }
         if (artistsFragmentSelected) {
             searchOpenedInArtistsFragments = true;
