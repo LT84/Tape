@@ -3,7 +3,8 @@ package com.project.tape.Activities;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
-import static com.project.tape.Adapters.AlbumsAdapter.mAlbum;
+import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
+import static com.project.tape.Fragments.AlbumsFragment.albumsAdapter;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
@@ -35,29 +36,33 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
-import com.project.tape.Fragments.AlbumsFragment;
 import com.project.tape.Fragments.ArtistsFragment;
 import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.Album;
 import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.SecondaryClasses.MusicLoader;
 import com.project.tape.SecondaryClasses.Song;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable {
+public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable,  LoaderManager.LoaderCallbacks<List<Album>> {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
@@ -247,6 +252,11 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                 pager2.setUserInputEnabled(true);
                 songSearchWasOpened = false;
                 sortBtn.setVisible(true);
+
+                //Loads albums list again, after search closed
+                final LoaderManager supportLoaderManager = MainActivity.this.getSupportLoaderManager();
+                supportLoaderManager.initLoader(1, null, MainActivity.this);
+
                 LinearLayout tabStrip = ((LinearLayout) tabLayout.getChildAt(0));
                 for (int i = 0; i < tabStrip.getChildCount(); i++) {
                     tabStrip.getChildAt(i).setOnTouchListener(new View.OnTouchListener() {
@@ -277,12 +287,12 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             searchOpenedInAlbumFragments = true;
             songSearchWasOpened = true;
             userInput = newText.toLowerCase();
-            for (Album album : mAlbum) {
+            for (Album album : mAlbums) {
                 if (album.getAlbumName().toLowerCase().contains(userInput)) {
                     myAlbumSearch.add(album);
                 }
             }
-            AlbumsFragment.albumsAdapter.updateAlbumList(myAlbumSearch);
+            albumsAdapter.updateAlbumList(myAlbumSearch);
         }
         if (artistsFragmentSelected) {
             searchOpenedInArtistsFragments = true;
@@ -392,6 +402,23 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                     R.drawable.play_song, position, songsList.size() - 1);
         }
         playPauseBtn.setImageResource(R.drawable.play_song);
+    }
+
+    //Music loader methods
+    @NonNull
+    @Override
+    public Loader<List<Album>> onCreateLoader(int id, @Nullable Bundle args) {
+        return new MusicLoader(this);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<Album>> loader, List<Album> data) {
+        albumsAdapter.addItems(data);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<List<Album>> loader) {
+        albumsAdapter.clearItem();
     }
 
 

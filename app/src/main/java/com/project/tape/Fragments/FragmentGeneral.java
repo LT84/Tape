@@ -11,7 +11,6 @@ import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
-import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
@@ -20,7 +19,6 @@ import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbu
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -41,13 +39,12 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.Services.OnClearFromRecentService;
 import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -303,31 +300,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
                 .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
         getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
-    }
-
-
-    protected void sortAlbumsList() {
-        //Throwing out duplicates from list
-        //Sorting albums
-        Collections.sort(albumList, new Comparator<Song>() {
-            @Override
-            public int compare(Song lhs, Song rhs) {
-                return lhs.getAlbum().toLowerCase().compareTo(rhs.getAlbum().toLowerCase());
-            }
-        });
-
-        //Creates iterator and throws out duplicates
-        Iterator<Song> iterator = albumList.iterator();
-        String album = "";
-        while (iterator.hasNext()) {
-            Song track = iterator.next();
-            String currentAlbum = track.getAlbum().toLowerCase();
-            if (currentAlbum.equals(album)) {
-                iterator.remove();
-            } else {
-                album = currentAlbum;
-            }
-        }
     }
 
     protected void sortArtistsList() {

@@ -87,6 +87,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     public void OnArtistsClick(int position) throws IOException {
         fromArtistsFragment = true;
         fromAlbumsFragment = false;
+
         if (searchOpenedInArtistsFragments) {
             artistList.addAll(mArtistsList);
         }

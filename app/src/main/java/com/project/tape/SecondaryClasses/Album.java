@@ -1,6 +1,7 @@
 package com.project.tape.SecondaryClasses;
 
 public class Album {
+
     private long id;
     private long albumId;
     private String albumName;

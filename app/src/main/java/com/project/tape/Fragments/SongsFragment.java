@@ -49,7 +49,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
     private static final int VERTICAL_ITEM_SPACE = 3;
 
-    public static ArrayList<Song> albumList = new ArrayList<>();
     public static ArrayList<Song> artistList = new ArrayList<>();
     public static ArrayList<Song> staticCurrentSongsInAlbum = new ArrayList<>();
     public static ArrayList<Song> staticPreviousSongsInAlbum = new ArrayList<>();
@@ -73,7 +72,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         v = inflater.inflate(R.layout.songs_fragment, container, false);
         //Loading audio list and albumList
         loadAudio();
-        albumList.addAll(songsList);
+
         artistList.addAll(songsList);
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -174,9 +173,8 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         myRecyclerView.setAdapter(songsAdapter);
 
-        //Sorting albums and artists arrays
+        //Sorting artists array
         sortArtistsList();
-        sortAlbumsList();
 
         return v;
     }

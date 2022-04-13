@@ -13,13 +13,12 @@ import androidx.loader.content.Loader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by JDavis on 7/26/2016.
- */
+
 public class MusicLoader extends AsyncTaskLoader<List<Album>> {
 
     List<Album> mCache;
     MusicObserver mMusicObserver;
+
 
     public MusicLoader(Context context) {
         super(context);
@@ -33,8 +32,8 @@ public class MusicLoader extends AsyncTaskLoader<List<Album>> {
         String sortOrder = MediaStore.Audio.Media.ALBUM + " ASC";
         Cursor cr = contentResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,projections, selection, null, sortOrder);
         List<Album> items = new ArrayList<>();
-        if(cr != null && cr.moveToFirst()) {
-            // Cache the column indexes so we don't have to look them up for every iteration of the do-while loop.
+        if (cr != null && cr.moveToFirst()) {
+            //Cache the column indexes so we don't have to look them up for every iteration of the do-while loop.
             int idIndex = cr.getColumnIndex(MediaStore.Audio.Media._ID);
             int AlbumNameIndex = cr.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             int albumId =  cr.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
@@ -42,13 +41,13 @@ public class MusicLoader extends AsyncTaskLoader<List<Album>> {
                 if(isLoadInBackgroundCanceled()){
                     return items;
                 }
-                // Music object to hold the music data.
+                //Music object to hold the music data.
                 Album item = new Album();
-                // Retrieve the respective music data from the cursor using the column index.
+                //Retrieve the respective music data from the cursor using the column index.
                 item.setId(cr.getLong(idIndex));
                 item.setAlbumName(cr.getString(AlbumNameIndex));
                 item.setAlbumId(cr.getLong(albumId));
-                // Once we've loaded the Music object, store it inside of the arraylist.
+                //Once we've loaded the Music object, store it inside of the arraylist.
                 items.add(item);
             }
             while(cr.moveToNext());
@@ -60,16 +59,14 @@ public class MusicLoader extends AsyncTaskLoader<List<Album>> {
 
     @Override
     public void deliverResult(List<Album> data) {
-        if(isReset()){
-
-            // CLose cursors or databse handles.
+        if (isReset()){
+            //CLose cursors or database handles.
             return;
         }
-        // Keep a reference to the loaded music data.
+        //Keep a reference to the loaded music data.
         mCache = data;
-
-        // If we are started pass the loaded music to our super implementation that handles sending it to the registered activity/fragment.
-        if(isStarted()){
+        //If we are started pass the loaded music to our super implementation that handles sending it to the registered activity/fragment.
+        if (isStarted()){
             super.deliverResult(data);
         }
     }
@@ -81,23 +78,23 @@ public class MusicLoader extends AsyncTaskLoader<List<Album>> {
 
     @Override
     protected void onStartLoading() {
-        if(mCache != null) {
+        if (mCache != null) {
             deliverResult(mCache);
         }
 
-        if(mMusicObserver == null) {
+        if (mMusicObserver == null) {
             mMusicObserver = new MusicObserver(this, new Handler());
             getContext().getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mMusicObserver);
         }
 
-        if(takeContentChanged() || mCache == null) {
+        if (takeContentChanged() || mCache == null) {
             forceLoad();
         }
     }
 
     @Override
     protected void onReset() {
-        // Close any cursors, web-sockets or database objects
+        //Close any cursors, web-sockets or database objects
         if(mMusicObserver != null) {
             getContext().getContentResolver().unregisterContentObserver(mMusicObserver);
             mMusicObserver = null;
@@ -118,8 +115,10 @@ public class MusicLoader extends AsyncTaskLoader<List<Album>> {
 
         @Override
         public void onChange(boolean selfChange) {
-            // A change has been detectec notify the Loader.
+            // A change has been detect notify the Loader.
             mLoader.onContentChanged();
         }
     }
+
+
 }

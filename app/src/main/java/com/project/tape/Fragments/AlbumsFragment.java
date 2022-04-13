@@ -5,9 +5,8 @@ import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.Adapters.AlbumsAdapter.mAlbum;
+import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
 import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
-import static com.project.tape.Fragments.SongsFragment.albumList;
 import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 
@@ -47,18 +46,16 @@ import java.util.List;
 
 public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCompletionListener, LoaderManager.LoaderCallbacks<List<Album>> {
 
-
     TextView album_title_albumFragments;
     ImageView album_cover_albumFragment;
     LinearLayoutManager LLMAlbumFragment = new LinearLayoutManager(getContext());
     private Parcelable listState;
     public static RecyclerView myRecyclerView;
+    public static AlbumsAdapter albumsAdapter;
 
     int positionIndex, topView;
     final int REQUEST_CODE = 1;
     private static final int VERTICAL_ITEM_SPACE = 10;
-
-    public static AlbumsAdapter albumsAdapter;
 
     private boolean oneTime = false;
 
@@ -97,22 +94,22 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         myRecyclerView.setHasFixedSize(true);
         myRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 
+        //RecyclerView listener
         myRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getActivity(), myRecyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
+                new RecyclerItemClickListener(getActivity(), myRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
                         fromAlbumsFragment = true;
                         fromArtistsFragment = false;
-
-
-
                         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
 
                         if (searchOpenedInAlbumFragments) {
-                            intent.putExtra("albumName", mAlbum.get(position).getAlbumName());
+                            intent.putExtra("albumName", mAlbums.get(position).getAlbumName());
                         } else {
-                            intent.putExtra("albumName", albumList.get(position).getAlbum());
+                            intent.putExtra("albumName", mAlbums.get(position).getAlbumName());
                         }
+
                         getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
                                 .putString("albumName", albumName).commit();
 
@@ -120,20 +117,19 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
                             getActivity().unregisterReceiver(broadcastReceiver);
                         }
 
-                       // getActivity().unregisterReceiver(audioSourceChangedReceiver);
+                        getActivity().unregisterReceiver(audioSourceChangedReceiver);
 
                         startActivityForResult(intent, REQUEST_CODE, bundle);
-                        //Sorting albumsFragment
-                        //sortAlbumsList();
                     }
 
-                    @Override public void onLongItemClick(View view, int position) {
-                        // do whatever
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+                        //Do what you need after long click
                     }
                 })
-
         );
 
+        //Creating LoaderManager
         final LoaderManager supportLoaderManager = getActivity().getSupportLoaderManager();
         supportLoaderManager.initLoader(1, null, this);
 
@@ -142,11 +138,12 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
             myRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
             listState = savedInstanceState.getParcelable("ListState");
         }
+
         return v;
     }
 
+    //Creating LinearLayoutManager
     public class WrapContentLinearLayoutManager extends LinearLayoutManager {
-
         public WrapContentLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
             super(context, orientation, reverseLayout);
         }
@@ -161,20 +158,20 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         }
     }
 
-
+    //Creating MusicLoader
     public Loader<List<Album>> onCreateLoader(int id, Bundle args) {
         return new MusicLoader(getActivity());
     }
 
+    // Add the newly loaded music to adapter.
     @Override
     public void onLoadFinished(@NonNull Loader<List<Album>> loader, List<Album> data) {
-        // Add the newly loaded music to adapter.
         albumsAdapter.addItems(data);
     }
 
+    // Clear the old music because a new list is going to be coming.
     @Override
     public void onLoaderReset(Loader<List<Album>> loader) {
-        // Clear the old music because a new list is going to be coming.
         albumsAdapter.clearItem();
     }
 
@@ -185,6 +182,7 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
+    //Get data from AboutFragmentItem
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -205,8 +203,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         super.onResume();
         createChannel();
         trackAudioSource();
-
-        myRecyclerView.swapAdapter(albumsAdapter, false);
 
         //Register headphones buttons
         HeadsetActionButtonReceiver.delegate = this;
@@ -231,6 +227,7 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
             song_title_main.setText(" ");
             artist_name_main.setText(" ");
         }
+        myRecyclerView.swapAdapter(albumsAdapter, false);
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
     }
 
