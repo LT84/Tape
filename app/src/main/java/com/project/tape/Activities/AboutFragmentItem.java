@@ -27,7 +27,6 @@ import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.uri;
 
-import android.app.KeyguardManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -455,7 +454,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     protected void onResume() {
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
-        createChannel();
         trackAudioSource();
 
         //Register headphones buttons
@@ -488,13 +486,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         Intent intent = new Intent();
         intent.putExtra("previousAlbumName", previousAlbumName);
         intent.putExtra("previousArtistName", previousArtistName);
-        //Checking is screen locked
-        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
-        if (myKM.inKeyguardRestrictedInputMode()) {
-            //if locked
-        } else {
-            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-        }
+
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
@@ -644,6 +636,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
         playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
     }
+
 
     //Called when headphones button pressed
     @Override

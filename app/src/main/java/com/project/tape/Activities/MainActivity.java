@@ -387,7 +387,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public void onTrackPause() {
         isPlaying = false;
         mediaPlayer.pause();
-
         if (songSearchWasOpened) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
                     R.drawable.play_song, position, songsFromSearch.size() - 1);
@@ -413,12 +412,16 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Album>> loader, List<Album> data) {
-        albumsAdapter.addItems(data);
+        if (!songsFragmentSelected) {
+            albumsAdapter.addItems(data);
+        }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<List<Album>> loader) {
+        if (!songsFragmentSelected) {
         albumsAdapter.clearItem();
+        }
     }
 
 

@@ -7,13 +7,14 @@ import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
-import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Adapters.SongsAdapter.myRecyclerView;
 
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -29,14 +30,18 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.tape.Adapters.SongsAdapter;
-import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.Song;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
@@ -112,7 +117,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .getBoolean("fromArtistInfo", false);
         uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                 .getString("uri", songsList.get(0).getData()));
-
         //uri = Uri.parse(songsList.get(0).getData());
 
         //Fills up staticCurrentSongsInAlbum
@@ -255,6 +259,8 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         createChannel();
         trackAudioSource();
 
+        Toast.makeText(getActivity(), "eded", Toast.LENGTH_SHORT).show();
+
         //Sets adapter after user sets sort preference
         if (sortChoiceChanged) {
             loadAudio();
@@ -333,9 +339,19 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {
             //if locked
-        } else {
-            getActivity().unregisterReceiver(broadcastReceiver);
         }
+        if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
+        } else {
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, new IntentFilter("SONGS_SONGS"));
+        }
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
     }
 
     //Called when headphones button pressed

@@ -11,7 +11,6 @@ import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 
 import android.app.ActivityOptions;
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -83,7 +82,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
-
         //Sets adapter to list and applies settings to recyclerView
         albumsAdapter = new AlbumsAdapter(getContext(), albumLists);
 
@@ -201,7 +199,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     @Override
     public void onResume() {
         super.onResume();
-        createChannel();
         trackAudioSource();
 
         //Register headphones buttons
@@ -234,14 +231,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     @Override
     public void onPause() {
         super.onPause();
-        //Checking is screen locked
-        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
-        if (myKM.inKeyguardRestrictedInputMode()) {
-            //if locked
-        } else {
-            getActivity().unregisterReceiver(broadcastReceiver);
-        }
-
         positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
         View startView = myRecyclerView.getChildAt(0);
         topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());

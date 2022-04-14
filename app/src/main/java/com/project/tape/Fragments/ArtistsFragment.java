@@ -10,7 +10,6 @@ import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.artistName;
 
 import android.app.ActivityOptions;
-import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -127,7 +126,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public void onResume() {
         super.onResume();
-        createChannel();
         trackAudioSource();
 
         //Register headphones buttons
@@ -154,18 +152,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             artist_name_main.setText(" ");
         }
         mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        //Checking is screen locked
-        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
-        if (myKM.inKeyguardRestrictedInputMode()) {
-            //if locked
-        } else {
-            getActivity().unregisterReceiver(broadcastReceiver);
-        }
     }
 
     @Override

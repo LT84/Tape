@@ -340,6 +340,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
     };
 
     BroadcastReceiver audioSourceChangedReceiver;
+
     public void trackAudioSource() {
         audioSourceChangedReceiver = new BroadcastReceiver() {
             @Override
