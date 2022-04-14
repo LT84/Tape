@@ -8,13 +8,16 @@ import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Activities.SongInfoTab.songInfoTabOpened;
 import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Adapters.SongsAdapter.myRecyclerView;
+import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
+import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
@@ -30,12 +33,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ProcessLifecycleOwner;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -69,6 +68,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
     public static Bitmap notificationBackground;
 
+    private boolean fromBackground = false;
+
+    public static boolean songsFragmentOpened;
 
     @Nullable
     @Override
@@ -77,6 +79,11 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         v = inflater.inflate(R.layout.songs_fragment, container, false);
         //Loading audio list and albumList
         loadAudio();
+        //Booleans
+        songsFragmentOpened = true;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = false;
+        aboutFragmentItemOpened = false;
 
         artistList.addAll(songsList);
         //Init views
@@ -85,8 +92,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         artist_name_main = (TextView) getActivity().findViewById(R.id.artist_name_main);
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
-
-        createChannel();
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
@@ -193,7 +198,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
        if (songSearchWasOpened) {
             songsList = songsFromSearch;
             uri = Uri.parse(songsFromSearch.get(position).getData());
-            Log.i("searchDebug", "fromSearch");
             songNameStr = songsFromSearch.get(position).getTitle();
             artistNameStr = songsFromSearch.get(position).getArtist();
         } else {
@@ -256,10 +260,16 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     @Override
     public void onResume() {
         super.onResume();
-        createChannel();
-        trackAudioSource();
 
-        Toast.makeText(getActivity(), "eded", Toast.LENGTH_SHORT).show();
+        if (fromBackground) {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_SONGSFRAGMENT");
+            fromBackground = false;
+        }
+
+        createChannel();
+        Log.i("broadcast", "reg_SONGSFRAGMENT");
+        trackAudioSource();
 
         //Sets adapter after user sets sort preference
         if (sortChoiceChanged) {
@@ -295,6 +305,13 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     @Override
     public void onStop() {
         super.onStop();
+
+        if (songsFragmentOpened && !songInfoTabOpened) {
+            createChannel();
+            fromBackground = true;
+            Log.i("broadcast", "reg_SONGSFRAGMENT");
+        }
+
         if (repeatBtnClicked) {
             getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", true).commit();
@@ -339,19 +356,17 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {
             //if locked
-        }
-        if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         } else {
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, new IntentFilter("SONGS_SONGS"));
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_SONGSFRAGMENT");
         }
+
 
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
     }
 
     //Called when headphones button pressed

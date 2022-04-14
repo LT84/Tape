@@ -1,5 +1,6 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
@@ -9,6 +10,8 @@ import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SortChoice.switchBetweenSorts;
+import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
+import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Fragments.FragmentGeneral.art;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
@@ -21,6 +24,7 @@ import static com.project.tape.Fragments.SongsFragment.songsList;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.uri;
+import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
 import android.app.KeyguardManager;
 import android.app.NotificationChannel;
@@ -36,6 +40,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -65,16 +70,23 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     private SeekBar seekBar;
     private final Handler handler = new Handler();
 
-    public static boolean repeatBtnClicked, shuffleBtnClicked;
+    public static boolean repeatBtnClicked, shuffleBtnClicked, songInfoTabOpened, secondBroadcastUnregistered;
 
     NotificationManager notificationManager;
 
+    private boolean fromBackground = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_info_tab);
         getSupportActionBar().hide();
+        //Booleans
+        aboutFragmentItemOpened = false;
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = false;
+        songInfoTabOpened = true;
 
         positionInInfoAboutItem = this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE)
                 .getInt("positionInInfoAboutItem", positionInInfoAboutItem);
@@ -621,7 +633,15 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     @Override
     protected void onResume() {
+
+        if (fromBackground) {
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Log.i("broadcast", "unreg_INFOTAB");
+            fromBackground = false;
+        }
+
         createChannel();
+        Log.i("broadcast", "reg_INFOTAB");
         trackAudioSource();
 
         //Register headphones buttons
@@ -652,6 +672,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Log.i("broadcast", "unreg_INFOTAB");
         }
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
@@ -659,6 +680,24 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (songInfoTabOpened) {
+           createChannel();
+           Log.i("broadcast", "reg_SONGINFOTAB");
+            fromBackground = true;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+        Log.i("broadcast", "unreg_INFOTAB");
+        secondBroadcastUnregistered = true;
     }
 
     private void initViews() {

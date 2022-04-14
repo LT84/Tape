@@ -1,20 +1,25 @@
 package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInArtistsFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Adapters.ArtistsAdapter.mArtistsList;
-import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
+import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
+import static com.project.tape.Fragments.AlbumsFragment.clickFromAlbumsFragment;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.artistName;
+import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
 import android.app.ActivityOptions;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,16 +53,21 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
 
     public static ArtistsAdapter artistsAdapter;
 
-    boolean oneTime = false;
-    public static boolean fromArtistsFragment;
+    private boolean fromBackground = false;
+
+    public static boolean clickFromArtistsFragment, artistsFragmentOpened;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
         v = inflater.inflate(R.layout.artists_fragment, container, false);
+        //Booleans
         coverLoaded = false;
-        fromArtistsFragment = true;
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = true;
+        aboutFragmentItemOpened = false;
 
         artist_name = v.findViewById(R.id.artist_name_artistsFragment);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.artists_recyclerview);
@@ -84,9 +94,8 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
 
     @Override
     public void OnArtistsClick(int position) throws IOException {
-        fromArtistsFragment = true;
-        fromAlbumsFragment = false;
-
+        clickFromArtistsFragment = true;
+        clickFromAlbumsFragment = false;
         if (searchOpenedInArtistsFragments) {
             artistList.addAll(mArtistsList);
         }
@@ -101,10 +110,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         }
         getActivity().getSharedPreferences("artistName", Context.MODE_PRIVATE).edit()
                 .putString("artistName", artistName).commit();
-
-        if (oneTime) {
-            getActivity().unregisterReceiver(broadcastReceiver);
-        }
 
         startActivityForResult(intent, REQUEST_CODE, bundle);
         //Sorting artistsList
@@ -126,6 +131,15 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public void onResume() {
         super.onResume();
+
+        if (fromBackground) {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_SONGSFRAGMENT");
+            fromBackground = false;
+        }
+
+        createChannel();
+        Log.i("broadcast", "reg_ARTISTSFRAGMENT");
         trackAudioSource();
 
         //Register headphones buttons
@@ -155,6 +169,19 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_ARTISTSFRAGMENT");
+        }
+    }
+
+    @Override
     public void onCompletion(MediaPlayer mp) {
         onTrackNext();
         mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
@@ -174,7 +201,15 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     public void onMediaButtonDoubleClick() {
     }
 
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (artistsFragmentOpened) {
+            createChannel();
+            Log.i("broadcast", "reg_ARTISTSFRAGMENT");
+            fromBackground = true;
+        }
+    }
 }
 
 

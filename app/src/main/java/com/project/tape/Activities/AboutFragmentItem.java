@@ -5,9 +5,12 @@ import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Activities.SongInfoTab.secondBroadcastUnregistered;
 import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
-import static com.project.tape.Fragments.AlbumsFragment.fromAlbumsFragment;
-import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
+import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
+import static com.project.tape.Fragments.AlbumsFragment.clickFromAlbumsFragment;
+import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
+import static com.project.tape.Fragments.ArtistsFragment.clickFromArtistsFragment;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
 import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
@@ -21,12 +24,15 @@ import static com.project.tape.Fragments.SongsFragment.artistName;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 import static com.project.tape.Fragments.SongsFragment.previousArtistName;
+import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.uri;
+import static com.project.tape.Activities.SongInfoTab.songInfoTabOpened;
 
+import android.app.KeyguardManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -39,6 +45,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -81,6 +88,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     public static int positionInInfoAboutItem;
 
+    private boolean fromBackground = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +96,12 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         this.setContentView(R.layout.about_fragment_item);
         this.getSupportActionBar().hide();
         //Booleans
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = false;
+        songInfoTabOpened = false;
         aboutFragmentItemOpened = true;
+
 
         if (mediaPlayer.isPlaying()) {
             isPlaying = true;
@@ -115,9 +128,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         getIntentMethod();
 
         //Getting albumName to fill the list
-        if (fromAlbumsFragment) {
+        if (clickFromAlbumsFragment) {
             album_title_albumInfo.setText(this.getIntent().getStringExtra("albumName"));
-        } else if (fromArtistsFragment) {
+        } else if (clickFromArtistsFragment) {
             album_title_albumInfo.setText(this.getIntent().getStringExtra("artistName"));
         }
 
@@ -137,7 +150,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
 
         //Filling up arrayLists depending where its from
-        if (fromAlbumsFragment) {
+        if (clickFromAlbumsFragment) {
             albumName = getIntent().getStringExtra("albumName");
             int a = 0;
             for (int i = 0; i < songsList.size(); i++) {
@@ -202,7 +215,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             switch (v.getId()) {
                 case R.id.backBtn_fragmentItemInfo:
                     finish();
-                    overridePendingTransition(0, R.anim.hold);
                     break;
                 case R.id.pause_button_in_itemInfo:
                     playPauseBtnClicked();
@@ -229,7 +241,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         this.positionInInfoAboutItem = position;
         fromSearch = false;
 
-        if (fromAlbumsFragment) {
+        if (clickFromAlbumsFragment) {
             previousAlbumName = albumName;
             staticCurrentSongsInAlbum = currentSongsInAlbum;
             staticPreviousSongsInAlbum.clear();
@@ -241,7 +253,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             fromAlbumInfo = true;
             fromArtistInfo = false;
             coverLoaded = false;
-        } else if (fromArtistsFragment) {
+        } else if (clickFromArtistsFragment) {
             previousArtistName = artistName;
             staticCurrentArtistSongs = currentArtistSongs;
             staticPreviousArtistSongs.clear();
@@ -255,7 +267,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             coverLoaded = false;
         }
 
-        if (currentSongsInAlbum != null && fromAlbumsFragment) {
+        if (currentSongsInAlbum != null && clickFromAlbumsFragment) {
             uri = Uri.parse(currentSongsInAlbum.get(positionInInfoAboutItem).getData());
         } else if (currentArtistSongs != null) {
             uri = Uri.parse(currentArtistSongs.get(positionInInfoAboutItem).getData());
@@ -454,6 +466,15 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     protected void onResume() {
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
+
+        if (fromBackground) {
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Log.i("broadcast", "unreg_ABOUTITEM");
+            fromBackground = false;
+        }
+
+        createChannel();
+        Log.i("broadcast", "reg_ABOUTITEM");
         trackAudioSource();
 
         //Register headphones buttons
@@ -487,11 +508,39 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         intent.putExtra("previousAlbumName", previousAlbumName);
         intent.putExtra("previousArtistName", previousArtistName);
 
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Log.i("broadcast", "unreg_ABOUTITEM");
+        }
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
                 .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (aboutFragmentItemOpened) {
+            createChannel();
+            Log.i("broadcast", "reg_ABOUTITEM");
+            fromBackground = true;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!secondBroadcastUnregistered) {
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            secondBroadcastUnregistered = false;
+        }
+        Log.i("broadcast", "unreg_ABOUTITEM");
     }
 
     @Override
@@ -636,7 +685,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
         playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
     }
-
 
     //Called when headphones button pressed
     @Override

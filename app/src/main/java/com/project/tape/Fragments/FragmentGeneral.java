@@ -431,22 +431,22 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
     @Override
     public void onTrackPlay() {
         isPlaying = true;
-        mediaPlayer.start();
-        if (fromSearch) {
-            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
-        } else if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
-        } else if (fromArtistInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
-        } else {
-            CreateNotification.createNotification(getActivity(), songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
-        }
-        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-        mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
+            mediaPlayer.start();
+            if (fromSearch) {
+                CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+                        R.drawable.pause_song, position, songsFromSearch.size() - 1);
+            } else if (fromAlbumInfo) {
+                CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                        R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+            } else if (fromArtistInfo) {
+                CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                        R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+            } else {
+                CreateNotification.createNotification(getActivity(), songsList.get(position),
+                        R.drawable.pause_song, position, songsList.size() - 1);
+            }
+            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+            mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
     }
 
     @Override

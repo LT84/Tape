@@ -6,16 +6,21 @@ import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragme
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
-import static com.project.tape.Fragments.ArtistsFragment.fromArtistsFragment;
+import static com.project.tape.Fragments.ArtistsFragment.clickFromArtistsFragment;
 import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
+import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
+import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 
 import android.app.ActivityOptions;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,12 +61,11 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     final int REQUEST_CODE = 1;
     private static final int VERTICAL_ITEM_SPACE = 10;
 
-    private boolean oneTime = false;
-
-    public static boolean fromAlbumsFragment;
+    public static boolean clickFromAlbumsFragment, albumsFragmentOpened;
 
     ArrayList<Album> albumLists = new ArrayList<>();
 
+    private boolean fromBackground = false;
 
     @Nullable
     @Override
@@ -70,6 +74,10 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         v = inflater.inflate(R.layout.albums_fragment, container, false);
         //Booleans
         coverLoaded = false;
+        songsFragmentOpened = false;
+        albumsFragmentOpened = true;
+        artistsFragmentOpened = false;
+        aboutFragmentItemOpened = false;
 
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
@@ -97,8 +105,9 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
                 new RecyclerItemClickListener(getActivity(), myRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        fromAlbumsFragment = true;
-                        fromArtistsFragment = false;
+                        clickFromAlbumsFragment = true;
+                        clickFromArtistsFragment = false;
+                        fromBackground = false;
                         Intent intent = new Intent(getActivity(), AboutFragmentItem.class);
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
 
@@ -110,10 +119,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
 
                         getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
                                 .putString("albumName", albumName).commit();
-
-                        if (oneTime) {
-                            getActivity().unregisterReceiver(broadcastReceiver);
-                        }
 
                         getActivity().unregisterReceiver(audioSourceChangedReceiver);
 
@@ -199,6 +204,15 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     @Override
     public void onResume() {
         super.onResume();
+
+        if (fromBackground) {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_SONGSFRAGMENT");
+            fromBackground = false;
+        }
+
+        createChannel();
+        Log.i("broadcast", "reg_ALBUMSFRAGMENT");
         trackAudioSource();
 
         //Register headphones buttons
@@ -231,6 +245,15 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     @Override
     public void onPause() {
         super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_ALBUMSFRAGMENT");
+        }
+
         positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
         View startView = myRecyclerView.getChildAt(0);
         topView = (startView == null) ? 0 : (startView.getTop() - myRecyclerView.getPaddingTop());
@@ -241,6 +264,16 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         } else {
             getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (albumsFragmentOpened) {
+            createChannel();
+            Log.i("broadcast", "reg_ALBUMSFRAGMENT");
+            fromBackground = true;
         }
     }
 
