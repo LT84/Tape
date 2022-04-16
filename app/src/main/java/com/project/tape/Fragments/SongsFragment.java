@@ -106,7 +106,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .setOnAudioFocusChangeListener(audioFocusChangeListener)
                 .build();
 
-
         //sharedPreferences
         repeatBtnClicked = getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE)
                 .getBoolean("repeatBtnClicked", true);
@@ -195,7 +194,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         fromAlbumInfo = false;
         fromArtistInfo = false;
 
-       if (songSearchWasOpened) {
+        if (songSearchWasOpened) {
             songsList = songsFromSearch;
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();

@@ -90,6 +90,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     private boolean fromBackground = false;
 
+    public static AboutFragmentItemAdapter aboutFragmentItemAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,7 +103,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         artistsFragmentOpened = false;
         songInfoTabOpened = false;
         aboutFragmentItemOpened = true;
-
 
         if (mediaPlayer.isPlaying()) {
             isPlaying = true;
@@ -160,7 +161,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                 }
             }
 
-            AboutFragmentItemAdapter aboutFragmentItemAdapter = new AboutFragmentItemAdapter(this, currentSongsInAlbum, this);
+            aboutFragmentItemAdapter = new AboutFragmentItemAdapter(this, currentSongsInAlbum, this);
             myRecyclerView = findViewById(R.id.itemSongs_recyclerview);
             myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             myRecyclerView.setAdapter(aboutFragmentItemAdapter);
@@ -173,8 +174,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     b++;
                 }
             }
-
-            AboutFragmentItemAdapter aboutFragmentItemAdapter = new AboutFragmentItemAdapter(this, currentArtistSongs, this);
+            aboutFragmentItemAdapter = new AboutFragmentItemAdapter(this, currentArtistSongs, this);
             myRecyclerView = findViewById(R.id.itemSongs_recyclerview);
             myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             myRecyclerView.setAdapter(aboutFragmentItemAdapter);
@@ -311,7 +311,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         //Checking is shuffle or repeat button clicked
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
-                positionInInfoAboutItem = getRandom(currentSongsInAlbum.size() - 1);
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
             } else if (fromSearch) {
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
@@ -387,7 +387,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         //Checking is shuffle or repeat button clicked
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
-                positionInInfoAboutItem = getRandom(currentSongsInAlbum.size() - 1);
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
             } else if (fromSearch) {
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
@@ -466,6 +466,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     protected void onResume() {
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
+
+        Log.i("artistName", previousArtistName);
+        Log.i("artistName", artistName);
 
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
@@ -615,9 +618,11 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+            aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+            aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
@@ -635,9 +640,11 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+            aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+            aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);

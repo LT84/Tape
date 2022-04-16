@@ -335,12 +335,12 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
                 onTrackPause();
             } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                onTrackPause();
             }
         }
     };
 
     BroadcastReceiver audioSourceChangedReceiver;
-
     public void trackAudioSource() {
         audioSourceChangedReceiver = new BroadcastReceiver() {
             @Override
@@ -388,6 +388,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
                 notificationManager.createNotificationChannel(channel);
             }
         }
+
         getActivity().registerReceiver(broadcastReceiver, new IntentFilter("SONGS_SONGS"));
         getActivity().startService(new Intent(getContext(), OnClearFromRecentService.class));
     }
@@ -407,6 +408,8 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         } else {
             CreateNotification.createNotification(getActivity(), songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
+            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
     }
 
@@ -425,6 +428,8 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         } else {
             CreateNotification.createNotification(getActivity(), songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
+            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
     }
 

@@ -49,6 +49,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
+import com.project.tape.Fragments.AlbumsFragment;
 import com.project.tape.Fragments.ArtistsFragment;
 import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
@@ -62,7 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable,  LoaderManager.LoaderCallbacks<List<Album>> {
+public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable, LoaderManager.LoaderCallbacks<List<Album>> {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
@@ -292,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                     myAlbumSearch.add(album);
                 }
             }
-            albumsAdapter.updateAlbumList(myAlbumSearch);
+            AlbumsFragment.albumsAdapter.updateAlbumList(myAlbumSearch);
         }
         if (artistsFragmentSelected) {
             searchOpenedInArtistsFragments = true;
@@ -420,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     @Override
     public void onLoaderReset(@NonNull Loader<List<Album>> loader) {
         if (!songsFragmentSelected) {
-        albumsAdapter.clearItem();
+            albumsAdapter.clearItem();
         }
     }
 

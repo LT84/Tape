@@ -1,11 +1,16 @@
 package com.project.tape.Adapters;
 
+import static com.project.tape.Fragments.SongsFragment.albumName;
+import static com.project.tape.Fragments.SongsFragment.artistName;
+import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
+import static com.project.tape.Fragments.SongsFragment.previousArtistName;
+
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +24,8 @@ import java.util.ArrayList;
 
 public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragmentItemAdapter.ItemInfoViewHolder> {
 
+
+    private int item_index;
     private Context mContext;
     private ArrayList<Song> songsInAlbumList;
     private OnItemListener onItemInfoListener;
@@ -45,6 +52,20 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
         holder.tv_title.setText(songsInAlbumList.get(position).getTitle());
         holder.tv_artist.setText(songsInAlbumList.get(position).getArtist());
         holder.tv_album.setText(songsInAlbumList.get(position).getAlbum());
+
+        if (item_index == position &&  previousAlbumName.equals(albumName)) {
+            holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
+            holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
+            holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
+        } else if (item_index == position && previousArtistName.equals(artistName)){
+                holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
+                holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
+                holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
+        } else {
+            holder.tv_title.setTextColor(Color.parseColor("#ffffff"));
+            holder.tv_artist.setTextColor(Color.parseColor("#b3ffffff"));
+            holder.tv_album.setTextColor(Color.parseColor("#b3ffffff"));
+        }
     }
 
     @Override
@@ -58,10 +79,13 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
         TextView tv_artist;
         TextView tv_album;
         OnItemListener onAlbumInfoListener;
+        LinearLayout item_linearlayout;
 
         public ItemInfoViewHolder(@NonNull View itemView, OnItemListener onAlbumInfoListener) {
             super(itemView);
             this.onAlbumInfoListener = onAlbumInfoListener;
+            item_linearlayout = (LinearLayout) itemView.findViewById(R.id.song_item);
+
             tv_title = (TextView) itemView.findViewById(R.id.song_title);
             tv_artist = (TextView) itemView.findViewById(R.id.artist_title);
             tv_album = (TextView) itemView.findViewById(R.id.album_title);
@@ -73,26 +97,17 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
         public void onClick(View v) {
             try {
                 onAlbumInfoListener.onItemClick(getAdapterPosition());
+                item_index = getAdapterPosition();
+                notifyDataSetChanged();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            //Changing color of item in recyclerView for a short time after it is clicked
-            tv_title.setTextColor(Color.parseColor("#66d9e0"));
-            tv_artist.setTextColor(Color.parseColor("#66d9e0"));
-            tv_album.setTextColor(Color.parseColor("#66d9e0"));
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    tv_title.setTextColor(Color.parseColor("#ffffff"));
-                    tv_artist.setTextColor(Color.parseColor("#ffffff"));
-                    tv_album.setTextColor(Color.parseColor("#ffffff"));
-                }
-            }, 300);
-
         }
+    }
 
+    public void updateColorAfterSongSwitch(int position) {
+        item_index = position;
+        notifyDataSetChanged();
     }
 
     public interface OnItemListener {

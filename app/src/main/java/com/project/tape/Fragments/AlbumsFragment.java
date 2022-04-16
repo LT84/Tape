@@ -1,17 +1,17 @@
 package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
+import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.clickFromArtistsFragment;
 import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
-import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
-import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 
 import android.app.ActivityOptions;
 import android.app.KeyguardManager;

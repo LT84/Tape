@@ -10,6 +10,7 @@ import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.AlbumsFragment.clickFromAlbumsFragment;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.artistName;
+import static com.project.tape.Fragments.SongsFragment.previousArtistName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
 import android.app.ActivityOptions;
@@ -122,7 +123,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             switch (requestCode) {
                 case REQUEST_CODE:
                     songNameStr = data.getStringExtra("songNameStr");
-                    artistNameStr = data.getStringExtra("artistNameStr");
+                    previousArtistName = data.getStringExtra("previousArtistName");
                     break;
             }
         }
@@ -131,7 +132,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public void onResume() {
         super.onResume();
-
+        Log.i("artistNameStr", artistNameStr);
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
             Log.i("broadcast", "unreg_SONGSFRAGMENT");

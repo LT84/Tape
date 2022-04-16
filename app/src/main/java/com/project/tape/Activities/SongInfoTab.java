@@ -20,11 +20,12 @@ import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.position;
+import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.songsList;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.uri;
-import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
 import android.app.KeyguardManager;
 import android.app.NotificationChannel;
@@ -51,6 +52,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
@@ -325,7 +327,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         mediaPlayer.stop();
         mediaPlayer.release();
 
-        //Checking is shuffle or repeat button clicked
         if (shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
@@ -336,32 +337,24 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             } else {
                 position = getRandom(songsList.size() - 1);
             }
-        } else if (!shuffleBtnClicked && repeatBtnClicked) {
-            if (fromAlbumInfo) {
-                uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
-            } else if (fromSearch) {
-                uri = Uri.parse(songsFromSearch.get(position).getData());
-            } else {
-                uri = Uri.parse(songsList.get(position).getData());
-            }
         } else if (!shuffleBtnClicked && !repeatBtnClicked) {
             if (fromAlbumInfo) {
-                positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousSongsInAlbum.size() - 1)
-                        : (positionInInfoAboutItem - 1);
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
+                        ? (0) : (positionInInfoAboutItem + 1);
             } else if (fromSearch) {
-                position = position - 1 < 0 ? (songsFromSearch.size() - 1)
-                        : (position - 1);
+                position = position + 1 == songsFromSearch.size() ? (0)
+                        : (position + 1);
             } else if (fromArtistInfo) {
-                positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousArtistSongs.size() - 1)
-                        : (positionInInfoAboutItem - 1);
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
+                        ? (0) : (positionInInfoAboutItem + 1);
             } else {
-                position = position - 1 < 0 ? (songsList.size() - 1)
-                        : (position - 1);
+                position = position + 1 == songsList.size() ? (0)
+                        : (position + 1);
             }
         } else if (shuffleBtnClicked && repeatBtnClicked) {
             position = getRandom(songsList.size() - 1);
             if (fromAlbumInfo) {
-                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+                positionInInfoAboutItem = getRandom(staticCurrentSongsInAlbum.size() - 1);
             }
             repeatBtnClicked = false;
         }
@@ -840,6 +833,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
         }
+        SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         playPauseBtn.setImageResource(R.drawable.pause_song);
     }
@@ -850,14 +844,15 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         nextBtnClicked();
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() + 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() + 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.pause_song, position, songsList.size() + 1);
         }
+        SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         playPauseBtn.setImageResource(R.drawable.pause_song);
     }
