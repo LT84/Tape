@@ -467,9 +467,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
-        Log.i("artistName", previousArtistName);
-        Log.i("artistName", artistName);
-
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
             Log.i("broadcast", "unreg_ABOUTITEM");

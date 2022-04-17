@@ -178,8 +178,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         songsAdapter = new SongsAdapter(getContext(), songsList, this);
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         myRecyclerView.setAdapter(songsAdapter);
+
+        SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
 
         //Sorting artists array
         sortArtistsList();
