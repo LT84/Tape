@@ -121,7 +121,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         }
 
         // Why null
-        aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, songsList, this);
+        aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, currentSongsInPlaylist, this);
         myRecyclerView = findViewById(R.id.playlist_songs_recyclerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         myRecyclerView.setAdapter(aboutPlaylistAdapter);

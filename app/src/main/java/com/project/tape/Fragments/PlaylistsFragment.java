@@ -171,7 +171,6 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
                     playlistsList.add(playlist);
                     popupWindow.dismiss();
                     playlistsAdapter.updatePlaylistList(playlistsList);
-
                 }
             });
 
@@ -193,7 +192,6 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
             }
         });
     }
-
 
     View.OnClickListener btnL = new View.OnClickListener() {
         @Override
