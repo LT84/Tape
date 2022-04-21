@@ -26,9 +26,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.project.tape.Adapters.PlaylistsAdapter;
 import com.project.tape.R;
 import com.project.tape.Activities.AboutPlaylist;
+import com.project.tape.SecondaryClasses.JsonData;
 import com.project.tape.SecondaryClasses.Playlist;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
@@ -52,9 +54,12 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
 
     private int deletePosition;
 
-    private int playlistsSize;
-
     final int REQUEST_CODE = 1;
+
+    Gson gson = new Gson();
+    String json;
+    JsonData data;
+
 
     @Nullable
     @Override
@@ -64,29 +69,24 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
         newPlaylistBtn = v.findViewById(R.id.new_playlist_btn);
         newPlaylistBtn.setOnClickListener(btnL);
 
+        //getArraylistOf playlists
+        getSharedPlaylists();
+
         addNewPlaylistEditText = v.findViewById(R.id.new_playlist_name);
-        playlistRecyclerView = v.findViewById(R.id.playlists_recyclerView);
-
-
-        playlistsSize = getActivity().getSharedPreferences("playlistSize", Context.MODE_PRIVATE)
-                .getInt("playlistSize", 0);
 
         //Sets adapter to list and applies settings to recyclerView
         playlistsAdapter = new PlaylistsAdapter(getContext(), playlistsList, this);
+        playlistsAdapter.updatePlaylistList(playlistsList);
+        playlistRecyclerView = v.findViewById(R.id.playlists_recyclerView);
         playlistRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         playlistRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         playlistRecyclerView.setAdapter(playlistsAdapter);
-
-        getSharedPlaylists();
 
         //RecyclerView listener
         playlistRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), playlistRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-//                        clickFromAlbumsFragment = true;
-//                        clickFromArtistsFragment = false;
-//                        fromBackground = false;
                         Intent intent = new Intent(getActivity(), AboutPlaylist.class);
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
 
@@ -112,8 +112,6 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
                     }
                 })
         );
-
-
         return v;
     }
 
@@ -204,40 +202,25 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
                 case R.id.new_playlist_btn:
                     onButtonShowPopupWindowClick(v);
                     break;
-                case R.id.about_playlist:
-                    Log.i("click", "clicked");
-                    break;
             }
-
         }
     };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        for (int i = 0; i < playlistsList.size(); i++) {
-            getActivity().getSharedPreferences("playlistName", Context.MODE_PRIVATE).edit()
-                    .putString("playlistName" + i, playlistsList.get(i).getPlaylistName()).commit();
-
-            playlistsSize = playlistsList.size();
-
-            getActivity().getSharedPreferences("playlistSize", Context.MODE_PRIVATE).edit()
-                    .putInt("playlistSize", playlistsSize).commit();
-        }
+        //Save json
+        data = new JsonData(playlistsList);
+        json = gson.toJson(data);
+        getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()
+                .putString("json", json).commit();
     }
 
+    //Get json
     public void getSharedPlaylists() {
-
-
-        //Отрабатывает не то количсетво раз, применяется одно название ко всем плейлистам
-
-        for (int i = 0; i < playlistsSize; i++) {
-            Playlist playlist = new Playlist();
-            playlist.setPlaylistName(getActivity().getSharedPreferences("playlistName", Context.MODE_PRIVATE)
-                    .getString("playlistName" + i, "aboba"));
-            playlistsList.add(playlist);
-        }
-        playlistsAdapter.updatePlaylistList(playlistsList);
+        data = gson.fromJson(getActivity().getSharedPreferences("json", Context.MODE_PRIVATE)
+                .getString("json", json), JsonData.class);
+        playlistsList.addAll(data.getArray());
     }
 
 

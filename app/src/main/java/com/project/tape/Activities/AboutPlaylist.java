@@ -1,8 +1,11 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.MainActivity.REQUEST_CODE;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.songInfoTabOpened;
+import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
 import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Fragments.FragmentGeneral.art;
@@ -12,8 +15,10 @@ import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.mediaPlayer;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
+import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
+import android.app.ActivityOptions;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -46,7 +51,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     ImageView album_cover_in_playlist;
     ImageButton backBtn, playPauseBtnInPlaylist;
     Button openFullInfoTab;
-    RecyclerView myRecyclerView;
+    private RecyclerView myRecyclerView;
 
     ArrayList<Song> currentSongsInPlaylist = new ArrayList<>();
 
@@ -61,11 +66,10 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     public static com.project.tape.Adapters.AboutPlaylistAdapter aboutPlaylistAdapter;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.about_fragment_item);
+        this.setContentView(R.layout.about_playlist);
         this.getSupportActionBar().hide();
         //Booleans
         songsFragmentOpened = false;
@@ -81,24 +85,22 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         }
 
         //Init views
-        backBtn = findViewById(R.id.backBtn_fragmentItemInfo);
+        backBtn = findViewById(R.id.backBtn_playlist);
         backBtn.setOnClickListener(btnListener);
-        openFullInfoTab = findViewById(R.id.open_information_tab_in_itemInfo);
+        openFullInfoTab = findViewById(R.id.open_information_tab_in_playlist);
         openFullInfoTab.setOnClickListener(btnListener);
 
-        album_title_playlist = findViewById(R.id.item_title_fragmentItemInfo);
-        song_title_in_playlist = findViewById(R.id.song_title_in_itemInfo);
-        artist_name_in_playlist = findViewById(R.id.artist_name_in_album);
-        album_cover_in_playlist = findViewById(R.id.album_cover_in_itemInfo);
-        playPauseBtnInPlaylist = findViewById(R.id.pause_button_in_itemInfo);
+        album_title_playlist = findViewById(R.id.item_title_playlist);
+        song_title_in_playlist = findViewById(R.id.song_title_in_playlist);
+        artist_name_in_playlist = findViewById(R.id.artist_name_in_playlist);
+        album_cover_in_playlist = findViewById(R.id.album_cover_in_playlist);
+        playPauseBtnInPlaylist = findViewById(R.id.pause_button_in_playlist);
         playPauseBtnInPlaylist.setOnClickListener(btnListener);
 
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
         getIntentMethod();
-
-        //Getting albumName to fill the list
 
         album_title_playlist.setText(this.getIntent().getStringExtra("playlistName"));
 
@@ -118,8 +120,9 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     .into(album_cover_in_playlist);
         }
 
-        aboutPlaylistAdapter = new AboutPlaylistAdapter(this, songsList, this);
-        myRecyclerView = findViewById(R.id.playlists_recyclerview);
+        // Why null
+        aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, songsList, this);
+        myRecyclerView = findViewById(R.id.playlist_songs_recyclerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         myRecyclerView.setAdapter(aboutPlaylistAdapter);
 
@@ -141,13 +144,13 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.backBtn_fragmentItemInfo:
+                case R.id.backBtn_playlist:
                     finish();
                     break;
-                case R.id.pause_button_in_itemInfo:
+                case R.id.pause_button_in_playlist:
                     playPauseBtnClicked();
                     break;
-                case R.id.open_information_tab_in_itemInfo:
+                case R.id.open_information_tab_in_playlist:
                     Intent intent = new Intent(AboutPlaylist.this, SongInfoTab.class);
                     intent.putExtra("positionInInfoAboutItem", positionInPlaylist);
                     startActivity(intent);
@@ -191,6 +194,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
     @Override
     public void onPlaylistClick(int position) throws IOException {
+
 
     }
 

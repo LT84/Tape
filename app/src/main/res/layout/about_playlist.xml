@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.AboutFragmentItem"
+    tools:context=".Activities.AboutPlaylist"
     >
 
 
@@ -42,12 +42,13 @@
             android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/ic_add_button" />
+            android:background="@drawable/ic_add_button"
+            android:backgroundTint="@color/secondaryColor"/>
 
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playlists_recyclerview"
+        android:id="@+id/playlist_songs_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/song_info_tab_in_playlist"
