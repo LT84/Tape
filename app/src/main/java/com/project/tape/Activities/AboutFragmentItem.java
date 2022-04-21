@@ -92,6 +92,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     public static AboutFragmentItemAdapter aboutFragmentItemAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

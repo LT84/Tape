@@ -27,9 +27,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/new_playlist_name"
         android:layout_alignParentEnd="true"
+        android:background="@android:color/transparent"
         android:text="Save"
-        android:textColor="@color/secondaryColor"
-        android:background="@android:color/transparent"/>
+        android:textColor="@color/secondaryColor" />
 
 
 </RelativeLayout>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="310dp"
+    android:layout_height="wrap_content"
+    android:background="@color/darkGrey">
+
+
+    <TextView
+        android:id="@+id/alertText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Delete this playlist ?"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/close_popup_alert_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/alertText"
+        android:background="@android:color/transparent"
+        android:text="close"
+        android:textColor="@color/secondaryColor" />
+
+    <Button
+        android:id="@+id/popup_delete_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/alertText"
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/transparent"
+        android:text="Delete"
+        android:textColor="@color/secondaryColor" />
+
+
+</RelativeLayout>
