@@ -24,7 +24,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
     private OnPlaylistListener mOnPlaylistListener;
 
 
-    public PlaylistsAdapter(Context mContext, ArrayList<Playlist> mSongsList, OnPlaylistListener mOnPlaylistListener) {
+    public PlaylistsAdapter(Context mContext, ArrayList<Playlist> mPlaylistsList, OnPlaylistListener mOnPlaylistListener) {
         this.mContext = mContext;
         this.mPlaylistsList = mPlaylistsList;
         this.mOnPlaylistListener = mOnPlaylistListener;

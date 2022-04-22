@@ -108,7 +108,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
                 String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
                 String duration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
                 // Save to audioList
-                songsList.add(new Song(data, title, album, artist, duration));
+                songsList.add(new Song(data, title, album, artist, duration, false));
             }
         }
         cursor.close();

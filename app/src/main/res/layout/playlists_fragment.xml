@@ -35,7 +35,8 @@
             android:textColor="@color/secondaryColor"
             android:textSize="17sp" />
 
-        <ImageView
+        <ImageButton
+            android:id="@+id/add_songs_to_playlist"
             android:layout_width="19dp"
             android:layout_height="19dp"
             android:layout_alignParentEnd="true"

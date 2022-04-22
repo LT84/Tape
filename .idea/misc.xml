@@ -27,6 +27,9 @@
         <entry key="..\:/Tape/app/src/main/res/layout/activity_album_info.xml" value="0.34057971014492755" />
         <entry key="..\:/Tape/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Tape/app/src/main/res/layout/activity_song_info_tab.xml" value="0.33" />
+        <entry key="..\:/Tape/app/src/main/res/layout/add_song_item.xml" value="0.3278985507246377" />
+        <entry key="..\:/Tape/app/src/main/res/layout/add_songs_activity.xml" value="0.3278985507246377" />
+        <entry key="..\:/Tape/app/src/main/res/layout/add_songs_fragment.xml" value="0.3278985507246377" />
         <entry key="..\:/Tape/app/src/main/res/layout/album_item.xml" value="0.3188405797101449" />
         <entry key="..\:/Tape/app/src/main/res/layout/albums_fragment.xml" value="0.3188405797101449" />
         <entry key="..\:/Tape/app/src/main/res/layout/artist_item.xml" value="0.33" />
@@ -43,10 +46,6 @@
         <entry key="..\:/Tape/app/src/main/res/menu/search.xml" value="0.3651041666666667" />
         <entry key="..\:/Tape/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.123" />
         <entry key="..\:/Tape/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2755" />
-        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/drawable/ic_add_button.xml" value="0.1" />
-        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/about_fragment_item.xml" value="0.14709569577935647" />
-        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/about_playlist.xml" value="0.14709569577935647" />
-        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/playlists_fragment.xml" value="0.14709569577935647" />
         <entry key="..\:/Users/CyPoBo/AndroidStudioProjects/Tape/app/src/main/res/layout/activity_main.xml" value="0.17755825734549138" />
         <entry key="..\:/Users/CyPoBo/AndroidStudioProjects/Tape/app/src/main/res/layout/albums_fragment.xml" value="0.2957427536231884" />
         <entry key="..\:/Users/CyPoBo/AndroidStudioProjects/Tape/app/src/main/res/layout/artists_fragment.xml" value="0.2595108695652174" />
@@ -62,7 +61,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_16_PREVIEW" project-jdk-name="JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_16" project-jdk-name="JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

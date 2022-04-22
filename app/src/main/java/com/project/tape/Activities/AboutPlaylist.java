@@ -1,11 +1,8 @@
 package com.project.tape.Activities;
 
-import static com.project.tape.Activities.MainActivity.REQUEST_CODE;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
-import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.songInfoTabOpened;
-import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
 import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Fragments.FragmentGeneral.art;
@@ -15,10 +12,8 @@ import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.mediaPlayer;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
-import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
-import android.app.ActivityOptions;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -49,11 +44,11 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
     TextView song_title_in_playlist, artist_name_in_playlist, song_title_main, artist_name_main, album_title_playlist;
     ImageView album_cover_in_playlist;
-    ImageButton backBtn, playPauseBtnInPlaylist;
+    ImageButton backBtn, playPauseBtnInPlaylist, addSongsToPlaylist;
     Button openFullInfoTab;
     private RecyclerView myRecyclerView;
 
-    ArrayList<Song> currentSongsInPlaylist = new ArrayList<>();
+    public static ArrayList<Song> currentSongsInPlaylist = new ArrayList<>();
 
     NotificationManager notificationManager;
 
@@ -86,16 +81,18 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         //Init views
         backBtn = findViewById(R.id.backBtn_playlist);
-        backBtn.setOnClickListener(btnListener);
+        backBtn.setOnClickListener(btnL);
         openFullInfoTab = findViewById(R.id.open_information_tab_in_playlist);
-        openFullInfoTab.setOnClickListener(btnListener);
+        openFullInfoTab.setOnClickListener(btnL);
 
+        addSongsToPlaylist = findViewById(R.id.add_songs_to_playlist);
+        addSongsToPlaylist.setOnClickListener(btnL);
         album_title_playlist = findViewById(R.id.item_title_playlist);
         song_title_in_playlist = findViewById(R.id.song_title_in_playlist);
         artist_name_in_playlist = findViewById(R.id.artist_name_in_playlist);
         album_cover_in_playlist = findViewById(R.id.album_cover_in_playlist);
         playPauseBtnInPlaylist = findViewById(R.id.pause_button_in_playlist);
-        playPauseBtnInPlaylist.setOnClickListener(btnListener);
+        playPauseBtnInPlaylist.setOnClickListener(btnL);
 
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
@@ -140,9 +137,10 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     }
 
 
-    View.OnClickListener btnListener = new View.OnClickListener() {
+    View.OnClickListener btnL = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Intent intent;
             switch (v.getId()) {
                 case R.id.backBtn_playlist:
                     finish();
@@ -151,9 +149,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     playPauseBtnClicked();
                     break;
                 case R.id.open_information_tab_in_playlist:
-                    Intent intent = new Intent(AboutPlaylist.this, SongInfoTab.class);
+                    intent = new Intent(AboutPlaylist.this, SongInfoTab.class);
                     intent.putExtra("positionInInfoAboutItem", positionInPlaylist);
                     startActivity(intent);
+                    break;
+                case R.id.add_songs_to_playlist:
+                    intent = new Intent(AboutPlaylist.this, AddSongsActivity.class);
+                    startActivity(intent);
+                    break;
             }
         }
     };
@@ -197,6 +200,13 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        aboutPlaylistAdapter.notifyDataSetChanged();
+    }
+
 
 //    //Notification
 //    BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {

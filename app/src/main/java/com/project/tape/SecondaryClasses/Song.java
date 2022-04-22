@@ -8,15 +8,17 @@ public class Song  {
     private String album;
     private String artist;
     private String duration;
+    private boolean isSelected;
 
 
 
-    public Song(String data, String title, String album, String artist, String duration) {
+    public Song(String data, String title, String album, String artist, String duration, boolean isSelected) {
         this.data = data;
         this.title = title;
         this.album = album;
         this.artist = artist;
         this.duration = duration;
+        this.isSelected = isSelected;
     }
 
     public String getData() {
@@ -57,6 +59,14 @@ public class Song  {
 
     public String getDuration() {
         return duration;
+    }
+
+    public boolean getSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
 

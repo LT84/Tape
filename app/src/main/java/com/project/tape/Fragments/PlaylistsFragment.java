@@ -9,7 +9,6 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,14 +21,13 @@ import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.project.tape.Activities.AboutPlaylist;
 import com.project.tape.Adapters.PlaylistsAdapter;
 import com.project.tape.R;
-import com.project.tape.Activities.AboutPlaylist;
 import com.project.tape.SecondaryClasses.JsonData;
 import com.project.tape.SecondaryClasses.Playlist;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
@@ -39,7 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPlaylistListener {
+public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapter.OnPlaylistListener {
 
     Button newPlaylistBtn, closeAddingNewPlaylistBtn, addNewPlaylistBtn, closeAlertPopupBtn, deletePlaylistBtn;
     EditText addNewPlaylistEditText;
@@ -58,7 +56,7 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
 
     Gson gson = new Gson();
     String json;
-    JsonData data;
+    JsonData data = new JsonData();
 
 
     @Nullable
@@ -217,13 +215,23 @@ public class PlaylistsFragment extends Fragment implements PlaylistsAdapter.OnPl
     //Get json
     public void getSharedPlaylists() {
         data = gson.fromJson(getActivity().getSharedPreferences("json", Context.MODE_PRIVATE)
-                .getString("json", json), JsonData.class);
+                .getString("json", " "), JsonData.class);
         playlistsList.addAll(data.getArray());
     }
 
-
     @Override
     public void onPlaylistClick(int position) throws IOException {
+
+    }
+
+    @Override
+    public void onMediaButtonSingleClick() {
+
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
     }
 
 

@@ -34,6 +34,10 @@
             android:name=".Activities.SortChoice"
             />
         <activity
+            android:name=".Activities.AddSongsActivity"
+            android:theme="@style/Theme.MyOwnSize"
+            />
+        <activity
             android:name=".Activities.AboutPlaylist"
             android:theme="@style/Theme.MyOwnSize"
             />
