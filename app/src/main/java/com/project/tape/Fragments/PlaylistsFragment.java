@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,8 @@ import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapter.OnPlaylistListener {
@@ -58,6 +61,8 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
 
     public static ArrayList<Playlist> playlistsList = new ArrayList<>();
 
+    Set<String> set = new HashSet<>();
+
 
     @Nullable
     @Override
@@ -69,6 +74,10 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
 
         //getArraylistOf playlists
         getSharedPlaylists();
+
+        for (int i = 0; i < playlistsList.size(); i++) {
+            set.add(playlistsList.get(i).getPlaylistName());
+        }
 
         addNewPlaylistEditText = v.findViewById(R.id.new_playlist_name);
 
@@ -145,6 +154,7 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
                 @Override
                 public void onClick(View v) {
                     getSongsInPlaylistMap.remove(playlistsList.get(deletePosition).getPlaylistName());
+                    set.remove(playlistsList.get(deletePosition).getPlaylistName());
 
                     playlistsList.remove(deletePosition);
 
@@ -168,7 +178,14 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
                 public void onClick(View v) {
                     Playlist playlist = new Playlist();
                     playlist.setPlaylistName(addNewPlaylistEditText.getText().toString());
-                    playlistsList.add(playlist);
+
+                    if (!set.contains(addNewPlaylistEditText.getText().toString())) {
+                        set.add(addNewPlaylistEditText.getText().toString());
+                        playlistsList.add(playlist);
+                    } else {
+                        Toast.makeText(getContext(), "Playlist with this name already exists", Toast.LENGTH_SHORT).show();
+                    }
+
                     popupWindow.dismiss();
                     playlistsAdapter.updatePlaylistList(playlistsList);
                 }
