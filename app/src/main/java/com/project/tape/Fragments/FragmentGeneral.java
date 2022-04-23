@@ -4,6 +4,9 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
+import static com.project.tape.Activities.AboutPlaylist.positionInAboutPlaylist;
+import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
 import static com.project.tape.Activities.MainActivity.SORT_PREF;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.fromSearch;
@@ -153,6 +156,8 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = getRandom(previousSongsInPlaylist.size() - 1);
             } else {
                 position = getRandom(songsList.size() - 1);
             }
@@ -166,6 +171,9 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
                         ? (0) : (positionInInfoAboutItem + 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = positionInAboutPlaylist + 1 == previousSongsInPlaylist.size()
+                        ? (0) : (positionInAboutPlaylist + 1);
             } else {
                 position = position + 1 == songsList.size() ? (0)
                         : (position + 1);
@@ -192,6 +200,10 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+        } else if (fromPlaylist) {
+            uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
+            songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
+            artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
@@ -230,6 +242,8 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
                 position = getRandom(songsFromSearch.size() - 1);
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = getRandom(staticPreviousArtistSongs.size() - 1);
             } else {
                 position = getRandom(songsList.size() - 1);
             }
@@ -238,6 +252,8 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
                 uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             } else if (fromSearch) {
                 uri = Uri.parse(songsFromSearch.get(position).getData());
+            } else if (fromPlaylist) {
+                uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             } else {
                 uri = Uri.parse(songsList.get(position).getData());
             }
@@ -251,6 +267,9 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             } else if (fromArtistInfo) {
                 positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousArtistSongs.size() - 1)
                         : (positionInInfoAboutItem - 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = positionInAboutPlaylist - 1 < 0 ? (previousSongsInPlaylist.size() - 1)
+                        : (positionInAboutPlaylist - 1);
             } else {
                 position = position - 1 < 0 ? (songsList.size() - 1)
                         : (position - 1);
@@ -277,6 +296,10 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+        } else if (fromPlaylist) {
+            uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
+            songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
+            artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
@@ -395,61 +418,74 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
 
     @Override
     public void onTrackPrevious() {
+        isPlaying = true;
         switchPreviousSongInFragment();
         if (fromSearch) {
-            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+            CreateNotification.createNotification(getContext(), songsFromSearch.get(position),
                     R.drawable.pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+            CreateNotification.createNotification(getContext(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+            CreateNotification.createNotification(getContext(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(getContext(), previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
-            CreateNotification.createNotification(getActivity(), songsList.get(position),
+            CreateNotification.createNotification(getContext(), songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
-            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
             SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
+            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+            mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
     }
 
     @Override
     public void onTrackNext() {
+        isPlaying = true;
         switchNextSongInFragment();
         if (fromSearch) {
-            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+            CreateNotification.createNotification(getContext(), songsFromSearch.get(position),
                     R.drawable.pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+            CreateNotification.createNotification(getContext(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+            CreateNotification.createNotification(getContext(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
                     R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(getContext(), previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
-            CreateNotification.createNotification(getActivity(), songsList.get(position),
+            CreateNotification.createNotification(getContext(), songsList.get(position),
                     R.drawable.pause_song, position, songsList.size() - 1);
-            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
             SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
+            audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+             mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
     }
 
     @Override
     public void onTrackPlay() {
         isPlaying = true;
             mediaPlayer.start();
-            if (fromSearch) {
-                CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
-                        R.drawable.pause_song, position, songsFromSearch.size() - 1);
-            } else if (fromAlbumInfo) {
-                CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                        R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
-            } else if (fromArtistInfo) {
-                CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                        R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
-            } else {
-                CreateNotification.createNotification(getActivity(), songsList.get(position),
-                        R.drawable.pause_song, position, songsList.size() - 1);
-            }
+        if (fromSearch) {
+            CreateNotification.createNotification(getContext(), songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(getContext(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(getContext(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(getContext(), previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+        } else {
+            CreateNotification.createNotification(getContext(), songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
             audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
             mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
     }
@@ -459,16 +495,19 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         isPlaying = false;
         mediaPlayer.pause();
         if (fromSearch) {
-            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+            CreateNotification.createNotification(getContext(), songsFromSearch.get(position),
                     R.drawable.play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+            CreateNotification.createNotification(getContext(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
-            CreateNotification.createNotification(getActivity(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
+            CreateNotification.createNotification(getContext(), staticPreviousArtistSongs.get(positionInInfoAboutItem),
                     R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(getContext(), previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.play_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
-            CreateNotification.createNotification(getActivity(), songsList.get(position),
+            CreateNotification.createNotification(getContext(), songsList.get(position),
                     R.drawable.play_song, position, songsList.size() - 1);
         }
         mainPlayPauseBtn.setImageResource(R.drawable.play_song);

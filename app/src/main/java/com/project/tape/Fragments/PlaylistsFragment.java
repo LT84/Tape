@@ -1,14 +1,25 @@
 package com.project.tape.Fragments;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
 import static com.project.tape.Activities.AboutPlaylist.getSongsInPlaylistMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonDataMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonMap;
+import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
+import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
+import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
 import android.app.ActivityOptions;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -29,6 +40,7 @@ import com.google.gson.Gson;
 import com.project.tape.Activities.AboutPlaylist;
 import com.project.tape.Adapters.PlaylistsAdapter;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.JsonDataMap;
 import com.project.tape.SecondaryClasses.JsonDataPlaylists;
 import com.project.tape.SecondaryClasses.Playlist;
@@ -41,7 +53,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapter.OnPlaylistListener {
+public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.OnCompletionListener, PlaylistsAdapter.OnPlaylistListener {
 
     Button newPlaylistBtn, closeAddingNewPlaylistBtn, addNewPlaylistBtn, closeAlertPopupBtn, deletePlaylistBtn;
     EditText addNewPlaylistEditText;
@@ -54,14 +66,19 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
     private int deletePosition;
 
     boolean fromLongClick;
+    public static boolean playlistsFragmentOpened;
 
     Gson gson = new Gson();
     String json;
-    JsonDataPlaylists jsonDataPlaylists = new JsonDataPlaylists();
+    JsonDataPlaylists jsonDataPlaylists;
 
     public static ArrayList<Playlist> playlistsList = new ArrayList<>();
 
     Set<String> set = new HashSet<>();
+
+    private boolean fromBackground = false;
+
+    public static boolean clickFromPlaylistFragment;
 
 
     @Nullable
@@ -73,6 +90,8 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
         newPlaylistBtn.setOnClickListener(btnL);
 
         //getArraylistOf playlists
+        // getSharedPlaylists();
+
         getSharedPlaylists();
 
         for (int i = 0; i < playlistsList.size(); i++) {
@@ -80,6 +99,10 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
         }
 
         addNewPlaylistEditText = v.findViewById(R.id.new_playlist_name);
+        song_title_main = getActivity().findViewById(R.id.song_title_main);
+        artist_name_main =  getActivity().findViewById(R.id.artist_name_main);
+        album_cover_main =  getActivity().findViewById(R.id.album_cover_main);
+        mainPlayPauseBtn =  getActivity().findViewById(R.id.pause_button);
 
         //Sets adapter to list and applies settings to recyclerView
         playlistsAdapter = new PlaylistsAdapter(getContext(), playlistsList, this);
@@ -97,9 +120,11 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
                         Intent intent = new Intent(getActivity(), AboutPlaylist.class);
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
 
+                        clickFromPlaylistFragment = true;
+
                         intent.putExtra("playlistName", playlistsList.get(position).getPlaylistName());
 
-//                     getActivity().unregisterReceiver(audioSourceChangedReceiver);
+                        getActivity().unregisterReceiver(audioSourceChangedReceiver);
 
                         startActivityForResult(intent, REQUEST_CODE, bundle);
                     }
@@ -225,7 +250,7 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
     public void onDestroy() {
         super.onDestroy();
         //Save json
-        jsonDataPlaylists = new JsonDataPlaylists(playlistsList);
+        jsonDataPlaylists.setArray(playlistsList);
         json = gson.toJson(jsonDataPlaylists);
         getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()
                 .putString("json", json).commit();
@@ -242,15 +267,105 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        coverLoaded = false;
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = false;
+        aboutFragmentItemOpened = false;
+        playlistsFragmentOpened = true;
+        aboutPlaylistOpened = false;
+
+        if (fromBackground) {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
+            fromBackground = false;
+        }
+
+        createChannel();
+        Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
+        trackAudioSource();
+
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(getActivity());
+
+        song_title_main.setText(songNameStr);
+        artist_name_main.setText(artistNameStr);
+        if (mediaPlayer != null) {
+            if (!coverLoaded) {
+                if (uri != null) {
+                    metaDataInFragment(uri);
+                    coverLoaded = true;
+                }
+            }
+
+            if (mediaPlayer.isPlaying()) {
+                mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
+            } else {
+                mainPlayPauseBtn.setImageResource(R.drawable.play_song);
+            }
+        } else {
+            song_title_main.setText(" ");
+            artist_name_main.setText(" ");
+        }
+        mediaPlayer.setOnCompletionListener(PlaylistsFragment.this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
+        }
+
+        if (repeatBtnClicked) {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", true).commit();
+        } else {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", false).commit();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (playlistsFragmentOpened) {
+            createChannel();
+            Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
+            fromBackground = true;
+        }
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        onTrackNext();
+        mediaPlayer.setOnCompletionListener(PlaylistsFragment.this);
+    }
+
+    @Override
     public void onPlaylistClick(int position) throws IOException {
     }
 
     @Override
     public void onMediaButtonSingleClick() {
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
     }
 
     @Override
     public void onMediaButtonDoubleClick() {
+
     }
 
 

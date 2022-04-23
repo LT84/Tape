@@ -54,7 +54,7 @@ public class AddSongsAdapter extends RecyclerView.Adapter<AddSongsAdapter.ViewHo
         holder.checkBox.setOnCheckedChangeListener(null);
 
         //if true, your checkbox will be selected, else unselected
-        holder.checkBox.setChecked(addSongsArray.get(position).getSelected());
+        //holder.checkBox.setChecked(addSongsArray.get(position).getSelected());
 
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

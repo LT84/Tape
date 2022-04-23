@@ -1,26 +1,56 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
+import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
+import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
+import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
+import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.MainActivity.songsFromSearch;
+import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
+import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
+import static com.project.tape.Activities.SongInfoTab.songInfoTabOpened;
+import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
+import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Fragments.FragmentGeneral.art;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
+import static com.project.tape.Fragments.FragmentGeneral.coverLoaded;
 import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.mediaPlayer;
+import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
+import static com.project.tape.Fragments.FragmentGeneral.uri;
+import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
+import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
+import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
+import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 
+import android.app.KeyguardManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,18 +60,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.project.tape.Adapters.AboutPlaylistAdapter;
+import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.CreateNotification;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.JsonDataMap;
 import com.project.tape.SecondaryClasses.JsonDataSongs;
+import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
 import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.Services.OnClearFromRecentService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
-public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAdapter.OnPlaylistListener {
+public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAdapter.OnPlaylistListener,
+        Playable, MediaPlayer.OnCompletionListener, HeadsetActionButtonReceiver.Delegate {
 
     TextView song_title_in_playlist, artist_name_in_playlist, song_title_main, artist_name_main, album_title_playlist;
     ImageButton backBtn, playPauseBtnInPlaylist, addSongsToPlaylist;
@@ -49,7 +86,13 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     Button openFullInfoTab;
     private RecyclerView myRecyclerView;
 
-    public static int positionInPlaylist;
+    Button closeAlertPopupBtn, deletePlaylistBtn;
+
+    private int deletePosition;
+
+    boolean fromLongClick;
+
+    public static int positionInAboutPlaylist;
 
     AboutPlaylistAdapter aboutPlaylistAdapter;
 
@@ -60,7 +103,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     Gson gson = new Gson();
 
     public static ArrayList<Song> currentSongsInPlaylist = new ArrayList<>();
+    public static ArrayList<Song> previousSongsInPlaylist = new ArrayList<>();
+
     public static Map<String, String> getSongsInPlaylistMap = new HashMap<>();
+
+    private boolean fromBackground = false;
+    public static boolean fromPlaylist, aboutPlaylistOpened;
+
+    NotificationManager notificationManager;
 
 
     @Override
@@ -68,6 +118,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.about_playlist);
         this.getSupportActionBar().hide();
+        //Booleans
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = false;
+        songInfoTabOpened = false;
+        aboutFragmentItemOpened = false;
+        playlistsFragmentOpened = false;
+        aboutPlaylistOpened = true;
 
         if (mediaPlayer.isPlaying()) {
             isPlaying = true;
@@ -93,6 +151,9 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         song_title_main = (TextView) findViewById(R.id.song_title_main);
         artist_name_main = (TextView) findViewById(R.id.artist_name_main);
 
+        song_title_main = (TextView) findViewById(R.id.song_title_main);
+        artist_name_main = (TextView) findViewById(R.id.artist_name_main);
+
         getIntentMethod();
 
         album_title_playlist.setText(this.getIntent().getStringExtra("playlistName"));
@@ -114,11 +175,112 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         getSongsFromJson();
 
+        //Sets information
+        song_title_in_playlist.setText(songNameStr);
+        artist_name_in_playlist.setText(artistNameStr);
+        if (art != null) {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(art)
+                    .into(album_cover_in_playlist);
+        } else {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(R.drawable.default_cover)
+                    .into(album_cover_in_playlist);
+        }
+
+
         aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, currentSongsInPlaylist, this);
         aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);
         myRecyclerView = findViewById(R.id.playlist_songs_recyclerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         myRecyclerView.setAdapter(aboutPlaylistAdapter);
+
+        //RecyclerView listener
+        myRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, myRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        positionInAboutPlaylist = position;
+                        fromSearch = false;
+                        fromPlaylist = true;
+
+                        previousSongsInPlaylist.clear();
+                        previousSongsInPlaylist.addAll(currentSongsInPlaylist);
+
+                        songNameStr = currentSongsInPlaylist.get(position).getTitle();
+                        artistNameStr = currentSongsInPlaylist.get(position).getArtist();
+
+                        coverLoaded = false;
+
+                        uri = Uri.parse(currentSongsInPlaylist.get(positionInAboutPlaylist).getData());
+
+
+                        mediaPlayer.release();
+                        mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
+                        onTrackPlay();
+
+                        metaDataInAboutPlaylist(uri);
+
+
+                        CreateNotification.createNotification(AboutPlaylist.this, currentSongsInPlaylist.get(position),
+                                R.drawable.pause_song, position, currentSongsInPlaylist.size() - 1);
+
+
+
+                        song_title_in_playlist.setText(songNameStr);
+                        artist_name_in_playlist.setText(artistNameStr);
+
+                        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+                        deletePosition = position;
+                        onButtonShowPopupWindowClick(view);
+                    }
+                })
+        );
+    }
+    public void onButtonShowPopupWindowClick(View view) {
+        //Inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+               this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView;
+        //Check which popup needed
+
+        popupView = inflater.inflate(R.layout.popup_delete_permission, null);
+
+        //Create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        //Show the popup window
+        //Which view you pass in doesn't matter, it is only used for the window token
+        popupWindow.showAtLocation(view, Gravity.CENTER_HORIZONTAL, 0, -230);
+        closeAlertPopupBtn = popupView.findViewById(R.id.close_popup_alert_btn);
+        deletePlaylistBtn = popupView.findViewById(R.id.popup_delete_btn);
+
+        //CloseAlertPopupBtn listener
+        closeAlertPopupBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+        //DeletePlaylistBtn listener
+        deletePlaylistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentSongsInPlaylist.remove(deletePosition);
+
+                aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);
+                popupWindow.dismiss();
+            }
+        });
     }
 
     private void getIntentMethod() {
@@ -129,6 +291,24 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                 playPauseBtnInPlaylist.setImageResource(R.drawable.play_song);
             }
         }
+    }
+
+    public void metaDataInAboutPlaylist(Uri uri) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(uri.toString());
+        art = retriever.getEmbeddedPicture();
+        if (art != null) {
+            Glide.with(AboutPlaylist.this)
+                    .asBitmap()
+                    .load(art)
+                    .into(album_cover_in_playlist);
+        } else {
+            Glide.with(AboutPlaylist.this)
+                    .asBitmap()
+                    .load(R.drawable.default_cover)
+                    .into(album_cover_in_playlist);
+        }
+        coverLoaded = false;
     }
 
     View.OnClickListener btnL = new View.OnClickListener() {
@@ -144,7 +324,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     break;
                 case R.id.open_information_tab_in_playlist:
                     intent = new Intent(AboutPlaylist.this, SongInfoTab.class);
-                    intent.putExtra("positionInInfoAboutItem", positionInPlaylist);
                     startActivity(intent);
                     break;
                 case R.id.add_songs_to_playlist:
@@ -158,10 +337,10 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     //Sets play button image
     public void playPauseBtnClicked() {
         if (isPlaying) {
-            // onTrackPause();
+            onTrackPause();
         } else {
             audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-            // onTrackPlay();
+            onTrackPlay();
         }
     }
 
@@ -184,12 +363,299 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
     @Override
     public void onPlaylistClick(int position) throws IOException {
+//        this.positionInAboutPlaylist = position;
+//        fromSearch = false;
+//        fromPlaylist = true;
+//
+//        previousSongsInPlaylist.clear();
+//        previousSongsInPlaylist.addAll(currentSongsInPlaylist);
+//
+//        songNameStr = currentSongsInPlaylist.get(position).getTitle();
+//        artistNameStr = currentSongsInPlaylist.get(position).getArtist();
+//        this.getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
+//                .putString("previousArtistName", previousArtistName).commit();
+//        coverLoaded = false;
+//
+//        uri = Uri.parse(currentSongsInPlaylist.get(positionInAboutPlaylist).getData());
+//
+//
+//        mediaPlayer.release();
+//        mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
+//        onTrackPlay();
+//
+//        metaDataInAboutPlaylist(uri);
+//
+//
+//        CreateNotification.createNotification(this, currentSongsInPlaylist.get(position),
+//                R.drawable.pause_song, position, currentSongsInPlaylist.size() - 1);
+//
+//
+//        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+//                .putString("uri", uri.toString()).commit();
+//        this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+//                .putString("songNameStr", songNameStr).commit();
+//        this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+//                .putString("artistNameStr", artistNameStr).commit();
+//
+//        song_title_in_playlist.setText(songNameStr);
+//        artist_name_in_playlist.setText(artistNameStr);
+//
+//        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
     }
+
+    public void switchToNextSong() {
+        mediaPlayer.stop();
+        mediaPlayer.release();
+
+        if (shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+            } else if (fromSearch) {
+                position = getRandom(songsFromSearch.size() - 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = getRandom(previousSongsInPlaylist.size() - 1);
+            } else {
+                position = getRandom(songsList.size() - 1);
+            }
+        } else if (!shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousSongsInAlbum.size()
+                        ? (0) : (positionInInfoAboutItem + 1);
+            } else if (fromSearch) {
+                position = position + 1 == songsFromSearch.size() ? (0)
+                        : (position + 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem + 1 == staticPreviousArtistSongs.size()
+                        ? (0) : (positionInInfoAboutItem + 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = positionInAboutPlaylist + 1 == previousSongsInPlaylist.size()
+                        ? (0) : (positionInAboutPlaylist + 1);
+            } else {
+                position = position + 1 == songsList.size() ? (0)
+                        : (position + 1);
+            }
+        } else if (shuffleBtnClicked && repeatBtnClicked) {
+            position = getRandom(songsList.size() - 1);
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(staticCurrentSongsInAlbum.size() - 1);
+            }
+            repeatBtnClicked = false;
+        }
+
+        coverLoaded = true;
+
+        if (fromAlbumInfo) {
+            uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
+            songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
+            artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+        } else if (fromSearch) {
+            uri = Uri.parse(songsFromSearch.get(position).getData());
+            songNameStr = songsFromSearch.get(position).getTitle();
+            artistNameStr = songsFromSearch.get(position).getArtist();
+        } else if (fromArtistInfo) {
+            uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
+            songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
+            artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+        } else if (fromPlaylist) {
+            uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
+            songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
+            artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+        } else {
+            uri = Uri.parse(songsList.get(position).getData());
+            songNameStr = songsList.get(position).getTitle();
+            artistNameStr = songsList.get(position).getArtist();
+        }
+
+        mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
+        metaDataInAboutPlaylist(uri);
+
+        song_title_in_playlist.setText(songNameStr);
+        artist_name_in_playlist.setText(artistNameStr);
+        mediaPlayer.start();
+
+        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
+        this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+                .putString("songNameStr", songNameStr).commit();
+        this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+                .putString("artistNameStr", artistNameStr).commit();
+        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
+                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
+        this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
+    }
+
+    public void switchToPreviousSong() {
+        mediaPlayer.stop();
+        mediaPlayer.release();
+
+        //Checking is shuffle or repeat button clicked
+        if (shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+            } else if (fromSearch) {
+                position = getRandom(songsFromSearch.size() - 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousArtistSongs.size() - 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = getRandom(staticPreviousArtistSongs.size() - 1);
+            } else {
+                position = getRandom(songsList.size() - 1);
+            }
+        } else if (!shuffleBtnClicked && repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
+            } else if (fromSearch) {
+                uri = Uri.parse(songsFromSearch.get(position).getData());
+            } else if (fromPlaylist) {
+                uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
+            } else {
+                uri = Uri.parse(songsList.get(position).getData());
+            }
+        } else if (!shuffleBtnClicked && !repeatBtnClicked) {
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousSongsInAlbum.size() - 1)
+                        : (positionInInfoAboutItem - 1);
+            } else if (fromSearch) {
+                position = position - 1 < 0 ? (songsFromSearch.size() - 1)
+                        : (position - 1);
+            } else if (fromArtistInfo) {
+                positionInInfoAboutItem = positionInInfoAboutItem - 1 < 0 ? (staticPreviousArtistSongs.size() - 1)
+                        : (positionInInfoAboutItem - 1);
+            } else if (fromPlaylist) {
+                positionInAboutPlaylist = positionInAboutPlaylist - 1 < 0 ? (previousSongsInPlaylist.size() - 1)
+                        : (positionInAboutPlaylist - 1);
+            } else {
+                position = position - 1 < 0 ? (songsList.size() - 1)
+                        : (position - 1);
+            }
+        } else if (shuffleBtnClicked && repeatBtnClicked) {
+            position = getRandom(songsList.size() - 1);
+            if (fromAlbumInfo) {
+                positionInInfoAboutItem = getRandom(staticPreviousSongsInAlbum.size() - 1);
+            }
+            repeatBtnClicked = false;
+        }
+
+        coverLoaded = true;
+
+        if (fromAlbumInfo) {
+            uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
+            songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
+            artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+        } else if (fromSearch) {
+            uri = Uri.parse(songsFromSearch.get(position).getData());
+            songNameStr = songsFromSearch.get(position).getTitle();
+            artistNameStr = songsFromSearch.get(position).getArtist();
+        } else if (fromArtistInfo) {
+            uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
+            songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
+            artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+        } else if (fromPlaylist) {
+            uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
+            songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
+            artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+        } else {
+            uri = Uri.parse(songsList.get(position).getData());
+            songNameStr = songsList.get(position).getTitle();
+            artistNameStr = songsList.get(position).getArtist();
+        }
+
+
+        mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
+        metaDataInAboutPlaylist(uri);
+
+        song_title_in_playlist.setText(songNameStr);
+        artist_name_in_playlist.setText(artistNameStr);
+        mediaPlayer.start();
+
+        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
+        this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+                .putString("songNameStr", songNameStr).commit();
+        this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+                .putString("artistNameStr", artistNameStr).commit();
+        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
+                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
+        this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
+    }
+
+    //Gets random number
+    public int getRandom(int i) {
+        Random random = new Random();
+        return random.nextInt(i + 1);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Log.i("broadcast", "unreg_ABOUTPLAYLIST");
+        }
+
+        this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromPlaylist", fromPlaylist).commit();
+        this.getSharedPreferences("positionInAboutPlaylist", Context.MODE_PRIVATE).edit()
+                .putInt("positionInAboutPlaylist", positionInAboutPlaylist).commit();
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
+        song_title_in_playlist.setText(songNameStr);
+        artist_name_in_playlist.setText(artistNameStr);
+
+        if (fromBackground) {
+            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Log.i("broadcast", "unreg_ABOUTPLAYLIST");
+            fromBackground = false;
+        }
+
+        createChannel();
+        Log.i("broadcast", "reg_ABOUTPLAYLIST");
+        trackAudioSourceInPlaylist();
+
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(this);
+
+        if (art != null) {
+            Glide.with(AboutPlaylist.this)
+                    .asBitmap()
+                    .load(art)
+                    .into(album_cover_in_playlist);
+        } else {
+            Glide.with(AboutPlaylist.this)
+                    .asBitmap()
+                    .load(R.drawable.default_cover)
+                    .into(album_cover_in_playlist);
+        }
+        if (mediaPlayer.isPlaying()) {
+            playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+        } else {
+            playPauseBtnInPlaylist.setImageResource(R.drawable.play_song);
+        }
+        mediaPlayer.setOnCompletionListener(this);
         aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (aboutPlaylistOpened) {
+            createChannel();
+            Log.i("broadcast", "reg_ABOUTPLAYLIST");
+            fromBackground = true;
+        }
     }
 
 
@@ -247,5 +713,171 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         writeNewPlaylistSongsToJson();
     }
 
+    //Calls when audio source changed
+    BroadcastReceiver audioSourceChangedReceiverInPlaylist = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                onTrackPause();
+            }
+        }
+    };
 
+    //To register audioSourceChangedReceiver
+    public void trackAudioSourceInPlaylist() {
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        this.registerReceiver(audioSourceChangedReceiverInPlaylist, intentFilter);
+    }
+
+    //Notification
+    BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionName");
+            switch (action) {
+                case CreateNotification.ACTION_PREVIOUS:
+                    onTrackPrevious();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (isPlaying) {
+                        onTrackPause();
+                    } else {
+                        onTrackPlay();
+                    }
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    onTrackNext();
+                    break;
+            }
+        }
+    };
+
+    private void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
+                    "Tape", NotificationManager.IMPORTANCE_HIGH);
+
+            notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+            this.registerReceiver(broadcastReceiverAboutFragmentInfo, new IntentFilter("SONGS_SONGS"));
+            this.startService(new Intent(this, OnClearFromRecentService.class));
+        }
+    }
+
+
+    @Override
+    public void onTrackPrevious() {
+        isPlaying = true;
+        switchToPreviousSong();
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+            aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+    }
+
+    @Override
+    public void onTrackNext() {
+        isPlaying = true;
+        switchToNextSong();
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+            aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+    }
+
+    @Override
+    public void onTrackPlay() {
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        isPlaying = true;
+        mediaPlayer.start();
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.pause_song, position, songsList.size() - 1);
+        }
+        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+    }
+
+    @Override
+    public void onTrackPause() {
+        isPlaying = false;
+        mediaPlayer.pause();
+        if (fromSearch) {
+            CreateNotification.createNotification(this, songsFromSearch.get(position),
+                    R.drawable.play_song, position, songsFromSearch.size() - 1);
+        } else if (fromAlbumInfo) {
+            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+        } else if (fromArtistInfo) {
+            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
+                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+        } else if (fromPlaylist) {
+            CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
+                    R.drawable.play_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+        } else {
+            CreateNotification.createNotification(this, songsList.get(position),
+                    R.drawable.play_song, position, songsList.size() - 1);
+        }
+        playPauseBtnInPlaylist.setImageResource(R.drawable.play_song);
+    }
+
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+
+    }
+
+    @Override
+    public void onMediaButtonSingleClick() {
+
+    }
+
+    @Override
+    public void onMediaButtonDoubleClick() {
+
+    }
 }

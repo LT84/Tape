@@ -3,6 +3,8 @@ package com.project.tape.Fragments;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
+import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
@@ -15,6 +17,7 @@ import static com.project.tape.Adapters.SongsAdapter.myRecyclerView;
 import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
+import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
 
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -194,6 +197,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         this.position = position;
         fromAlbumInfo = false;
         fromArtistInfo = false;
+        fromPlaylist = false;
 
         if (songSearchWasOpened) {
             songsList = songsFromSearch;
@@ -260,6 +264,12 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     @Override
     public void onResume() {
         super.onResume();
+        songsFragmentOpened = true;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = false;
+        aboutFragmentItemOpened = false;
+        playlistsFragmentOpened = false;
+        aboutPlaylistOpened = false;
 
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);

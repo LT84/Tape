@@ -12,6 +12,8 @@ import static com.project.tape.Fragments.ArtistsFragment.clickFromArtistsFragmen
 import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
+import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
 
 import android.app.ActivityOptions;
 import android.app.KeyguardManager;
@@ -74,10 +76,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         v = inflater.inflate(R.layout.albums_fragment, container, false);
         //Booleans
         coverLoaded = false;
-        songsFragmentOpened = false;
-        albumsFragmentOpened = true;
-        artistsFragmentOpened = false;
-        aboutFragmentItemOpened = false;
 
         //Init views
         album_title_albumFragments = (TextView) v.findViewById(R.id.album_title_albumFragment);
@@ -185,7 +183,7 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
-    //Get jsonDataPlaylists from AboutFragmentItem
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -204,6 +202,12 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     @Override
     public void onResume() {
         super.onResume();
+        songsFragmentOpened = false;
+        albumsFragmentOpened = true;
+        artistsFragmentOpened = false;
+        aboutFragmentItemOpened = false;
+        playlistsFragmentOpened = false;
+        aboutPlaylistOpened = false;
 
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);

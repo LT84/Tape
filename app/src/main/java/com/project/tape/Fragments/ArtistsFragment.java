@@ -2,12 +2,14 @@ package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInArtistsFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Adapters.ArtistsAdapter.mArtistsList;
 import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.AlbumsFragment.clickFromAlbumsFragment;
+import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.artistName;
 import static com.project.tape.Fragments.SongsFragment.previousArtistName;
@@ -65,10 +67,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         v = inflater.inflate(R.layout.artists_fragment, container, false);
         //Booleans
         coverLoaded = false;
-        songsFragmentOpened = false;
-        albumsFragmentOpened = false;
-        artistsFragmentOpened = true;
-        aboutFragmentItemOpened = false;
 
         artist_name = v.findViewById(R.id.artist_name_artistsFragment);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.artists_recyclerview);
@@ -132,6 +130,13 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public void onResume() {
         super.onResume();
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = true;
+        aboutFragmentItemOpened = false;
+        playlistsFragmentOpened = false;
+        aboutPlaylistOpened = false;
+
         Log.i("artistNameStr", artistNameStr);
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
