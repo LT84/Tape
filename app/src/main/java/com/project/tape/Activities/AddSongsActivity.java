@@ -16,16 +16,13 @@ import java.io.IOException;
 public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapter.OnAddSongListener {
 
     AddSongsAdapter addSongsAdapter;
-
     RecyclerView addSongsRecyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.add_songs_activity);
-
-
-
 
         addSongsAdapter = new AddSongsAdapter(AddSongsActivity.this, songsList, this);
         addSongsAdapter.updateAddSongsListList(songsList);
@@ -43,5 +40,7 @@ public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapt
     protected void onResume() {
         super.onResume();
     }
+
+
 }
 

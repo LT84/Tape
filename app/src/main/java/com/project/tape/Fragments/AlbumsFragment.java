@@ -185,7 +185,7 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
-    //Get data from AboutFragmentItem
+    //Get jsonDataPlaylists from AboutFragmentItem
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {

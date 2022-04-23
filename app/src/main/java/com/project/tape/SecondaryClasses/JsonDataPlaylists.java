@@ -2,15 +2,15 @@ package com.project.tape.SecondaryClasses;
 
 import java.util.ArrayList;
 
-public class JsonData {
+public class JsonDataPlaylists {
 
 
     private ArrayList<Playlist> array;
 
-    public JsonData() {
+    public JsonDataPlaylists() {
     }
 
-    public JsonData(ArrayList<Playlist> array) {
+    public JsonDataPlaylists(ArrayList<Playlist> array) {
         this.array = array;
     }
 

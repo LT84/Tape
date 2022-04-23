@@ -2,9 +2,6 @@ package com.project.tape.Activities;
 
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
-import static com.project.tape.Activities.SongInfoTab.songInfoTabOpened;
-import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
-import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Fragments.FragmentGeneral.art;
 import static com.project.tape.Fragments.FragmentGeneral.audioFocusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.audioManager;
@@ -12,15 +9,14 @@ import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.mediaPlayer;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
-import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -32,33 +28,39 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.project.tape.Adapters.AboutPlaylistAdapter;
 import com.project.tape.R;
+import com.project.tape.SecondaryClasses.JsonDataMap;
+import com.project.tape.SecondaryClasses.JsonDataSongs;
 import com.project.tape.SecondaryClasses.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAdapter.OnPlaylistListener {
 
     TextView song_title_in_playlist, artist_name_in_playlist, song_title_main, artist_name_main, album_title_playlist;
-    ImageView album_cover_in_playlist;
     ImageButton backBtn, playPauseBtnInPlaylist, addSongsToPlaylist;
+    ImageView album_cover_in_playlist;
     Button openFullInfoTab;
     private RecyclerView myRecyclerView;
 
-    public static ArrayList<Song> currentSongsInPlaylist = new ArrayList<>();
-
-    NotificationManager notificationManager;
-
-    public static boolean fromAlbumInfo, fromArtistInfo, aboutFragmentItemOpened;
-
     public static int positionInPlaylist;
 
-    private boolean fromBackground = false;
+    AboutPlaylistAdapter aboutPlaylistAdapter;
 
-    public static com.project.tape.Adapters.AboutPlaylistAdapter aboutPlaylistAdapter;
+    public static String jsonMap;
+    String json;
+    public static JsonDataMap jsonDataMap = new JsonDataMap();
+    JsonDataSongs jsonDataSongs = new JsonDataSongs();
+    Gson gson = new Gson();
+
+    public static ArrayList<Song> currentSongsInPlaylist = new ArrayList<>();
+    public static Map<String, String> getSongsInPlaylistMap = new HashMap<>();
 
 
     @Override
@@ -66,12 +68,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.about_playlist);
         this.getSupportActionBar().hide();
-        //Booleans
-        songsFragmentOpened = false;
-        albumsFragmentOpened = false;
-        artistsFragmentOpened = false;
-        songInfoTabOpened = false;
-        aboutFragmentItemOpened = true;
 
         if (mediaPlayer.isPlaying()) {
             isPlaying = true;
@@ -101,7 +97,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         album_title_playlist.setText(this.getIntent().getStringExtra("playlistName"));
 
-
         //Sets information
         song_title_in_playlist.setText(songNameStr);
         artist_name_in_playlist.setText(artistNameStr);
@@ -117,14 +112,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     .into(album_cover_in_playlist);
         }
 
-        // Why null
+        getSongsFromJson();
+
         aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, currentSongsInPlaylist, this);
+        aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);
         myRecyclerView = findViewById(R.id.playlist_songs_recyclerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         myRecyclerView.setAdapter(aboutPlaylistAdapter);
-
     }
-
 
     private void getIntentMethod() {
         if (songsList != null) {
@@ -135,7 +130,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             }
         }
     }
-
 
     View.OnClickListener btnL = new View.OnClickListener() {
         @Override
@@ -164,19 +158,12 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     //Sets play button image
     public void playPauseBtnClicked() {
         if (isPlaying) {
-           // onTrackPause();
+            // onTrackPause();
         } else {
             audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-           // onTrackPlay();
+            // onTrackPlay();
         }
     }
-
-//    @Override
-//    public void onCompletion(MediaPlayer mediaPlayer) {
-//        onTrackNext();
-//        mediaPlayer.setOnCompletionListener(this);
-//    }
-
 
     //Calls when audio source changed
     BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
@@ -184,7 +171,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-               // onTrackPause();
+                // onTrackPause();
             }
         }
     };
@@ -197,140 +184,68 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
     @Override
     public void onPlaylistClick(int position) throws IOException {
-
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        aboutPlaylistAdapter.notifyDataSetChanged();
+        aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);
     }
 
 
-//    //Notification
-//    BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            String action = intent.getExtras().getString("actionName");
-//            switch (action) {
-//                case CreateNotification.ACTION_PREVIOUS:
-//                    onTrackPrevious();
-//                    break;
-//                case CreateNotification.ACTION_PLAY:
-//                    if (isPlaying) {
-//                        onTrackPause();
-//                    } else {
-//                        onTrackPlay();
-//                    }
-//                    break;
-//                case CreateNotification.ACTION_NEXT:
-//                    onTrackNext();
-//                    break;
-//            }
-//        }
-//    };
+    //Get json
+    public void getSongsFromJson() {
+        String incomingName = getIntent().getStringExtra("playlistName");
 
-//    private void createChannel() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
-//                    "Tape", NotificationManager.IMPORTANCE_HIGH);
-//
-//            notificationManager = getSystemService(NotificationManager.class);
-//            if (notificationManager != null) {
-//                notificationManager.createNotificationChannel(channel);
-//            }
-//            this.registerReceiver(broadcastReceiverAboutFragmentInfo, new IntentFilter("SONGS_SONGS"));
-//            this.startService(new Intent(this, OnClearFromRecentService.class));
-//        }
-//    }
+        jsonMap = this.getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE)
+                .getString("sharedJsonStringMap", "");
+
+        if (!jsonMap.equals("")) {
+            jsonDataMap = gson.fromJson(jsonMap, JsonDataMap.class);
+            getSongsInPlaylistMap.putAll(jsonDataMap.getMap());
+        }
+
+        if (getSongsInPlaylistMap.containsKey(incomingName)) {
+
+            json = getSongsInPlaylistMap.get(incomingName);
+
+            jsonDataSongs = gson.fromJson(json, JsonDataSongs.class);
+            currentSongsInPlaylist.addAll(jsonDataSongs.getArray());
 
 
-//    @Override
-//    public void onTrackPrevious() {
-//        isPlaying = true;
-//        switchToPreviousSong();
-//        if (fromSearch) {
-//            CreateNotification.createNotification(this, songsFromSearch.get(position),
-//                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
-//        } else if (fromAlbumInfo) {
-//            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-//                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
-//            aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
-//        } else if (fromArtistInfo) {
-//            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-//                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
-//            aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
-//        } else {
-//            CreateNotification.createNotification(this, songsList.get(position),
-//                    R.drawable.pause_song, position, songsList.size() - 1);
-//        }
-//        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-//    }
+            Log.i("jsonMap", this.getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE)
+                    .getString("sharedJsonStringMap", ""));
+            Log.i("jsonMap", incomingName);
+            Log.i("jsonString", json);
+        }
 
-//    @Override
-//    public void onTrackNext() {
-//        isPlaying = true;
-//        switchToNextSong();
-//        if (fromSearch) {
-//            CreateNotification.createNotification(this, songsFromSearch.get(position),
-//                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
-//        } else if (fromAlbumInfo) {
-//            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-//                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
-//            aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
-//        } else if (fromArtistInfo) {
-//            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-//                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
-//           aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
-//        } else {
-//            CreateNotification.createNotification(this, songsList.get(position),
-//                    R.drawable.pause_song, position, songsList.size() - 1);
-//        }
-//        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-//    }
+    }
 
-//    @Override
-//    public void onTrackPlay() {
-//        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-//        isPlaying = true;
-//        mediaPlayer.start();
-//        if (fromSearch) {
-//            CreateNotification.createNotification(this, songsFromSearch.get(position),
-//                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
-//        } else if (fromAlbumInfo) {
-//            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInPlaylist),
-//                    R.drawable.pause_song, positionInPlaylist, staticPreviousSongsInAlbum.size() - 1);
-//        } else if (fromArtistInfo) {
-//            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInPlaylist),
-//                    R.drawable.pause_song, positionInPlaylist, staticPreviousArtistSongs.size() - 1);
-//        } else {
-//            CreateNotification.createNotification(this, songsList.get(position),
-//                    R.drawable.pause_song, position, songsList.size() - 1);
-//        }
-//        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
-//    }
-//
-//    @Override
-//    public void onTrackPause() {
-//        isPlaying = false;
-//        mediaPlayer.pause();
-//        if (fromSearch) {
-//            CreateNotification.createNotification(this, songsFromSearch.get(position),
-//                    R.drawable.play_song, position, songsFromSearch.size() - 1);
-//        } else if (fromAlbumInfo) {
-//            CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInPlaylist),
-//                    R.drawable.play_song, positionInPlaylist, staticPreviousSongsInAlbum.size() - 1);
-//        } else if (fromArtistInfo) {
-//            CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInPlaylist),
-//                    R.drawable.play_song, positionInPlaylist, staticPreviousArtistSongs.size() - 1);
-//        } else {
-//            CreateNotification.createNotification(this, songsList.get(position),
-//                    R.drawable.play_song, position, songsList.size() - 1);
-//        }
-//        playPauseBtnInPlaylist.setImageResource(R.drawable.play_song);
-//    }
+    public void writeNewPlaylistSongsToJson() {
+        //Save json
+        jsonDataSongs = new JsonDataSongs(currentSongsInPlaylist);
 
+        json = gson.toJson(jsonDataSongs);
+        getSongsInPlaylistMap.put(getIntent().getStringExtra("playlistName"), json);
+
+        jsonDataMap = new JsonDataMap(getSongsInPlaylistMap);
+        jsonMap = gson.toJson(jsonDataMap);
+
+        this.getSharedPreferences("sharedPrefPlaylistName", Context.MODE_PRIVATE).edit()
+                .putString("sharedPrefPlaylistName", getIntent().getStringExtra("playlistName")).commit();
+        this.getSharedPreferences("sharedJsonString", Context.MODE_PRIVATE).edit()
+                .putString("sharedJsonString", json).commit();
+        this.getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE).edit()
+                .putString("sharedJsonStringMap", jsonMap).commit();
+
+        currentSongsInPlaylist.clear();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        writeNewPlaylistSongsToJson();
+    }
 
 
 }

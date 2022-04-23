@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdapter.PlaylistViewHolder> {
 
-
     private int item_index;
     private Context mContext;
     private ArrayList<Song> songsInAlbumList;
@@ -103,6 +102,12 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
                 e.printStackTrace();
             }
         }
+    }
+
+    public void updatePlaylistList(ArrayList<Song> updateSongsInAlbumList) {
+        songsInAlbumList = new ArrayList<>();
+        songsInAlbumList.addAll(updateSongsInAlbumList);
+        notifyDataSetChanged();
     }
 
     public void updateColorAfterSongSwitch(int position) {

@@ -1,9 +1,9 @@
 package com.project.tape.Fragments;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
-import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
-import static com.project.tape.Fragments.SongsFragment.albumName;
+import static com.project.tape.Activities.AboutPlaylist.getSongsInPlaylistMap;
+import static com.project.tape.Activities.AboutPlaylist.jsonDataMap;
+import static com.project.tape.Activities.AboutPlaylist.jsonMap;
 
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -28,7 +28,8 @@ import com.google.gson.Gson;
 import com.project.tape.Activities.AboutPlaylist;
 import com.project.tape.Adapters.PlaylistsAdapter;
 import com.project.tape.R;
-import com.project.tape.SecondaryClasses.JsonData;
+import com.project.tape.SecondaryClasses.JsonDataMap;
+import com.project.tape.SecondaryClasses.JsonDataPlaylists;
 import com.project.tape.SecondaryClasses.Playlist;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
@@ -46,17 +47,16 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
     PlaylistsAdapter playlistsAdapter;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
-    public static ArrayList<Playlist> playlistsList = new ArrayList<>();
+    final int REQUEST_CODE = 1;
+    private int deletePosition;
 
     boolean fromLongClick;
 
-    private int deletePosition;
-
-    final int REQUEST_CODE = 1;
-
     Gson gson = new Gson();
     String json;
-    JsonData data = new JsonData();
+    JsonDataPlaylists jsonDataPlaylists = new JsonDataPlaylists();
+
+    public static ArrayList<Playlist> playlistsList = new ArrayList<>();
 
 
     @Nullable
@@ -88,14 +88,7 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
                         Intent intent = new Intent(getActivity(), AboutPlaylist.class);
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
 
-                        if (searchOpenedInAlbumFragments) {
-                            intent.putExtra("albumName", mAlbums.get(position).getAlbumName());
-                        } else {
-                            intent.putExtra("albumName", mAlbums.get(position).getAlbumName());
-                        }
-
-                        getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
-                                .putString("albumName", albumName).commit();
+                        intent.putExtra("playlistName", playlistsList.get(position).getPlaylistName());
 
 //                     getActivity().unregisterReceiver(audioSourceChangedReceiver);
 
@@ -151,7 +144,16 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
             deletePlaylistBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    getSongsInPlaylistMap.remove(playlistsList.get(deletePosition).getPlaylistName());
+
                     playlistsList.remove(deletePosition);
+
+                    jsonDataMap = new JsonDataMap(getSongsInPlaylistMap);
+                    jsonMap = gson.toJson(jsonDataMap);
+                    getActivity().getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE).edit()
+                            .putString("sharedJsonStringMap", jsonMap).commit();
+
+
                     playlistsAdapter.updatePlaylistList(playlistsList);
                     popupWindow.dismiss();
                 }
@@ -206,32 +208,32 @@ public class PlaylistsFragment extends FragmentGeneral implements PlaylistsAdapt
     public void onDestroy() {
         super.onDestroy();
         //Save json
-        data = new JsonData(playlistsList);
-        json = gson.toJson(data);
+        jsonDataPlaylists = new JsonDataPlaylists(playlistsList);
+        json = gson.toJson(jsonDataPlaylists);
         getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()
                 .putString("json", json).commit();
     }
 
     //Get json
     public void getSharedPlaylists() {
-        data = gson.fromJson(getActivity().getSharedPreferences("json", Context.MODE_PRIVATE)
-                .getString("json", " "), JsonData.class);
-        playlistsList.addAll(data.getArray());
+        json = getActivity().getSharedPreferences("json", Context.MODE_PRIVATE)
+                .getString("json", "");
+        if (!json.equals("")) {
+            jsonDataPlaylists = gson.fromJson(json, JsonDataPlaylists.class);
+            playlistsList.addAll(jsonDataPlaylists.getArray());
+        }
     }
 
     @Override
     public void onPlaylistClick(int position) throws IOException {
-
     }
 
     @Override
     public void onMediaButtonSingleClick() {
-
     }
 
     @Override
     public void onMediaButtonDoubleClick() {
-
     }
 
 

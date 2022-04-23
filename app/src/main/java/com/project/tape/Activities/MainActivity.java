@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     }
 
-    //Permission to read data from phone
+    //Permission to read jsonDataSongs from phone
     private void permission() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {

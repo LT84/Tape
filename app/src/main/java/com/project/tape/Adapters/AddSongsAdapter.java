@@ -3,7 +3,6 @@ package com.project.tape.Adapters;
 import static com.project.tape.Activities.AboutPlaylist.currentSongsInPlaylist;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,23 +50,6 @@ public class AddSongsAdapter extends RecyclerView.Adapter<AddSongsAdapter.ViewHo
         holder.tv_artist.setText(addSongsArray.get(position).getArtist());
         holder.tv_album.setText(addSongsArray.get(position).getAlbum());
 
-//        holder.checkBox.setChecked(addSongsArray.get(position).getSelected());
-//        holder.checkBox.setTag(position);
-//        holder.checkBox.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//               Integer pos = (Integer) holder.checkBox.getTag();
-//
-//                if (addSongsArray.get(position).getSelected()) {
-//                    addSongsArray.get(position).setSelected(false);
-//                } else {
-//                    addSongsArray.get(position).setSelected(true);
-//                }
-//            }
-//        });
-
-
         //in some cases, it will prevent unwanted situations
         holder.checkBox.setOnCheckedChangeListener(null);
 
@@ -81,7 +63,6 @@ public class AddSongsAdapter extends RecyclerView.Adapter<AddSongsAdapter.ViewHo
                 if (isChecked) {
                     addSongsArray.get(position).setSelected(isChecked);
                     currentSongsInPlaylist.add(addSongsArray.get(position));
-                    Log.i("checkitemadd", Integer.toString(checkedSongs.size()));
                 } else {
                     addSongsArray.get(position).setSelected(isChecked);
                     currentSongsInPlaylist.remove(addSongsArray.get(position));
