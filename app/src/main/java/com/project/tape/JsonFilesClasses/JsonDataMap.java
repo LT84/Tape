@@ -1,4 +1,4 @@
-package com.project.tape.SecondaryClasses;
+package com.project.tape.JsonFilesClasses;
 
 import java.util.Map;
 
@@ -20,5 +20,6 @@ public class JsonDataMap {
     public void setMap(Map<String, String> map) {
         this.map = map;
     }
+
 
 }

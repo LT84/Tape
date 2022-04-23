@@ -54,10 +54,10 @@ import com.project.tape.Fragments.ArtistsFragment;
 import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
-import com.project.tape.SecondaryClasses.Album;
+import com.project.tape.ItemClasses.Album;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.MusicLoader;
-import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.ItemClasses.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,30 +127,37 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (searchView != null) {
-                    if (tab.getPosition() == 1) {
+                    if (tab.getPosition() == 0) {
+                        searchView.setQueryHint("Find your song");
+                        songsFragmentSelected = true;
+                        SongsFragment.songsFragmentOpened = true;
+                        artistsFragmentSelected = false;
+                        albumsFragmentSelected = false;
+                        sortBtn.setEnabled(true);
+                        menuItem.setVisible(true);
+                    } else if (tab.getPosition() == 1) {
                         searchView.setQueryHint("Find your album");
                         songsFragmentSelected = false;
                         albumsFragmentSelected = true;
                         artistsFragmentSelected = false;
                         sortBtn.setEnabled(false);
+                        menuItem.setVisible(true);
                     } else if (tab.getPosition() == 2) {
                         searchView.setQueryHint("Find your artist");
                         songsFragmentSelected = false;
                         artistsFragmentSelected = true;
                         albumsFragmentSelected = false;
                         sortBtn.setEnabled(false);
-                    } else if (tab.getPosition() == 0) {
-                        searchView.setQueryHint("Find your song");
-                        songsFragmentSelected = true;
-                        artistsFragmentSelected = false;
-                        albumsFragmentSelected = false;
-                        sortBtn.setEnabled(true);
+                        menuItem.setVisible(true);
+                    } else if (tab.getPosition() == 3) {
+                        sortBtn.setEnabled(false);
+                        menuItem.setVisible(false);
                     }
                 }
                 pager2.setCurrentItem(tab.getPosition());
             }
 
-            @Override
+        @Override
             public void onTabUnselected(TabLayout.Tab tab) {
             }
 
@@ -166,6 +173,14 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                 tabLayout.selectTab(tabLayout.getTabAt(position));
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.cancel(1);
+        }
     }
 
     //Sets play button image in main
@@ -230,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         sortBtn.getActionView();
         searchView = (SearchView) menuItem.getActionView();
         searchView.setOnQueryTextListener(this);
-        searchView.setQueryHint("Find your song");
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -348,14 +362,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.cancel(1);
-        }
-    }
-
-    @Override
     public void onTrackPrevious() {
     }
 
@@ -369,19 +375,19 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         mediaPlayer.start();
         if (songSearchWasOpened) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticCurrentArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticCurrentArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-        playPauseBtn.setImageResource(R.drawable.pause_song);
+        playPauseBtn.setImageResource(R.drawable.ic_pause_song);
     }
 
     @Override
@@ -390,18 +396,18 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         mediaPlayer.pause();
         if (songSearchWasOpened) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.play_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.play_song, position, songsList.size() - 1);
+                    R.drawable.ic_play_song, position, songsList.size() - 1);
         }
-        playPauseBtn.setImageResource(R.drawable.play_song);
+        playPauseBtn.setImageResource(R.drawable.ic_play_song);
     }
 
     //Music loader methods
@@ -426,7 +432,8 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     }
 
     @Override
-    public void onBackPressed() {}
+    public void onBackPressed() {
+    }
 
 
 }

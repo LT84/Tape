@@ -10,6 +10,8 @@ import android.provider.MediaStore;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.loader.content.Loader;
 
+import com.project.tape.ItemClasses.Album;
+
 import java.util.ArrayList;
 import java.util.List;
 

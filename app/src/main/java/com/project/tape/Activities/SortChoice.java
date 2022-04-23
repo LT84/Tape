@@ -29,7 +29,7 @@ public class SortChoice extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sort_choice);
+        setContentView(R.layout.activity_sort_choice);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         getSupportActionBar().hide();
 

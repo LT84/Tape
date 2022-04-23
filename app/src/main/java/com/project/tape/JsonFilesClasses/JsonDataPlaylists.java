@@ -1,6 +1,9 @@
-package com.project.tape.SecondaryClasses;
+package com.project.tape.JsonFilesClasses;
+
+import com.project.tape.ItemClasses.Playlist;
 
 import java.util.ArrayList;
+
 
 public class JsonDataPlaylists {
 
@@ -21,4 +24,6 @@ public class JsonDataPlaylists {
     public void setArray(ArrayList<Playlist> array) {
         this.array = array;
     }
+
+
 }

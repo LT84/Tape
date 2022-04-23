@@ -65,7 +65,7 @@ import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.ItemClasses.Song;
 import com.project.tape.Services.OnClearFromRecentService;
 
 import java.io.IOException;
@@ -207,9 +207,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     private void getIntentMethod() {
         if (songsList != null) {
             if (mediaPlayer.isPlaying()) {
-                playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
+                playPauseBtnInItemInfo.setImageResource(R.drawable.ic_pause_song);
             } else {
-                playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
+                playPauseBtnInItemInfo.setImageResource(R.drawable.ic_play_song);
             }
         }
     }
@@ -287,10 +287,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
         if (fromAlbumInfo) {
             CreateNotification.createNotification(this, currentSongsInAlbum.get(position),
-                    R.drawable.pause_song, position, currentSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, position, currentSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, currentArtistSongs.get(position),
-                    R.drawable.pause_song, position, currentArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, position, currentArtistSongs.size() - 1);
         }
 
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
@@ -307,7 +307,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
-        playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.ic_pause_song);
     }
 
     public void switchToNextSong() {
@@ -528,9 +528,9 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     .into(album_cover_in_itemInfo);
         }
         if (mediaPlayer.isPlaying()) {
-            playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
+            playPauseBtnInItemInfo.setImageResource(R.drawable.ic_pause_song);
         } else {
-            playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
+            playPauseBtnInItemInfo.setImageResource(R.drawable.ic_play_song);
         }
         mediaPlayer.setOnCompletionListener(this);
         super.onResume();
@@ -641,19 +641,19 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         switchToPreviousSong();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
     }
@@ -664,19 +664,19 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         switchToNextSong();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
     }
@@ -688,21 +688,21 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         mediaPlayer.start();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
-        playPauseBtnInItemInfo.setImageResource(R.drawable.pause_song);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.ic_pause_song);
     }
 
     @Override
@@ -711,21 +711,21 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         mediaPlayer.pause();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.play_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.play_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_play_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.play_song, position, songsList.size() - 1);
+                    R.drawable.ic_play_song, position, songsList.size() - 1);
         }
-        playPauseBtnInItemInfo.setImageResource(R.drawable.play_song);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.ic_play_song);
     }
 
     //Called when headphones button pressed

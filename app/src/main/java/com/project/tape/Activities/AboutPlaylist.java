@@ -64,10 +64,10 @@ import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.SecondaryClasses.JsonDataMap;
-import com.project.tape.SecondaryClasses.JsonDataSongs;
+import com.project.tape.JsonFilesClasses.JsonDataMap;
+import com.project.tape.JsonFilesClasses.JsonDataSongs;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
-import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.ItemClasses.Song;
 import com.project.tape.Services.OnClearFromRecentService;
 
 import java.io.IOException;
@@ -116,7 +116,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.about_playlist);
+        this.setContentView(R.layout.activity_about_playlist);
         this.getSupportActionBar().hide();
         //Booleans
         songsFragmentOpened = false;
@@ -225,14 +225,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
 
                         CreateNotification.createNotification(AboutPlaylist.this, currentSongsInPlaylist.get(position),
-                                R.drawable.pause_song, position, currentSongsInPlaylist.size() - 1);
+                                R.drawable.ic_pause_song, position, currentSongsInPlaylist.size() - 1);
 
 
 
                         song_title_in_playlist.setText(songNameStr);
                         artist_name_in_playlist.setText(artistNameStr);
 
-                        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+                        playPauseBtnInPlaylist.setImageResource(R.drawable.ic_pause_song);
                     }
 
                     @Override
@@ -286,9 +286,9 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     private void getIntentMethod() {
         if (songsList != null) {
             if (mediaPlayer.isPlaying()) {
-                playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+                playPauseBtnInPlaylist.setImageResource(R.drawable.ic_pause_song);
             } else {
-                playPauseBtnInPlaylist.setImageResource(R.drawable.play_song);
+                playPauseBtnInPlaylist.setImageResource(R.drawable.ic_play_song);
             }
         }
     }
@@ -640,9 +640,9 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     .into(album_cover_in_playlist);
         }
         if (mediaPlayer.isPlaying()) {
-            playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+            playPauseBtnInPlaylist.setImageResource(R.drawable.ic_pause_song);
         } else {
-            playPauseBtnInPlaylist.setImageResource(R.drawable.play_song);
+            playPauseBtnInPlaylist.setImageResource(R.drawable.ic_play_song);
         }
         mediaPlayer.setOnCompletionListener(this);
         aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);
@@ -774,23 +774,23 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         switchToPreviousSong();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
             aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+        playPauseBtnInPlaylist.setImageResource(R.drawable.ic_pause_song);
     }
 
     @Override
@@ -799,23 +799,23 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         switchToNextSong();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
             aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+        playPauseBtnInPlaylist.setImageResource(R.drawable.ic_pause_song);
     }
 
     @Override
@@ -825,21 +825,21 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         mediaPlayer.start();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
-        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
+        playPauseBtnInPlaylist.setImageResource(R.drawable.ic_pause_song);
     }
 
     @Override
@@ -848,21 +848,21 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         mediaPlayer.pause();
         if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
-                    R.drawable.play_song, position, songsFromSearch.size() - 1);
+                    R.drawable.ic_play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(this, staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
+                    R.drawable.ic_play_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
         } else if (fromArtistInfo) {
             CreateNotification.createNotification(this, staticPreviousArtistSongs.get(positionInInfoAboutItem),
-                    R.drawable.play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
+                    R.drawable.ic_play_song, positionInInfoAboutItem, staticPreviousArtistSongs.size() - 1);
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
-                    R.drawable.play_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
+                    R.drawable.ic_play_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
-                    R.drawable.play_song, position, songsList.size() - 1);
+                    R.drawable.ic_play_song, position, songsList.size() - 1);
         }
-        playPauseBtnInPlaylist.setImageResource(R.drawable.play_song);
+        playPauseBtnInPlaylist.setImageResource(R.drawable.ic_play_song);
     }
 
 

@@ -1,4 +1,4 @@
-package com.project.tape.SecondaryClasses;
+package com.project.tape.ItemClasses;
 
 
 public class Song  {
@@ -9,7 +9,6 @@ public class Song  {
     private String artist;
     private String duration;
     private boolean isSelected;
-
 
 
     public Song(String data, String title, String album, String artist, String duration, boolean isSelected) {

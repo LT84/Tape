@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.tape.R;
-import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.ItemClasses.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class AddSongsAdapter extends RecyclerView.Adapter<AddSongsAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.add_song_item, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.item_add_song, parent, false);
         ViewHolder vHolder = new ViewHolder(v, onAddSongListener);
         return vHolder;
     }

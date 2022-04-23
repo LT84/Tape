@@ -1,5 +1,6 @@
 package com.project.tape.Fragments;
 
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
@@ -16,7 +17,6 @@ import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Adapters.SongsAdapter.myRecyclerView;
 import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
-import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
 
 import android.app.KeyguardManager;
@@ -45,14 +45,13 @@ import com.project.tape.Adapters.SongsAdapter;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.ItemClasses.Song;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
 import java.util.ArrayList;
 
 
 public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
-
 
     private static final int VERTICAL_ITEM_SPACE = 3;
 
@@ -75,11 +74,12 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
     public static boolean songsFragmentOpened;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) throws NullPointerException {
         View v;
-        v = inflater.inflate(R.layout.songs_fragment, container, false);
+        v = inflater.inflate(R.layout.fragment_songs, container, false);
         //Loading audio list and albumList
         loadAudio();
         //Booleans
@@ -124,7 +124,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .getBoolean("fromArtistInfo", false);
         uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                 .getString("uri", songsList.get(0).getData()));
-        //uri = Uri.parse(songsList.get(0).getData());
 
         //Fills up staticCurrentSongsInAlbum
         int a = 0;
@@ -146,7 +145,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 b++;
             }
         }
-
         //Fills up staticArtistSongs
         artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
                 .getString("artistNameStr", " ");
@@ -157,7 +155,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 c++;
             }
         }
-
         //Fills up staticPreviousArtistSongs
         int d = 0;
         previousArtistName = getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE)
@@ -191,76 +188,8 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         return v;
     }
 
-    //Plays song after it clicked in RecyclerView
-    @Override
-    public void onSongClick(int position) {
-        this.position = position;
-        fromAlbumInfo = false;
-        fromArtistInfo = false;
-        fromPlaylist = false;
-
-        if (songSearchWasOpened) {
-            songsList = songsFromSearch;
-            uri = Uri.parse(songsFromSearch.get(position).getData());
-            songNameStr = songsFromSearch.get(position).getTitle();
-            artistNameStr = songsFromSearch.get(position).getArtist();
-        } else {
-            songsList = mSongsList;
-            uri = Uri.parse(songsList.get(position).getData());
-            songNameStr = songsList.get(position).getTitle();
-            artistNameStr = songsList.get(position).getArtist();
-        }
-
-        //Gets audioFocus, then creates mediaPlayer
-        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
-        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            mediaPlayer.release();
-            mediaPlayer = MediaPlayer.create(getContext(), uri);
-            onTrackPlay();
-        }
-
-        metaDataInFragment(uri);
-
-        if (songSearchWasOpened) {
-            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
-                    R.drawable.pause_song, position, songsFromSearch.size() - 1);
-        } else {
-            CreateNotification.createNotification(getActivity(), songsList.get(position),
-                    R.drawable.pause_song, position, songsList.size() - 1);
-        }
-
-        getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
-                .putString("songNameStr", songNameStr).commit();
-        getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
-                .putString("artistNameStr", artistNameStr).commit();
-        getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
-                .putInt("position", position).commit();
-        getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
-        getActivity().getSharedPreferences("durationTotal", Context.MODE_PRIVATE).edit()
-                .putInt("durationTotal", Integer.parseInt(songsList.get(position).getDuration()) / 1000).apply();
-
-        mediaPlayer.setOnCompletionListener(this);
-        song_title_main.setText(songsList.get(position).getTitle());
-        artist_name_main.setText(songsList.get(position).getArtist());
-        mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
-
-        for (Song song : songsList) {
-            if (song.getTitle().contains(songNameStr)) {
-                uri = Uri.parse(song.getData());
-                getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                        .putString("uri", uri.toString()).commit();
-            }
-        }
-
-        getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("uri", uri.toString()).commit();
-        loadAudio();
-    }
-
-
     /*Switches next composition, sets album cover in main, sets
-           title and artist when SongsFragment is opened*/
+          title and artist when SongsFragment is opened*/
     @Override
     public void onResume() {
         super.onResume();
@@ -304,12 +233,25 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             song_title_main.setText(songNameStr);
             artist_name_main.setText(artistNameStr);
             if (mediaPlayer.isPlaying()) {
-                mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_pause_song);
             } else {
-                mainPlayPauseBtn.setImageResource(R.drawable.play_song);
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_play_song);
             }
         }
         mediaPlayer.setOnCompletionListener(SongsFragment.this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_SONGSFRAGMENT");
+        }
     }
 
     @Override
@@ -329,6 +271,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             getActivity().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
                     .putBoolean("repeatBtnClicked", false).commit();
         }
+
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
         getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
@@ -346,12 +289,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
-        onTrackNext();
-        mediaPlayer.setOnCompletionListener(this);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -359,27 +296,80 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         }
     }
 
+    //Plays song after it clicked in RecyclerView
     @Override
-    public void onPause() {
-        super.onPause();
-        //Checking is screen locked
-        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
-        if (myKM.inKeyguardRestrictedInputMode()) {
-            //if locked
+    public void onSongClick(int position) {
+        this.position = position;
+        fromAlbumInfo = false;
+        fromArtistInfo = false;
+        fromPlaylist = false;
+
+        if (songSearchWasOpened) {
+            songsList = songsFromSearch;
+            uri = Uri.parse(songsFromSearch.get(position).getData());
+            songNameStr = songsFromSearch.get(position).getTitle();
+            artistNameStr = songsFromSearch.get(position).getArtist();
         } else {
-            getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_SONGSFRAGMENT");
+            songsList = mSongsList;
+            uri = Uri.parse(songsList.get(position).getData());
+            songNameStr = songsList.get(position).getTitle();
+            artistNameStr = songsList.get(position).getArtist();
         }
 
+        //Gets audioFocus, then creates mediaPlayer
+        audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        if (audioFocusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(getContext(), uri);
+            onTrackPlay();
+        }
 
+        metaDataInFragment(uri);
+
+        if (songSearchWasOpened) {
+            CreateNotification.createNotification(getActivity(), songsFromSearch.get(position),
+                    R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
+        } else {
+            CreateNotification.createNotification(getActivity(), songsList.get(position),
+                    R.drawable.ic_pause_song, position, songsList.size() - 1);
+        }
+
+        mediaPlayer.setOnCompletionListener(this);
+
+        song_title_main.setText(songsList.get(position).getTitle());
+        artist_name_main.setText(songsList.get(position).getArtist());
+        mainPlayPauseBtn.setImageResource(R.drawable.ic_pause_song);
+
+        for (Song song : songsList) {
+            if (song.getTitle().contains(songNameStr)) {
+                uri = Uri.parse(song.getData());
+            }
+        }
+
+        //Shared preferences
+        getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
+                .putString("songNameStr", songNameStr).commit();
+        getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
+                .putString("artistNameStr", artistNameStr).commit();
+        getActivity().getSharedPreferences("position", Context.MODE_PRIVATE).edit()
+                .putInt("position", position).commit();
+        getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
+        getActivity().getSharedPreferences("durationTotal", Context.MODE_PRIVATE).edit()
+                .putInt("durationTotal", Integer.parseInt(songsList.get(position).getDuration()) / 1000).apply();
+        getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
+
+        loadAudio();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onCompletion(MediaPlayer mp) {
+        onTrackNext();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
-    //Called when headphones button pressed
+    //Handling headphones buttons methods
     @Override
     public void onMediaButtonSingleClick() {
         if (isPlaying) {

@@ -18,14 +18,12 @@ public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapt
     AddSongsAdapter addSongsAdapter;
     RecyclerView addSongsRecyclerView;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.add_songs_activity);
-        setContentView(R.layout.add_songs_activity);
+        this.setContentView(R.layout.activity_add_songs);
+        setContentView(R.layout.activity_add_songs);
         getSupportActionBar().hide();
-
 
         addSongsAdapter = new AddSongsAdapter(AddSongsActivity.this, songsList, this);
         addSongsAdapter.updateAddSongsListList(songsList);
@@ -35,17 +33,7 @@ public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapt
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
     public void onAddSongClick(int position) throws IOException {
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
 

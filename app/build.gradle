@@ -39,6 +39,7 @@ dependencies {
     implementation 'androidx.media:media:1.5.0'
     testImplementation 'junit:junit:'
     implementation "androidx.recyclerview:recyclerview:1.2.1"
+
     //gson
     implementation 'com.google.code.gson:gson:2.8.6'
 

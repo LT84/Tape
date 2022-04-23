@@ -60,6 +60,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
 
     public static boolean clickFromArtistsFragment, artistsFragmentOpened;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -89,6 +90,76 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             listState = savedInstanceState.getParcelable("ListState");
         }
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = true;
+        aboutFragmentItemOpened = false;
+        playlistsFragmentOpened = false;
+        aboutPlaylistOpened = false;
+
+        Log.i("artistNameStr", artistNameStr);
+        if (fromBackground) {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_SONGSFRAGMENT");
+            fromBackground = false;
+        }
+
+        createChannel();
+        Log.i("broadcast", "reg_ARTISTSFRAGMENT");
+        trackAudioSource();
+
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(getActivity());
+
+        song_title_main.setText(songNameStr);
+        artist_name_main.setText(artistNameStr);
+        if (mediaPlayer != null) {
+            if (!coverLoaded) {
+                if (uri != null) {
+                    metaDataInFragment(uri);
+                    coverLoaded = true;
+                }
+            }
+
+            if (mediaPlayer.isPlaying()) {
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_pause_song);
+            } else {
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_play_song);
+            }
+        } else {
+            song_title_main.setText(" ");
+            artist_name_main.setText(" ");
+        }
+        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_ARTISTSFRAGMENT");
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (artistsFragmentOpened) {
+            createChannel();
+            Log.i("broadcast", "reg_ARTISTSFRAGMENT");
+            fromBackground = true;
+        }
     }
 
     @Override
@@ -128,71 +199,10 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        songsFragmentOpened = false;
-        albumsFragmentOpened = false;
-        artistsFragmentOpened = true;
-        aboutFragmentItemOpened = false;
-        playlistsFragmentOpened = false;
-        aboutPlaylistOpened = false;
-
-        Log.i("artistNameStr", artistNameStr);
-        if (fromBackground) {
-            getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_SONGSFRAGMENT");
-            fromBackground = false;
-        }
-
-        createChannel();
-        Log.i("broadcast", "reg_ARTISTSFRAGMENT");
-        trackAudioSource();
-
-        //Register headphones buttons
-        HeadsetActionButtonReceiver.delegate = this;
-        HeadsetActionButtonReceiver.register(getActivity());
-
-        song_title_main.setText(songNameStr);
-        artist_name_main.setText(artistNameStr);
-        if (mediaPlayer != null) {
-            if (!coverLoaded) {
-                if (uri != null) {
-                    metaDataInFragment(uri);
-                    coverLoaded = true;
-                }
-            }
-
-            if (mediaPlayer.isPlaying()) {
-                mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
-            } else {
-                mainPlayPauseBtn.setImageResource(R.drawable.play_song);
-            }
-        } else {
-            song_title_main.setText(" ");
-            artist_name_main.setText(" ");
-        }
-        mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        //Checking is screen locked
-        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
-        if (myKM.inKeyguardRestrictedInputMode()) {
-            //if locked
-        } else {
-            getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_ARTISTSFRAGMENT");
-        }
-    }
-
-    @Override
     public void onCompletion(MediaPlayer mp) {
         onTrackNext();
         mediaPlayer.setOnCompletionListener(ArtistsFragment.this);
     }
-
 
     @Override
     public void onMediaButtonSingleClick() {
@@ -207,15 +217,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     public void onMediaButtonDoubleClick() {
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (artistsFragmentOpened) {
-            createChannel();
-            Log.i("broadcast", "reg_ARTISTSFRAGMENT");
-            fromBackground = true;
-        }
-    }
+
 }
 
 

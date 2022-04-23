@@ -41,19 +41,18 @@ import com.project.tape.Activities.AboutPlaylist;
 import com.project.tape.Adapters.PlaylistsAdapter;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.SecondaryClasses.JsonDataMap;
-import com.project.tape.SecondaryClasses.JsonDataPlaylists;
-import com.project.tape.SecondaryClasses.Playlist;
+import com.project.tape.JsonFilesClasses.JsonDataMap;
+import com.project.tape.JsonFilesClasses.JsonDataPlaylists;
+import com.project.tape.ItemClasses.Playlist;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 
-public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.OnCompletionListener, PlaylistsAdapter.OnPlaylistListener {
+public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.OnCompletionListener {
 
     Button newPlaylistBtn, closeAddingNewPlaylistBtn, addNewPlaylistBtn, closeAlertPopupBtn, deletePlaylistBtn;
     EditText addNewPlaylistEditText;
@@ -66,48 +65,47 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
     private int deletePosition;
 
     boolean fromLongClick;
-    public static boolean playlistsFragmentOpened;
+    private boolean fromBackground = false;
+    public static boolean playlistsFragmentOpened, clickFromPlaylistFragment;
 
     Gson gson = new Gson();
     String json;
     JsonDataPlaylists jsonDataPlaylists;
 
     public static ArrayList<Playlist> playlistsList = new ArrayList<>();
-
-    Set<String> set = new HashSet<>();
-
-    private boolean fromBackground = false;
-
-    public static boolean clickFromPlaylistFragment;
+    Set<String> allAlbumsNamesSet = new HashSet<>();
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
-        v = inflater.inflate(R.layout.playlists_fragment, container, false);
+        v = inflater.inflate(R.layout.fragment_playlists, container, false);
         newPlaylistBtn = v.findViewById(R.id.new_playlist_btn);
         newPlaylistBtn.setOnClickListener(btnL);
+        //Booleans
+        coverLoaded = false;
 
-        //getArraylistOf playlists
-        // getSharedPlaylists();
-
+        //GetArraylistOf playlists
         getSharedPlaylists();
 
+        //Fills up HashSet to then prevent creating duplicates
         for (int i = 0; i < playlistsList.size(); i++) {
-            set.add(playlistsList.get(i).getPlaylistName());
+            allAlbumsNamesSet.add(playlistsList.get(i).getPlaylistName());
         }
 
+        //Init views
         addNewPlaylistEditText = v.findViewById(R.id.new_playlist_name);
+        playlistRecyclerView = v.findViewById(R.id.playlists_recyclerView);
+        //Init views in main
         song_title_main = getActivity().findViewById(R.id.song_title_main);
-        artist_name_main =  getActivity().findViewById(R.id.artist_name_main);
-        album_cover_main =  getActivity().findViewById(R.id.album_cover_main);
-        mainPlayPauseBtn =  getActivity().findViewById(R.id.pause_button);
+        artist_name_main = getActivity().findViewById(R.id.artist_name_main);
+        album_cover_main = getActivity().findViewById(R.id.album_cover_main);
+        mainPlayPauseBtn = getActivity().findViewById(R.id.pause_button);
 
         //Sets adapter to list and applies settings to recyclerView
-        playlistsAdapter = new PlaylistsAdapter(getContext(), playlistsList, this);
+        playlistsAdapter = new PlaylistsAdapter(getContext(), playlistsList);
         playlistsAdapter.updatePlaylistList(playlistsList);
-        playlistRecyclerView = v.findViewById(R.id.playlists_recyclerView);
         playlistRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         playlistRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         playlistRecyclerView.setAdapter(playlistsAdapter);
@@ -115,20 +113,20 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         //RecyclerView listener
         playlistRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(getActivity(), playlistRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    //RecyclerView click listener
                     @Override
                     public void onItemClick(View view, int position) {
                         Intent intent = new Intent(getActivity(), AboutPlaylist.class);
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
-
                         clickFromPlaylistFragment = true;
-
+                        //Passes name to aboutPlaylist
                         intent.putExtra("playlistName", playlistsList.get(position).getPlaylistName());
-
+                        //Unregister audioSourceChangedReceiver
                         getActivity().unregisterReceiver(audioSourceChangedReceiver);
-
                         startActivityForResult(intent, REQUEST_CODE, bundle);
                     }
 
+                    //RecyclerView long click listener
                     @Override
                     public void onLongItemClick(View view, int position) {
                         fromLongClick = true;
@@ -140,16 +138,109 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Booleans
+        songsFragmentOpened = false;
+        albumsFragmentOpened = false;
+        artistsFragmentOpened = false;
+        aboutFragmentItemOpened = false;
+        playlistsFragmentOpened = true;
+        aboutPlaylistOpened = false;
+
+        //Unregister broadcastReceiver after app was resumed
+        if (fromBackground) {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
+            fromBackground = false;
+        }
+        createChannel();
+        Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
+        trackAudioSource();
+
+        //Register headphones buttons
+        HeadsetActionButtonReceiver.delegate = this;
+        HeadsetActionButtonReceiver.register(getActivity());
+
+        //Sets information about about song after activity was resumed
+        song_title_main.setText(songNameStr);
+        artist_name_main.setText(artistNameStr);
+        if (mediaPlayer != null) {
+            if (!coverLoaded) {
+                if (uri != null) {
+                    metaDataInFragment(uri);
+                    coverLoaded = true;
+                }
+            }
+
+            if (mediaPlayer.isPlaying()) {
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_pause_song);
+            } else {
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_play_song);
+            }
+        } else {
+            song_title_main.setText(" ");
+            artist_name_main.setText(" ");
+        }
+        mediaPlayer.setOnCompletionListener(PlaylistsFragment.this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Checking is screen locked
+        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
+        if (myKM.inKeyguardRestrictedInputMode()) {
+            //if locked
+        } else {
+            getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
+        }
+
+        //Puts repeatBtn state in to shared Preferences
+        if (repeatBtnClicked) {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", true).commit();
+        } else {
+            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
+                    .putBoolean("repeatBtnClicked", false).commit();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //Creates broadcastReceiver when app is collapsed
+        if (playlistsFragmentOpened) {
+            createChannel();
+            Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
+            fromBackground = true;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //Save json
+        jsonDataPlaylists.setArray(playlistsList);
+        json = gson.toJson(jsonDataPlaylists);
+        getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()
+                .putString("json", json).commit();
+    }
+
+    //Popup windows method, when user wants to add new playlist or delete existed
     public void onButtonShowPopupWindowClick(View view) {
         //Inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater)
                 getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView;
+
         //Check which popup needed
         if (fromLongClick) {
             popupView = inflater.inflate(R.layout.popup_delete_permission, null);
         } else {
-            popupView = inflater.inflate(R.layout.popup_window, null);
+            popupView = inflater.inflate(R.layout.popup_window_add_new_album, null);
         }
 
         //Create the popup window
@@ -174,12 +265,13 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                     popupWindow.dismiss();
                 }
             });
+
             //DeletePlaylistBtn listener
             deletePlaylistBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     getSongsInPlaylistMap.remove(playlistsList.get(deletePosition).getPlaylistName());
-                    set.remove(playlistsList.get(deletePosition).getPlaylistName());
+                    allAlbumsNamesSet.remove(playlistsList.get(deletePosition).getPlaylistName());
 
                     playlistsList.remove(deletePosition);
 
@@ -204,8 +296,8 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                     Playlist playlist = new Playlist();
                     playlist.setPlaylistName(addNewPlaylistEditText.getText().toString());
 
-                    if (!set.contains(addNewPlaylistEditText.getText().toString())) {
-                        set.add(addNewPlaylistEditText.getText().toString());
+                    if (!allAlbumsNamesSet.contains(addNewPlaylistEditText.getText().toString())) {
+                        allAlbumsNamesSet.add(addNewPlaylistEditText.getText().toString());
                         playlistsList.add(playlist);
                     } else {
                         Toast.makeText(getContext(), "Playlist with this name already exists", Toast.LENGTH_SHORT).show();
@@ -225,6 +317,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                 }
             });
         }
+
         //Dismiss the popup window when touched
         popupView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -235,6 +328,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         });
     }
 
+    //Add new playlist button listener
     View.OnClickListener btnL = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -246,17 +340,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         }
     };
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //Save json
-        jsonDataPlaylists.setArray(playlistsList);
-        json = gson.toJson(jsonDataPlaylists);
-        getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()
-                .putString("json", json).commit();
-    }
-
-    //Get json
+    //Get json file and add its content in playlistList
     public void getSharedPlaylists() {
         json = getActivity().getSharedPreferences("json", Context.MODE_PRIVATE)
                 .getString("json", "");
@@ -266,94 +350,14 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        coverLoaded = false;
-        songsFragmentOpened = false;
-        albumsFragmentOpened = false;
-        artistsFragmentOpened = false;
-        aboutFragmentItemOpened = false;
-        playlistsFragmentOpened = true;
-        aboutPlaylistOpened = false;
-
-        if (fromBackground) {
-            getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
-            fromBackground = false;
-        }
-
-        createChannel();
-        Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
-        trackAudioSource();
-
-        //Register headphones buttons
-        HeadsetActionButtonReceiver.delegate = this;
-        HeadsetActionButtonReceiver.register(getActivity());
-
-        song_title_main.setText(songNameStr);
-        artist_name_main.setText(artistNameStr);
-        if (mediaPlayer != null) {
-            if (!coverLoaded) {
-                if (uri != null) {
-                    metaDataInFragment(uri);
-                    coverLoaded = true;
-                }
-            }
-
-            if (mediaPlayer.isPlaying()) {
-                mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
-            } else {
-                mainPlayPauseBtn.setImageResource(R.drawable.play_song);
-            }
-        } else {
-            song_title_main.setText(" ");
-            artist_name_main.setText(" ");
-        }
-        mediaPlayer.setOnCompletionListener(PlaylistsFragment.this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        //Checking is screen locked
-        KeyguardManager myKM = (KeyguardManager) getActivity().getSystemService(Context.KEYGUARD_SERVICE);
-        if (myKM.inKeyguardRestrictedInputMode()) {
-            //if locked
-        } else {
-            getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
-        }
-
-        if (repeatBtnClicked) {
-            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
-                    .putBoolean("repeatBtnClicked", true).commit();
-        } else {
-            getContext().getSharedPreferences("repeatBtnClicked", Context.MODE_PRIVATE).edit()
-                    .putBoolean("repeatBtnClicked", false).commit();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (playlistsFragmentOpened) {
-            createChannel();
-            Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
-            fromBackground = true;
-        }
-    }
-
+    //Switches to next song after previous is ended
     @Override
     public void onCompletion(MediaPlayer mp) {
         onTrackNext();
         mediaPlayer.setOnCompletionListener(PlaylistsFragment.this);
     }
 
-    @Override
-    public void onPlaylistClick(int position) throws IOException {
-    }
-
+    //Handling headphones buttons methods
     @Override
     public void onMediaButtonSingleClick() {
         if (isPlaying) {
@@ -365,7 +369,6 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
 
     @Override
     public void onMediaButtonDoubleClick() {
-
     }
 
 

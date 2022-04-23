@@ -17,10 +17,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.tape.R;
-import com.project.tape.SecondaryClasses.Song;
+import com.project.tape.ItemClasses.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 
 public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdapter.PlaylistViewHolder> {
 
@@ -41,7 +42,7 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
     @Override
     public PlaylistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v;
-        v = LayoutInflater.from(mContext).inflate(R.layout.song_item, parent, false);
+        v = LayoutInflater.from(mContext).inflate(R.layout.item_song, parent, false);
         PlaylistViewHolder vHolder = new PlaylistViewHolder(v, onPlaylistListener);
         return vHolder;
     }

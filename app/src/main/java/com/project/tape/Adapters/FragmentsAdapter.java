@@ -11,6 +11,7 @@ import com.project.tape.Fragments.ArtistsFragment;
 import com.project.tape.Fragments.PlaylistsFragment;
 import com.project.tape.Fragments.SongsFragment;
 
+
 public class FragmentsAdapter extends FragmentStateAdapter {
 
     public FragmentsAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
@@ -20,16 +21,14 @@ public class FragmentsAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        switch (position)
-        {
-            case 1 :
+        switch (position) {
+            case 1:
                 return new AlbumsFragment();
-            case 2 :
+            case 2:
                 return new ArtistsFragment();
             case 3:
                 return new PlaylistsFragment();
         }
-
         return new SongsFragment();
     }
 

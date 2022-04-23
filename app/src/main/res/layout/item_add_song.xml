@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_song_item"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/song_title_addSongs"
+        android:layout_width="320dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <CheckBox
+        android:id="@+id/add_songs_checkBox"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@+id/song_title_addSongs" />
+
+    <RelativeLayout
+        android:layout_width="320dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/song_title_addSongs"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/artist_title_addSongs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/transparentWhite"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/dash_addSongs"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_toEndOf="@id/artist_title_addSongs"
+            android:text="@string/dash"
+            android:textColor="@color/transparentWhite"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/album_title_addSongs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_toEndOf="@id/dash_addSongs"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/transparentWhite"
+            android:textSize="11sp" />
+    </RelativeLayout>
+
+</RelativeLayout>

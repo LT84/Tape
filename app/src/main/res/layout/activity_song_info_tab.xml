@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/song_info_tab"
@@ -109,7 +110,7 @@
             android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/infoTab_pause_button"
-            android:background="@drawable/previous_song" />
+            android:background="@drawable/ic_previous_song" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/infoTab_pause_button"
@@ -121,7 +122,7 @@
             android:backgroundTint="@color/secondaryColor"
             android:clickable="true"
             android:focusable="true"
-            android:src="@drawable/play_song" />
+            android:src="@drawable/ic_play_song" />
 
         <ImageView
             android:id="@+id/infoTab_next_button"
@@ -129,7 +130,7 @@
             android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/infoTab_pause_button"
-            android:src="@drawable/next_song" />
+            android:src="@drawable/ic_next_song" />
     </RelativeLayout>
 
     <ImageView
@@ -138,7 +139,7 @@
         android:layout_height="48dp"
         android:layout_below="@id/control_buttons_layout"
         android:layout_marginStart="57dp"
-        android:background="@drawable/repeat_song_off" />
+        android:background="@drawable/ic_repeat_song_off" />
 
     <ImageView
         android:id="@+id/infoTab_shuffle_button"
@@ -147,7 +148,7 @@
         android:layout_below="@id/control_buttons_layout"
         android:layout_alignParentRight="true"
         android:layout_marginEnd="57dp"
-        android:background="@drawable/shuffle_songs_off" />
+        android:background="@drawable/ic_shuffle_songs_off" />
 
 
 </RelativeLayout>

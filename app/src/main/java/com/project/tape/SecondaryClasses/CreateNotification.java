@@ -2,8 +2,6 @@ package com.project.tape.SecondaryClasses;
 
 
 import static com.project.tape.Fragments.FragmentGeneral.art;
-import static com.project.tape.Fragments.SongsFragment.notificationBackground;
-import static com.project.tape.Fragments.FragmentGeneral.uri;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -12,19 +10,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 
+import com.project.tape.ItemClasses.Song;
 import com.project.tape.R;
 import com.project.tape.Services.NotificationActionService;
-
-
-import java.io.ByteArrayOutputStream;
 
 
 public class CreateNotification {
@@ -53,7 +47,7 @@ public class CreateNotification {
                     .setAction(ACTION_PREVIOUS);
             pendingIntentPrevious = PendingIntent.getBroadcast(context, 0,
                     intentPrevious, PendingIntent.FLAG_UPDATE_CURRENT);
-            drw_previous = R.drawable.previous_song;
+            drw_previous = R.drawable.ic_previous_song;
 
             //Play btn
             Intent intentPlay = new Intent(context, NotificationActionService.class)
@@ -68,7 +62,7 @@ public class CreateNotification {
                     .setAction(ACTION_NEXT);
             pendingIntentNext = PendingIntent.getBroadcast(context, 0,
                     intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
-            drw_next = R.drawable.next_song;
+            drw_next = R.drawable.ic_next_song;
 
             //Create notification
             if (art != null) {

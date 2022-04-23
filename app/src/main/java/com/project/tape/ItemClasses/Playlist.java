@@ -1,9 +1,9 @@
-package com.project.tape.SecondaryClasses;
+package com.project.tape.ItemClasses;
+
 
 public class Playlist {
 
     String playlistName;
-
 
     public String getPlaylistName() {
         return playlistName;
@@ -12,4 +12,6 @@ public class Playlist {
     public void setPlaylistName(String playlistName) {
         this.playlistName = playlistName;
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
 import static com.project.tape.Activities.MainActivity.songNameStr;
@@ -9,11 +10,10 @@ import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Adapters.AlbumsAdapter.mAlbums;
 import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.clickFromArtistsFragment;
+import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.albumName;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
-import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
-import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
 
 import android.app.ActivityOptions;
 import android.app.KeyguardManager;
@@ -40,7 +40,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.tape.Activities.AboutFragmentItem;
 import com.project.tape.Adapters.AlbumsAdapter;
 import com.project.tape.R;
-import com.project.tape.SecondaryClasses.Album;
+import com.project.tape.ItemClasses.Album;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.MusicLoader;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
@@ -143,61 +143,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         return v;
     }
 
-    //Creating LinearLayoutManager
-    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
-        public WrapContentLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
-            super(context, orientation, reverseLayout);
-        }
-
-        @Override
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-            try {
-                super.onLayoutChildren(recycler, state);
-            } catch (IndexOutOfBoundsException e) {
-
-            }
-        }
-    }
-
-    //Creating MusicLoader
-    public Loader<List<Album>> onCreateLoader(int id, Bundle args) {
-        return new MusicLoader(getActivity());
-    }
-
-    // Add the newly loaded music to adapter.
-    @Override
-    public void onLoadFinished(@NonNull Loader<List<Album>> loader, List<Album> data) {
-        albumsAdapter.addItems(data);
-    }
-
-    // Clear the old music because a new list is going to be coming.
-    @Override
-    public void onLoaderReset(Loader<List<Album>> loader) {
-        albumsAdapter.clearItem();
-    }
-
-    //Saving place where recyclerView stopped
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_CODE:
-                    songNameStr = data.getStringExtra("titleToMain");
-                    artistNameStr = data.getStringExtra("ArtistNameToMain");
-                    previousAlbumName = data.getStringExtra("previousAlbumName");
-                    getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
-                            .putString("previousAlbumName", previousAlbumName);
-                    break;
-            }
-        }
-    }
 
     @Override
     public void onResume() {
@@ -234,9 +179,9 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
             }
 
             if (mediaPlayer.isPlaying()) {
-                mainPlayPauseBtn.setImageResource(R.drawable.pause_song);
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_pause_song);
             } else {
-                mainPlayPauseBtn.setImageResource(R.drawable.play_song);
+                mainPlayPauseBtn.setImageResource(R.drawable.ic_play_song);
             }
         } else {
             song_title_main.setText(" ");
@@ -281,12 +226,66 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         }
     }
 
+    //Creating LinearLayoutManager
+    public class WrapContentLinearLayoutManager extends LinearLayoutManager {
+        public WrapContentLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
+            super(context, orientation, reverseLayout);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            } catch (IndexOutOfBoundsException e) {
+
+            }
+        }
+    }
+
+    //Creating MusicLoader
+    public Loader<List<Album>> onCreateLoader(int id, Bundle args) {
+        return new MusicLoader(getActivity());
+    }
+
+    // Add the newly loaded music to adapter.
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<Album>> loader, List<Album> data) {
+        albumsAdapter.addItems(data);
+    }
+
+    // Clear the old music because a new list is going to be coming.
+    @Override
+    public void onLoaderReset(Loader<List<Album>> loader) {
+        albumsAdapter.clearItem();
+    }
+
+    //Saving place where recyclerView stopped
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("ListState", myRecyclerView.getLayoutManager().onSaveInstanceState());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CODE:
+                    songNameStr = data.getStringExtra("titleToMain");
+                    artistNameStr = data.getStringExtra("ArtistNameToMain");
+                    previousAlbumName = data.getStringExtra("previousAlbumName");
+                    getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE).edit()
+                            .putString("previousAlbumName", previousAlbumName);
+                    break;
+            }
+        }
+    }
+
     @Override
     public void onCompletion(MediaPlayer mp) {
         onTrackNext();
         mediaPlayer.setOnCompletionListener(AlbumsFragment.this);
     }
-
 
     @Override
     public void onMediaButtonSingleClick() {
