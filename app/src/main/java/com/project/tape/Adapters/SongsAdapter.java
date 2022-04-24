@@ -52,7 +52,6 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         holder.tv_artist.setText(mSongsList.get(position).getArtist());
         holder.tv_album.setText(mSongsList.get(position).getAlbum());
 
-
         if (!elementsList.contains(holder.tv_title)) {
             elementsList.add(holder.tv_title);
         }

@@ -1,10 +1,5 @@
 package com.project.tape.Adapters;
 
-import static com.project.tape.Fragments.SongsFragment.albumName;
-import static com.project.tape.Fragments.SongsFragment.artistName;
-import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
-import static com.project.tape.Fragments.SongsFragment.previousArtistName;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -16,8 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.project.tape.R;
 import com.project.tape.ItemClasses.Song;
+import com.project.tape.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,11 +48,7 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
         holder.tv_artist.setText(songsInAlbumList.get(position).getArtist());
         holder.tv_album.setText(songsInAlbumList.get(position).getAlbum());
 
-        if (item_index == position &&  previousAlbumName.equals(albumName)) {
-            holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
-            holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
-            holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
-        } else if (item_index == position && previousArtistName.equals(artistName)){
+        if (item_index == position){
             holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));

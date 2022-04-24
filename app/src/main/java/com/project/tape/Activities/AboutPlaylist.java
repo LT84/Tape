@@ -90,8 +90,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
     private int deletePosition;
 
-    boolean fromLongClick;
-
     public static int positionInAboutPlaylist;
 
     AboutPlaylistAdapter aboutPlaylistAdapter;
@@ -228,7 +226,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                                 R.drawable.ic_pause_song, position, currentSongsInPlaylist.size() - 1);
 
 
-
                         song_title_in_playlist.setText(songNameStr);
                         artist_name_in_playlist.setText(artistNameStr);
 
@@ -243,10 +240,11 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                 })
         );
     }
+
     public void onButtonShowPopupWindowClick(View view) {
         //Inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater)
-               this.getSystemService(LAYOUT_INFLATER_SERVICE);
+                this.getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView;
         //Check which popup needed
 
