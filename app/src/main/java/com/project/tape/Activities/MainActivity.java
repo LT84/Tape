@@ -178,9 +178,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.cancel(1);
-        }
+        notificationManager.cancel(1);
     }
 
     //Sets play button image in main

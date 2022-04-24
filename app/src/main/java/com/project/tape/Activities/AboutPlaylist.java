@@ -24,11 +24,15 @@ import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.FragmentGeneral.uri;
 import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
+import static com.project.tape.Fragments.PlaylistsFragment.playlistsList;
+import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
+import static com.project.tape.Fragments.SongsFragment.previousArtistName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
 
+import android.app.ActivityOptions;
 import android.app.KeyguardManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -156,6 +160,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         album_title_playlist.setText(this.getIntent().getStringExtra("playlistName"));
 
+
         //Sets information
         song_title_in_playlist.setText(songNameStr);
         artist_name_in_playlist.setText(artistNameStr);
@@ -172,6 +177,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         }
 
         getSongsFromJson();
+
 
         //Sets information
         song_title_in_playlist.setText(songNameStr);
@@ -203,6 +209,9 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                         positionInAboutPlaylist = position;
                         fromSearch = false;
                         fromPlaylist = true;
+                        //!!!!!!!!!!!!!!!!!!
+                        getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
+                                .putBoolean("fromPlaylist", true).commit();
 
                         previousSongsInPlaylist.clear();
                         previousSongsInPlaylist.addAll(currentSongsInPlaylist);
@@ -316,6 +325,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             switch (v.getId()) {
                 case R.id.backBtn_playlist:
                     finish();
+                    overridePendingTransition(0, R.anim.hold);
                     break;
                 case R.id.pause_button_in_playlist:
                     playPauseBtnClicked();
@@ -326,7 +336,8 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     break;
                 case R.id.add_songs_to_playlist:
                     intent = new Intent(AboutPlaylist.this, AddSongsActivity.class);
-                    startActivity(intent);
+                    Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(AboutPlaylist.this).toBundle();
+                    startActivity(intent, bundle);
                     break;
             }
         }
@@ -590,6 +601,9 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
     @Override
     protected void onPause() {
         super.onPause();
+        Intent intent = new Intent();
+        intent.putExtra("songsAmount", Integer.toString(currentSongsInPlaylist.size()));
+
         //Checking is screen locked
         KeyguardManager myKM = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
         if (myKM.inKeyguardRestrictedInputMode()) {

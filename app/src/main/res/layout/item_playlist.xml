@@ -16,19 +16,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="11dp"
         android:layout_toEndOf="@id/playlist_cover"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/playlist_songs_amount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/playlist_name"
-        android:layout_marginStart="7dp"
-        android:layout_marginTop="2dp"
-        android:layout_toEndOf="@id/playlist_cover"
-        android:textSize="11sp" />
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:ellipsize="end"
+        android:maxLines="1"/>
 
     <ImageView
         android:id="@+id/about_playlist"

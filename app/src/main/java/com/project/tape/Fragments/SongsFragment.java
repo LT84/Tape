@@ -5,7 +5,12 @@ import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
+import static com.project.tape.Activities.AboutPlaylist.currentSongsInPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
+import static com.project.tape.Activities.AboutPlaylist.getSongsInPlaylistMap;
+import static com.project.tape.Activities.AboutPlaylist.jsonDataMap;
+import static com.project.tape.Activities.AboutPlaylist.jsonMap;
+import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
@@ -41,7 +46,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.project.tape.Adapters.SongsAdapter;
+import com.project.tape.JsonFilesClasses.JsonDataMap;
+import com.project.tape.JsonFilesClasses.JsonDataSongs;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
@@ -52,6 +60,10 @@ import java.util.ArrayList;
 
 
 public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSongListener, MediaPlayer.OnCompletionListener {
+
+    Gson gson = new Gson();
+    String json;
+    JsonDataSongs jsonDataSongs = new JsonDataSongs();
 
     private static final int VERTICAL_ITEM_SPACE = 3;
 
@@ -88,6 +100,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         artistsFragmentOpened = false;
         aboutFragmentItemOpened = false;
 
+        //!!!!!!!!!!
+        getSongsFromJson();
+
         artistList.addAll(songsList);
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -97,6 +112,8 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+
+
 
         playbackAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
@@ -124,6 +141,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .getBoolean("fromArtistInfo", false);
         uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                 .getString("uri", songsList.get(0).getData()));
+        //!!!!!!!!!!
+        fromPlaylist = getActivity().getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE)
+                .getBoolean("fromPlaylist", true);
 
         //Fills up staticCurrentSongsInAlbum
         int a = 0;
@@ -186,6 +206,35 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         sortArtistsList();
 
         return v;
+    }
+
+    //Get json
+    public void getSongsFromJson() {
+       String incomingName = getActivity().getSharedPreferences("sharedPrefPlaylistName", Context.MODE_PRIVATE)
+                .getString("sharedPrefPlaylistName", " ");
+
+        jsonMap = getActivity().getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE)
+                .getString("sharedJsonStringMap", "");
+
+        if (!jsonMap.equals("")) {
+            jsonDataMap = gson.fromJson(jsonMap, JsonDataMap.class);
+            getSongsInPlaylistMap.putAll(jsonDataMap.getMap());
+        }
+
+        if (getSongsInPlaylistMap.containsKey(incomingName)) {
+
+            json = getSongsInPlaylistMap.get(incomingName);
+
+            jsonDataSongs = gson.fromJson(json, JsonDataSongs.class);
+            previousSongsInPlaylist.addAll(jsonDataSongs.getArray());
+
+            Log.i("prevSize", Integer.toString(previousSongsInPlaylist.size()));
+
+//            Log.i("jsonMap", this.getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE)
+//                    .getString("sharedJsonStringMap", ""));
+//            Log.i("jsonMap", incomingName);
+//            Log.i("jsonString", json);
+        }
     }
 
     /*Switches next composition, sets album cover in main, sets
@@ -286,14 +335,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .putString("previousArtistName", previousArtistName).commit();
         getContext().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.cancel(1);
-        }
     }
 
     //Plays song after it clicked in RecyclerView

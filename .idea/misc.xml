@@ -69,6 +69,15 @@
         <entry key="..\:/Tape/app/src/main/res/menu/search.xml" value="0.3651041666666667" />
         <entry key="..\:/Tape/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.123" />
         <entry key="..\:/Tape/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2755" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/activity_about_playlist.xml" value="0.20863616930312098" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/activity_add_songs.xml" value="0.20863616930312098" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/activity_main.xml" value="0.10196406184705391" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/activity_song_info_tab.xml" value="0.10196406184705391" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/album_item.xml" value="0.10196406184705391" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/fragment_playlists.xml" value="0.264" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/item_about_fragment.xml" value="0.10474561778537837" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/item_playlist.xml" value="0.20863616930312098" />
+        <entry key="..\:/Users/Aboba/StudioProjects/Tape/app/src/main/res/layout/popup_window_add_new_album.xml" value="0.20863616930312098" />
         <entry key="..\:/Users/CyPoBo/AndroidStudioProjects/Tape/app/src/main/res/layout/activity_main.xml" value="0.17755825734549138" />
         <entry key="..\:/Users/CyPoBo/AndroidStudioProjects/Tape/app/src/main/res/layout/albums_fragment.xml" value="0.2957427536231884" />
         <entry key="..\:/Users/CyPoBo/AndroidStudioProjects/Tape/app/src/main/res/layout/artists_fragment.xml" value="0.2595108695652174" />

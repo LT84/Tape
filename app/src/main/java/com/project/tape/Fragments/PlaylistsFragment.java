@@ -1,16 +1,20 @@
 package com.project.tape.Fragments;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
+import static com.project.tape.Activities.AboutPlaylist.currentSongsInPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.getSongsInPlaylistMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonDataMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonMap;
+import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
+import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
 import android.app.ActivityOptions;
@@ -29,6 +33,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -70,7 +75,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
 
     Gson gson = new Gson();
     String json;
-    JsonDataPlaylists jsonDataPlaylists;
+    JsonDataPlaylists jsonDataPlaylists = new JsonDataPlaylists();
 
     public static ArrayList<Playlist> playlistsList = new ArrayList<>();
     Set<String> allAlbumsNamesSet = new HashSet<>();
@@ -148,7 +153,6 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         aboutFragmentItemOpened = false;
         playlistsFragmentOpened = true;
         aboutPlaylistOpened = false;
-
         //Unregister broadcastReceiver after app was resumed
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
@@ -223,6 +227,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
     public void onDestroy() {
         super.onDestroy();
         //Save json
+        Log.i("arraySize", Integer.toString(playlistsList.size()));
         jsonDataPlaylists.setArray(playlistsList);
         json = gson.toJson(jsonDataPlaylists);
         getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()

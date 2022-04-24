@@ -50,7 +50,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tv_playlist_title = (TextView) itemView.findViewById(R.id.playlist_name);
+            tv_playlist_title = itemView.findViewById(R.id.playlist_name);
         }
 
     }

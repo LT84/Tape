@@ -99,7 +99,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.about_fragment_item);
+        this.setContentView(R.layout.activity_about_fragment_item);
         this.getSupportActionBar().hide();
         //Booleans
         songsFragmentOpened = false;
