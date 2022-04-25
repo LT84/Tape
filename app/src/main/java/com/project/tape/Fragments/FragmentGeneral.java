@@ -1,9 +1,11 @@
 package com.project.tape.Fragments;
 
 import static androidx.core.content.ContextCompat.getSystemService;
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemAdapter;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistAdapter;
 import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.positionInAboutPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
@@ -15,6 +17,7 @@ import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
 import static com.project.tape.Fragments.SongsFragment.artistList;
+import static com.project.tape.Fragments.SongsFragment.songsAdapter;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
@@ -189,10 +192,14 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
 
         coverLoaded = true;
 
+        //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -201,14 +208,23 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
         mediaPlayer = MediaPlayer.create(getContext(), uri);
@@ -285,10 +301,14 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
 
         coverLoaded = true;
 
+        //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -297,14 +317,23 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
         mediaPlayer = MediaPlayer.create(getContext(), uri);
@@ -437,7 +466,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         } else {
             CreateNotification.createNotification(getContext(), songsList.get(position),
                     R.drawable.ic_pause_song, position, songsList.size() - 1);
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         mainPlayPauseBtn.setImageResource(R.drawable.ic_pause_song);
@@ -450,7 +478,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         if (fromSearch) {
             CreateNotification.createNotification(getContext(), songsFromSearch.get(position),
                     R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(getContext(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);
@@ -463,7 +490,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         } else {
             CreateNotification.createNotification(getContext(), songsList.get(position),
                     R.drawable.ic_pause_song, position, songsList.size() - 1);
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         mainPlayPauseBtn.setImageResource(R.drawable.ic_pause_song);

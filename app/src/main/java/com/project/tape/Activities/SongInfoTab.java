@@ -1,9 +1,11 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemAdapter;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistAdapter;
 import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.positionInAboutPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
@@ -24,6 +26,7 @@ import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.position;
+import static com.project.tape.Fragments.SongsFragment.songsAdapter;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.songsList;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
@@ -56,7 +59,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
@@ -146,7 +148,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         mediaPlayer.setOnCompletionListener(this);
     }
 
-    //Sets pause button image and max value of seekBar
+    //Sets pause button image
     private void getIntentMethod() {
         if (songsList != null) {
             if (mediaPlayer.isPlaying()) {
@@ -198,6 +200,12 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
             durationTotal = Integer.parseInt(staticPreviousArtistSongs
                     .get(positionInInfoAboutItem)
+                    .getDuration()) / 1000;
+            time_duration_total.setText(formattedTime(durationTotal));
+        } else if (fromPlaylist) {
+            seekBar.setMax(mediaPlayer.getDuration() / 1000);
+            durationTotal = Integer.parseInt(previousSongsInPlaylist
+                    .get(positionInAboutPlaylist)
                     .getDuration()) / 1000;
             time_duration_total.setText(formattedTime(durationTotal));
         } else {
@@ -373,7 +381,9 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -382,17 +392,23 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
-            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
         //Creates mediaPlayer, sets song and artist name, sets seekBar
@@ -569,11 +585,14 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         }
 
         //Sets song and artist strings
+        //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -582,17 +601,23 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
-            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
         //Creates mediaPlayer, sets song and artist name, sets seekBar
@@ -877,7 +902,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.ic_pause_song, position, songsList.size() - 1);
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            songsAdapter.updateColorAfterSongSwitch(position);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         playPauseBtn.setImageResource(R.drawable.ic_pause_song);
@@ -902,7 +927,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.ic_pause_song, position, songsList.size() - 1);
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            songsAdapter.updateColorAfterSongSwitch(position);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
         playPauseBtn.setImageResource(R.drawable.ic_pause_song);

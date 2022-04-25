@@ -177,9 +177,9 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                         menuItem.setVisible(true);
                     } else if (tab.getPosition() == 3) {
                         if (Locale.getDefault().getLanguage().equals("en")) {
-                            searchView.setQueryHint("Find your artist");
+                            searchView.setQueryHint("Find your playlist");
                         } else {
-                            searchView.setQueryHint("Найти исполнителя");
+                            searchView.setQueryHint("Найти плейлист");
                         }
                         songsFragmentSelected = false;
                         artistsFragmentSelected = false;
@@ -230,9 +230,9 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
 
     //Permission to read jsonDataSongs from phone
     private void permission() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}
                     , REQUEST_CODE);
         }
     }
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Do what you want permission related
             } else {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}
                         , REQUEST_CODE);
             }
         }
@@ -366,7 +366,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             }
             SongsFragment.songsAdapter.updateSongList(mySearch);
         } else {
-            fromSearch = true;
             songSearchWasOpened = true;
             userInput = newText.toLowerCase();
             for (Playlist playlist : playListsList) {

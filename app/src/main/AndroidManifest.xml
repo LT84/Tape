@@ -3,56 +3,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.project.tape">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
 
 
     <application
         android:allowBackup="true"
-        android:fullBackupContent="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
 
         <activity
             android:name=".Activities.AboutFragmentItem"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.MyOwnSize" />
         <activity
             android:name=".Activities.SongInfoTab"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.MyOwnSize" />
         <activity
             android:name=".Activities.SortChoice"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activities.AddSongsActivity"
-            android:theme="@style/Theme.MyOwnSize"
-            />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MyOwnSize" />
         <activity
             android:name=".Activities.AboutPlaylist"
-            android:theme="@style/Theme.MyOwnSize"
-            />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MyOwnSize" />
         <activity
             android:name=".Activities.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyOwnSize"
-            >
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MyOwnSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
 
 
         <receiver android:name=".Services.NotificationActionService" />

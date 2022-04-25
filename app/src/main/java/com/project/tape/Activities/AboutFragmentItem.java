@@ -1,5 +1,6 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistAdapter;
 import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.positionInAboutPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
@@ -28,6 +29,7 @@ import static com.project.tape.Fragments.SongsFragment.artistName;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 import static com.project.tape.Fragments.SongsFragment.previousArtistName;
+import static com.project.tape.Fragments.SongsFragment.songsAdapter;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
@@ -61,12 +63,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.project.tape.Adapters.AboutFragmentItemAdapter;
-import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
+import com.project.tape.ItemClasses.Song;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.ItemClasses.Song;
 import com.project.tape.Services.OnClearFromRecentService;
 
 import java.io.IOException;
@@ -350,11 +351,14 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
         coverLoaded = true;
 
+        //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -363,17 +367,23 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
-            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
         metaDataInAboutFragmentItem(uri);
@@ -450,11 +460,14 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
         coverLoaded = true;
 
+        //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -463,17 +476,23 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
-            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
         metaDataInAboutFragmentItem(uri);

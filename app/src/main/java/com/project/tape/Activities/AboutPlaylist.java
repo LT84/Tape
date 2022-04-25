@@ -1,5 +1,6 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemAdapter;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
@@ -24,6 +25,7 @@ import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.FragmentGeneral.uri;
 import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
+import static com.project.tape.Fragments.SongsFragment.songsAdapter;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
@@ -61,7 +63,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.project.tape.Adapters.AboutPlaylistAdapter;
-import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.ItemClasses.Song;
 import com.project.tape.JsonFilesClasses.JsonDataMap;
@@ -205,7 +206,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                         aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
                         fromSearch = false;
                         fromAlbumInfo = false;
-                        fromAlbumInfo = false;
+                        fromArtistInfo = false;
                         fromPlaylist = true;
                         //!!!!!!!!!!!!!!!!!!
                         getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
@@ -362,52 +363,8 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         }
     };
 
-    //To register audioSourceChangedReceiver
-    public void trackAudioSource() {
-        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        this.registerReceiver(audioSourceChangedReceiver, intentFilter);
-    }
-
     @Override
     public void onPlaylistClick(int position) throws IOException {
-//        this.positionInAboutPlaylist = position;
-//        fromSearch = false;
-//        fromPlaylist = true;
-//
-//        previousSongsInPlaylist.clear();
-//        previousSongsInPlaylist.addAll(currentSongsInPlaylist);
-//
-//        songNameStr = currentSongsInPlaylist.get(position).getTitle();
-//        artistNameStr = currentSongsInPlaylist.get(position).getArtist();
-//        this.getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
-//                .putString("previousArtistName", previousArtistName).commit();
-//        coverLoaded = false;
-//
-//        uri = Uri.parse(currentSongsInPlaylist.get(positionInAboutPlaylist).getData());
-//
-//
-//        mediaPlayer.release();
-//        mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
-//        onTrackPlay();
-//
-//        metaDataInAboutPlaylist(uri);
-//
-//
-//        CreateNotification.createNotification(this, currentSongsInPlaylist.get(position),
-//                R.drawable.pause_song, position, currentSongsInPlaylist.size() - 1);
-//
-//
-//        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-//                .putString("uri", uri.toString()).commit();
-//        this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
-//                .putString("songNameStr", songNameStr).commit();
-//        this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
-//                .putString("artistNameStr", artistNameStr).commit();
-//
-//        song_title_in_playlist.setText(songNameStr);
-//        artist_name_in_playlist.setText(artistNameStr);
-//
-//        playPauseBtnInPlaylist.setImageResource(R.drawable.pause_song);
     }
 
     public void switchToNextSong() {
@@ -453,11 +410,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         coverLoaded = true;
 
+        //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -466,17 +426,23 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
-            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
         mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
@@ -552,11 +518,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         coverLoaded = true;
 
+        //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -565,17 +534,23 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
-            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            if (aboutFragmentItemAdapter != null) {
+                aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
+            }
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
-            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            if (aboutPlaylistAdapter != null) {
+                aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
+            }
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
-            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+            if (songsAdapter != null) {
+                songsAdapter.updateColorAfterSongSwitch(position);
+            }
         }
 
 
@@ -884,16 +859,23 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-
+        onTrackNext();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     @Override
     public void onMediaButtonSingleClick() {
-
+        if (isPlaying) {
+            onTrackPause();
+        } else {
+            onTrackPlay();
+        }
     }
 
     @Override
     public void onMediaButtonDoubleClick() {
 
     }
+
+
 }
