@@ -1,20 +1,16 @@
 package com.project.tape.Fragments;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
 import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
-import static com.project.tape.Activities.AboutPlaylist.currentSongsInPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.getSongsInPlaylistMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonDataMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonMap;
-import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Fragments.AlbumsFragment.albumsFragmentOpened;
 import static com.project.tape.Fragments.ArtistsFragment.artistsFragmentOpened;
-import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 
 import android.app.ActivityOptions;
@@ -33,7 +29,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,11 +39,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.project.tape.Activities.AboutPlaylist;
 import com.project.tape.Adapters.PlaylistsAdapter;
-import com.project.tape.R;
-import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
+import com.project.tape.ItemClasses.Playlist;
 import com.project.tape.JsonFilesClasses.JsonDataMap;
 import com.project.tape.JsonFilesClasses.JsonDataPlaylists;
-import com.project.tape.ItemClasses.Playlist;
+import com.project.tape.R;
+import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
@@ -241,12 +236,15 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                 getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView;
 
+
         //Check which popup needed
         if (fromLongClick) {
             popupView = inflater.inflate(R.layout.popup_delete_permission, null);
         } else {
             popupView = inflater.inflate(R.layout.popup_window_add_new_album, null);
         }
+
+
 
         //Create the popup window
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
@@ -256,7 +254,9 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
 
         //Show the popup window
         //Which view you pass in doesn't matter, it is only used for the window token
+        popupWindow.setAnimationStyle(R.style.popupWindowAnimation);
         popupWindow.showAtLocation(view, Gravity.CENTER_HORIZONTAL, 0, -230);
+
 
         //Listeners
         if (fromLongClick) {

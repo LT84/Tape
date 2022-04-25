@@ -43,10 +43,10 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.project.tape.Interfaces.Playable;
+import com.project.tape.ItemClasses.Song;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.ItemClasses.Song;
 import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.ArrayList;
@@ -450,6 +450,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         if (fromSearch) {
             CreateNotification.createNotification(getContext(), songsFromSearch.get(position),
                     R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
+            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         } else if (fromAlbumInfo) {
             CreateNotification.createNotification(getContext(), staticPreviousSongsInAlbum.get(positionInInfoAboutItem),
                     R.drawable.ic_pause_song, positionInInfoAboutItem, staticPreviousSongsInAlbum.size() - 1);

@@ -61,6 +61,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.project.tape.Adapters.AboutFragmentItemAdapter;
+import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
@@ -295,10 +296,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
-        this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
-        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
                 .putString("songNameStr", songNameStr).commit();
         this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
@@ -357,6 +354,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -365,14 +363,17 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
+            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
 
         metaDataInAboutFragmentItem(uri);
@@ -453,6 +454,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -461,14 +463,17 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
+            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
 
         metaDataInAboutFragmentItem(uri);
@@ -551,11 +556,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
             Log.i("broadcast", "unreg_ABOUTITEM");
         }
-
-        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
-        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
-                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
     }
 
     @Override
@@ -571,6 +571,12 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
+        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
+                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
+        this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromPlaylist", fromPlaylist).commit();
     }
 
     @Override

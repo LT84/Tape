@@ -24,9 +24,6 @@ import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.FragmentGeneral.uri;
 import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpened;
-import static com.project.tape.Fragments.PlaylistsFragment.playlistsList;
-import static com.project.tape.Fragments.SongsFragment.previousAlbumName;
-import static com.project.tape.Fragments.SongsFragment.previousArtistName;
 import static com.project.tape.Fragments.SongsFragment.songsFragmentOpened;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentSongsInAlbum;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
@@ -64,14 +61,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.project.tape.Adapters.AboutPlaylistAdapter;
+import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
+import com.project.tape.ItemClasses.Song;
+import com.project.tape.JsonFilesClasses.JsonDataMap;
+import com.project.tape.JsonFilesClasses.JsonDataSongs;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.JsonFilesClasses.JsonDataMap;
-import com.project.tape.JsonFilesClasses.JsonDataSongs;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
-import com.project.tape.ItemClasses.Song;
 import com.project.tape.Services.OnClearFromRecentService;
 
 import java.io.IOException;
@@ -96,7 +94,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
     public static int positionInAboutPlaylist;
 
-    AboutPlaylistAdapter aboutPlaylistAdapter;
+    public static AboutPlaylistAdapter aboutPlaylistAdapter;
 
     public static String jsonMap;
     String json;
@@ -207,12 +205,14 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     @Override
                     public void onItemClick(View view, int position) {
                         positionInAboutPlaylist = position;
+                        aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
                         fromSearch = false;
+                        fromAlbumInfo = false;
+                        fromAlbumInfo = false;
                         fromPlaylist = true;
                         //!!!!!!!!!!!!!!!!!!
                         getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
-                                .putBoolean("fromPlaylist", true).commit();
-
+                                .putBoolean("fromPlaylist", fromPlaylist).commit();
                         previousSongsInPlaylist.clear();
                         previousSongsInPlaylist.addAll(currentSongsInPlaylist);
 
@@ -222,7 +222,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                         coverLoaded = false;
 
                         uri = Uri.parse(currentSongsInPlaylist.get(positionInAboutPlaylist).getData());
-
 
                         mediaPlayer.release();
                         mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
@@ -267,7 +266,9 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         //Show the popup window
         //Which view you pass in doesn't matter, it is only used for the window token
+        popupWindow.setAnimationStyle(R.style.popupWindowAnimation);
         popupWindow.showAtLocation(view, Gravity.CENTER_HORIZONTAL, 0, -230);
+
         closeAlertPopupBtn = popupView.findViewById(R.id.close_popup_alert_btn);
         deletePlaylistBtn = popupView.findViewById(R.id.popup_delete_btn);
 
@@ -459,6 +460,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -467,14 +469,17 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
+            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
 
         mediaPlayer = MediaPlayer.create(AboutPlaylist.this, uri);
@@ -554,6 +559,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromSearch) {
             uri = Uri.parse(songsFromSearch.get(position).getData());
             songNameStr = songsFromSearch.get(position).getTitle();
@@ -562,14 +568,17 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             uri = Uri.parse(staticPreviousArtistSongs.get(positionInInfoAboutItem).getData());
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+            AboutFragmentItem.aboutFragmentItemAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else if (fromPlaylist) {
             uri = Uri.parse(previousSongsInPlaylist.get(positionInAboutPlaylist).getData());
             songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
             artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
+            AboutPlaylist.aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInAboutPlaylist);
         } else {
             uri = Uri.parse(songsList.get(position).getData());
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
+            SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         }
 
 
@@ -796,7 +805,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
                     R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
-            aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.ic_pause_song, position, songsList.size() - 1);
@@ -821,7 +829,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         } else if (fromPlaylist) {
             CreateNotification.createNotification(this, previousSongsInPlaylist.get(positionInAboutPlaylist),
                     R.drawable.ic_pause_song, positionInAboutPlaylist, previousSongsInPlaylist.size() - 1);
-            aboutPlaylistAdapter.updateColorAfterSongSwitch(positionInInfoAboutItem);
         } else {
             CreateNotification.createNotification(this, songsList.get(position),
                     R.drawable.ic_pause_song, position, songsList.size() - 1);

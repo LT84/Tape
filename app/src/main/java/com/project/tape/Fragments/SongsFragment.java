@@ -5,7 +5,6 @@ import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutFragmentItem.fromArtistInfo;
 import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutItem;
 import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
-import static com.project.tape.Activities.AboutPlaylist.currentSongsInPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.getSongsInPlaylistMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonDataMap;
@@ -32,7 +31,6 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,12 +46,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.project.tape.Adapters.SongsAdapter;
+import com.project.tape.ItemClasses.Song;
 import com.project.tape.JsonFilesClasses.JsonDataMap;
 import com.project.tape.JsonFilesClasses.JsonDataSongs;
 import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
-import com.project.tape.ItemClasses.Song;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
 import java.util.ArrayList;
@@ -100,9 +98,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         artistsFragmentOpened = false;
         aboutFragmentItemOpened = false;
 
-        //!!!!!!!!!!
-        getSongsFromJson();
-
         artistList.addAll(songsList);
         //Init views
         myRecyclerView = (RecyclerView) v.findViewById(R.id.compositions_recyclerview);
@@ -141,9 +136,12 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .getBoolean("fromArtistInfo", false);
         uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                 .getString("uri", songsList.get(0).getData()));
-        //!!!!!!!!!!
         fromPlaylist = getActivity().getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE)
-                .getBoolean("fromPlaylist", true);
+                .getBoolean("fromPlaylist", false);
+
+
+        //!!!!!!!!!!
+        getSongsFromJson();
 
         //Fills up staticCurrentSongsInAlbum
         int a = 0;
@@ -208,6 +206,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         return v;
     }
 
+    //!!!!!!!!!
     //Get json
     public void getSongsFromJson() {
        String incomingName = getActivity().getSharedPreferences("sharedPrefPlaylistName", Context.MODE_PRIVATE)
@@ -227,13 +226,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
             jsonDataSongs = gson.fromJson(json, JsonDataSongs.class);
             previousSongsInPlaylist.addAll(jsonDataSongs.getArray());
-
-            Log.i("prevSize", Integer.toString(previousSongsInPlaylist.size()));
-
-//            Log.i("jsonMap", this.getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE)
-//                    .getString("sharedJsonStringMap", ""));
-//            Log.i("jsonMap", incomingName);
-//            Log.i("jsonString", json);
         }
     }
 
@@ -400,7 +392,8 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .putInt("durationTotal", Integer.parseInt(songsList.get(position).getDuration()) / 1000).apply();
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
-
+        getActivity().getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromPlaylist", fromPlaylist).commit();
         loadAudio();
     }
 
