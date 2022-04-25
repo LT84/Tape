@@ -158,7 +158,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         album_title_playlist.setText(this.getIntent().getStringExtra("playlistName"));
 
-
         //Sets information
         song_title_in_playlist.setText(songNameStr);
         artist_name_in_playlist.setText(artistNameStr);
@@ -176,7 +175,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         getSongsFromJson();
 
-
         //Sets information
         song_title_in_playlist.setText(songNameStr);
         artist_name_in_playlist.setText(artistNameStr);
@@ -191,7 +189,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     .load(R.drawable.default_cover)
                     .into(album_cover_in_playlist);
         }
-
 
         aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, currentSongsInPlaylist, this);
         aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);

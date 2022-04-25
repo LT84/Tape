@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/add_btn"
-            android:text="Add new playlist"
+            android:text="@string/add_new_playlist"
             android:textColor="@color/secondaryColor"
             android:textSize="17sp" />
 

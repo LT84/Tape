@@ -25,7 +25,6 @@ import static com.project.tape.Fragments.PlaylistsFragment.playlistsFragmentOpen
 
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -77,8 +76,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     public static String previousArtistName;
 
     public static SongsAdapter songsAdapter;
-
-    public static Bitmap notificationBackground;
 
     private boolean fromBackground = false;
 

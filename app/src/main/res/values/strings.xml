@@ -8,4 +8,13 @@
     <string name="open_back">open_back</string>
     <string name="open_go">open_go</string>
     <string name="dash">–</string>
+    <string name="choose_sorting_mode">Choose sorting mode</string>
+    <string name="sort_songs_by_name">Sort songs by name</string>
+    <string name="sort_songs_by_date">Sort songs by date</string>
+    <string name="save">Save</string>
+    <string name="close">close</string>
+    <string name="add_new_playlist">Add new playlist</string>
+    <string name="delete_this_playlist">Delete this playlist ?</string>
+    <string name="delete">Delete</string>
+
 </resources>

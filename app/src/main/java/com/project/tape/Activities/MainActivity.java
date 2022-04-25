@@ -11,6 +11,7 @@ import static com.project.tape.Fragments.FragmentGeneral.focusRequest;
 import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
+import static com.project.tape.Fragments.PlaylistsFragment.playListsList;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
@@ -51,16 +52,19 @@ import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
 import com.project.tape.Fragments.AlbumsFragment;
 import com.project.tape.Fragments.ArtistsFragment;
+import com.project.tape.Fragments.PlaylistsFragment;
 import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
-import com.project.tape.R;
 import com.project.tape.ItemClasses.Album;
+import com.project.tape.ItemClasses.Playlist;
+import com.project.tape.ItemClasses.Song;
+import com.project.tape.R;
 import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.MusicLoader;
-import com.project.tape.ItemClasses.Song;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable, LoaderManager.LoaderCallbacks<List<Album>> {
@@ -82,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public static boolean searchOpenedInAlbumFragments, searchOpenedInArtistsFragments,
             searchSongsFragmentSelected, fromSearch;
 
-    boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected;
+    boolean albumsFragmentSelected, artistsFragmentSelected, songsFragmentSelected, playlistFragmentSelected;
 
     public static final int REQUEST_CODE = 1;
 
@@ -118,46 +122,77 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         adapter = new FragmentsAdapter(fm, getLifecycle());
         pager2.setAdapter(adapter);
 
-        tabLayout.addTab(tabLayout.newTab().setText("Songs"));
-        tabLayout.addTab(tabLayout.newTab().setText("Albums"));
-        tabLayout.addTab(tabLayout.newTab().setText("Artists"));
-        tabLayout.addTab(tabLayout.newTab().setText("Playlists"));
+        if (Locale.getDefault().getLanguage().equals("en")) {
+            tabLayout.addTab(tabLayout.newTab().setText("Songs"));
+            tabLayout.addTab(tabLayout.newTab().setText("Albums"));
+            tabLayout.addTab(tabLayout.newTab().setText("Artists"));
+            tabLayout.addTab(tabLayout.newTab().setText("Playlists"));
+        } else {
+            tabLayout.addTab(tabLayout.newTab().setText("Композиции"));
+            tabLayout.addTab(tabLayout.newTab().setText("Альбомы"));
+            tabLayout.addTab(tabLayout.newTab().setText("Исполнители"));
+            tabLayout.addTab(tabLayout.newTab().setText("Плейлисты"));
+        }
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (searchView != null) {
                     if (tab.getPosition() == 0) {
-                        searchView.setQueryHint("Find your song");
+                        if (Locale.getDefault().getLanguage().equals("en")) {
+                            searchView.setQueryHint("Find your song");
+                        } else {
+                            searchView.setQueryHint("Найти композицию");
+                        }
                         songsFragmentSelected = true;
                         SongsFragment.songsFragmentOpened = true;
                         artistsFragmentSelected = false;
                         albumsFragmentSelected = false;
+                        playlistFragmentSelected = false;
                         sortBtn.setEnabled(true);
                         menuItem.setVisible(true);
                     } else if (tab.getPosition() == 1) {
-                        searchView.setQueryHint("Find your album");
+                        if (Locale.getDefault().getLanguage().equals("en")) {
+                            searchView.setQueryHint("Find your album");
+                        } else {
+                            searchView.setQueryHint("Найти альбом");
+                        }
                         songsFragmentSelected = false;
                         albumsFragmentSelected = true;
                         artistsFragmentSelected = false;
                         sortBtn.setEnabled(false);
                         menuItem.setVisible(true);
+                        playlistFragmentSelected = false;
                     } else if (tab.getPosition() == 2) {
-                        searchView.setQueryHint("Find your artist");
+                        if (Locale.getDefault().getLanguage().equals("en")) {
+                            searchView.setQueryHint("Find your artist");
+                        } else {
+                            searchView.setQueryHint("Найти исполнителя");
+                        }
                         songsFragmentSelected = false;
                         artistsFragmentSelected = true;
                         albumsFragmentSelected = false;
+                        playlistFragmentSelected = false;
                         sortBtn.setEnabled(false);
                         menuItem.setVisible(true);
                     } else if (tab.getPosition() == 3) {
+                        if (Locale.getDefault().getLanguage().equals("en")) {
+                            searchView.setQueryHint("Find your artist");
+                        } else {
+                            searchView.setQueryHint("Найти исполнителя");
+                        }
+                        songsFragmentSelected = false;
+                        artistsFragmentSelected = false;
+                        albumsFragmentSelected = false;
+                        playlistFragmentSelected = true;
                         sortBtn.setEnabled(false);
-                        menuItem.setVisible(false);
+                        menuItem.setVisible(true);
                     }
                 }
                 pager2.setCurrentItem(tab.getPosition());
             }
 
-        @Override
+            @Override
             public void onTabUnselected(TabLayout.Tab tab) {
             }
 
@@ -296,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         String userInput = newText.toLowerCase();
         ArrayList<Song> mySearch = new ArrayList<>();
         ArrayList<Album> myAlbumSearch = new ArrayList<>();
+        ArrayList<Playlist> myPlaylistSearch = new ArrayList<>();
         if (albumsFragmentSelected) {
             searchOpenedInAlbumFragments = true;
             songSearchWasOpened = true;
@@ -329,6 +365,16 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                 }
             }
             SongsFragment.songsAdapter.updateSongList(mySearch);
+        } else {
+            fromSearch = true;
+            songSearchWasOpened = true;
+            userInput = newText.toLowerCase();
+            for (Playlist playlist : playListsList) {
+                if (playlist.getPlaylistName().toLowerCase().contains(userInput)) {
+                    myPlaylistSearch.add(playlist);
+                }
+            }
+            PlaylistsFragment.playlistsAdapter.updatePlaylistList(myPlaylistSearch);
         }
         return true;
     }

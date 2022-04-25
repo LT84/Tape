@@ -12,9 +12,10 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:text="Delete this playlist ?"
+        android:text="@string/delete_this_playlist"
         android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:layout_marginStart="7dp"/>
 
     <Button
         android:id="@+id/close_popup_alert_btn"
@@ -22,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/alertText"
         android:background="@android:color/transparent"
-        android:text="close"
+        android:text="@string/close"
         android:textColor="@color/secondaryColor" />
 
     <Button
@@ -32,7 +33,7 @@
         android:layout_below="@id/alertText"
         android:layout_alignParentEnd="true"
         android:background="@android:color/transparent"
-        android:text="Delete"
+        android:text="@string/delete"
         android:textColor="@color/secondaryColor" />
 
 

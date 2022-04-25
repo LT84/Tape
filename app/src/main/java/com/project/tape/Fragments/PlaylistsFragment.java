@@ -58,7 +58,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
     EditText addNewPlaylistEditText;
 
     RecyclerView playlistRecyclerView;
-    PlaylistsAdapter playlistsAdapter;
+    public static PlaylistsAdapter playlistsAdapter;
     private static final int VERTICAL_ITEM_SPACE = 3;
 
     final int REQUEST_CODE = 1;
@@ -72,7 +72,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
     String json;
     JsonDataPlaylists jsonDataPlaylists = new JsonDataPlaylists();
 
-    public static ArrayList<Playlist> playlistsList = new ArrayList<>();
+    public static ArrayList<Playlist> playListsList = new ArrayList<>();
     Set<String> allAlbumsNamesSet = new HashSet<>();
 
 
@@ -90,8 +90,8 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         getSharedPlaylists();
 
         //Fills up HashSet to then prevent creating duplicates
-        for (int i = 0; i < playlistsList.size(); i++) {
-            allAlbumsNamesSet.add(playlistsList.get(i).getPlaylistName());
+        for (int i = 0; i < playListsList.size(); i++) {
+            allAlbumsNamesSet.add(playListsList.get(i).getPlaylistName());
         }
 
         //Init views
@@ -104,8 +104,8 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         mainPlayPauseBtn = getActivity().findViewById(R.id.pause_button);
 
         //Sets adapter to list and applies settings to recyclerView
-        playlistsAdapter = new PlaylistsAdapter(getContext(), playlistsList);
-        playlistsAdapter.updatePlaylistList(playlistsList);
+        playlistsAdapter = new PlaylistsAdapter(getContext(), playListsList);
+        playlistsAdapter.updatePlaylistList(playListsList);
         playlistRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         playlistRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         playlistRecyclerView.setAdapter(playlistsAdapter);
@@ -120,7 +120,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                         Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle();
                         clickFromPlaylistFragment = true;
                         //Passes name to aboutPlaylist
-                        intent.putExtra("playlistName", playlistsList.get(position).getPlaylistName());
+                        intent.putExtra("playlistName", playListsList.get(position).getPlaylistName());
                         //Unregister audioSourceChangedReceiver
                         getActivity().unregisterReceiver(audioSourceChangedReceiver);
                         startActivityForResult(intent, REQUEST_CODE, bundle);
@@ -222,8 +222,8 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
     public void onDestroy() {
         super.onDestroy();
         //Save json
-        Log.i("arraySize", Integer.toString(playlistsList.size()));
-        jsonDataPlaylists.setArray(playlistsList);
+        Log.i("arraySize", Integer.toString(playListsList.size()));
+        jsonDataPlaylists.setArray(playListsList);
         json = gson.toJson(jsonDataPlaylists);
         getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()
                 .putString("json", json).commit();
@@ -275,10 +275,10 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
             deletePlaylistBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getSongsInPlaylistMap.remove(playlistsList.get(deletePosition).getPlaylistName());
-                    allAlbumsNamesSet.remove(playlistsList.get(deletePosition).getPlaylistName());
+                    getSongsInPlaylistMap.remove(playListsList.get(deletePosition).getPlaylistName());
+                    allAlbumsNamesSet.remove(playListsList.get(deletePosition).getPlaylistName());
 
-                    playlistsList.remove(deletePosition);
+                    playListsList.remove(deletePosition);
 
                     jsonDataMap = new JsonDataMap(getSongsInPlaylistMap);
                     jsonMap = gson.toJson(jsonDataMap);
@@ -286,7 +286,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                             .putString("sharedJsonStringMap", jsonMap).commit();
 
 
-                    playlistsAdapter.updatePlaylistList(playlistsList);
+                    playlistsAdapter.updatePlaylistList(playListsList);
                     popupWindow.dismiss();
                 }
             });
@@ -303,13 +303,13 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
 
                     if (!allAlbumsNamesSet.contains(addNewPlaylistEditText.getText().toString())) {
                         allAlbumsNamesSet.add(addNewPlaylistEditText.getText().toString());
-                        playlistsList.add(playlist);
+                        playListsList.add(playlist);
                     } else {
                         Toast.makeText(getContext(), "Playlist with this name already exists", Toast.LENGTH_SHORT).show();
                     }
 
                     popupWindow.dismiss();
-                    playlistsAdapter.updatePlaylistList(playlistsList);
+                    playlistsAdapter.updatePlaylistList(playListsList);
                 }
             });
 
@@ -351,7 +351,7 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                 .getString("json", "");
         if (!json.equals("")) {
             jsonDataPlaylists = gson.fromJson(json, JsonDataPlaylists.class);
-            playlistsList.addAll(jsonDataPlaylists.getArray());
+            playListsList.addAll(jsonDataPlaylists.getArray());
         }
     }
 

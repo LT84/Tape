@@ -23,7 +23,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="10dp"
-        android:text="Choose sorting mode"
+        android:text="@string/choose_sorting_mode"
         android:textColor="@color/secondaryColor"
         android:textSize="18sp" />
 
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:buttonTint="@color/secondaryColor"
             android:onClick="onRadioButtonClicked"
-            android:text="Sort songs by name"
+            android:text="@string/sort_songs_by_name"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:buttonTint="@color/secondaryColor"
             android:onClick="onRadioButtonClicked"
-            android:text="Sort songs by date"
+            android:text="@string/sort_songs_by_date"
             android:textColor="@color/white"
             android:textSize="16sp" />
     </RadioGroup>

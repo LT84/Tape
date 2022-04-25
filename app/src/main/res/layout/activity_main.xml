@@ -17,8 +17,10 @@
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/secondaryColor"
         app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/secondaryColor"></com.google.android.material.tabs.TabLayout>
-
+        app:tabPaddingEnd="4dp"
+        app:tabPaddingStart="4dp"
+        app:tabSelectedTextColor="@color/secondaryColor"
+        app:tabTextAppearance="@style/MyCustomTabText" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +31,7 @@
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewpager2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></androidx.viewpager2.widget.ViewPager2>
+            android:layout_height="match_parent" />
     </LinearLayout>
 
 
