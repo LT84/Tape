@@ -416,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public void onTrackPlay() {
         isPlaying = true;
         mediaPlayer.start();
-        if (songSearchWasOpened) {
+        if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
                     R.drawable.ic_pause_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {
@@ -437,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     public void onTrackPause() {
         isPlaying = false;
         mediaPlayer.pause();
-        if (songSearchWasOpened) {
+        if (fromSearch) {
             CreateNotification.createNotification(this, songsFromSearch.get(position),
                     R.drawable.ic_play_song, position, songsFromSearch.size() - 1);
         } else if (fromAlbumInfo) {

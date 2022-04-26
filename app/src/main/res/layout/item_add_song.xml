@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/song_title_addSongs"
-        android:layout_width="320dp"
+        android:layout_width="310dp"
         android:layout_height="20dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
@@ -24,11 +24,12 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_toEndOf="@+id/song_title_addSongs"
-        app:buttonTint="@color/secondaryColor"/>
+        app:buttonTint="@color/secondaryColor" />
 
     <RelativeLayout
-        android:layout_width="320dp"
+        android:layout_width="310dp"
         android:layout_height="20dp"
         android:layout_below="@id/song_title_addSongs"
         android:orientation="horizontal">

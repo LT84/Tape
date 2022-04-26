@@ -1,5 +1,6 @@
 package com.project.tape.Activities;
 
+import static com.project.tape.Adapters.AddSongsAdapter.setCheckBox;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 
 import android.os.Bundle;
@@ -20,6 +21,7 @@ public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapt
     AddSongsAdapter addSongsAdapter;
     RecyclerView addSongsRecyclerView;
     ImageButton backBtn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,13 @@ public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapt
             }
         }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setCheckBox = false;
+    }
+
 
 }
 

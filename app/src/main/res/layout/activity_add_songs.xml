@@ -9,14 +9,13 @@
         android:id="@+id/backBtn_addSongs"
         android:layout_width="27dp"
         android:layout_height="27dp"
-        android:background="@drawable/ic_arrow_back"
         android:layout_margin="7dp"
-        />
+        android:background="@drawable/ic_arrow_back" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/add_songs_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        android:layout_marginStart="10dp" />
 
 </LinearLayout>
