@@ -368,6 +368,4 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
     @Override
     public void onMediaButtonDoubleClick() {
     }
-
-
 }

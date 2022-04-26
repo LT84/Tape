@@ -82,7 +82,5 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ArtistsV
     public interface OnArtistListener {
         void OnArtistsClick(int position) throws IOException;
     }
-
-
 }
 

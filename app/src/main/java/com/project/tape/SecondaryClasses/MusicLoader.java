@@ -121,6 +121,4 @@ public class MusicLoader extends AsyncTaskLoader<List<Album>> {
             mLoader.onContentChanged();
         }
     }
-
-
 }

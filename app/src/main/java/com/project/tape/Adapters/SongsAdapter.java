@@ -122,6 +122,4 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
     public interface OnSongListener {
         void onSongClick(int position) throws IOException;
     }
-
-
 }

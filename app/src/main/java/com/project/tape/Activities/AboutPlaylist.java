@@ -848,6 +848,4 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
     public void onMediaButtonDoubleClick() {
 
     }
-
-
 }

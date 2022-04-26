@@ -60,6 +60,4 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
         mPlaylistsList.addAll(playlistArrayList);
         notifyDataSetChanged();
     }
-
-
 }

@@ -12,6 +12,4 @@ public class Playlist {
     public void setPlaylistName(String playlistName) {
         this.playlistName = playlistName;
     }
-
-
 }

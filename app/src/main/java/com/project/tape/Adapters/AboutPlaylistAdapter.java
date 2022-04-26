@@ -92,6 +92,4 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
         item_index = position;
         notifyDataSetChanged();
     }
-
-
 }

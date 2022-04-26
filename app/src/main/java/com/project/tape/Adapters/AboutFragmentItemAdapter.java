@@ -118,6 +118,4 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
     public interface OnItemListener {
         void onItemClick(int position) throws IOException;
     }
-
-
 }

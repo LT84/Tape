@@ -24,6 +24,4 @@ public class JsonDataPlaylists {
     public void setArray(ArrayList<Playlist> array) {
         this.array = array;
     }
-
-
 }

@@ -30,7 +30,6 @@ public class Album {
     public void setAlbumName(String albumName) {
         this.albumName = albumName;
     }
-
 }
 
 

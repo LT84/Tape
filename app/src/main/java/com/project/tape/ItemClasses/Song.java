@@ -67,8 +67,6 @@ public class Song  {
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
-
-
 }
 
 

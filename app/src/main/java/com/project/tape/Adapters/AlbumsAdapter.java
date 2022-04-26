@@ -298,7 +298,5 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.AlbumViewH
         mAlbums.addAll(albumsArrayList);
         notifyDataSetChanged();
     }
-
-
 }
 

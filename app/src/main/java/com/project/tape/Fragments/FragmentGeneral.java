@@ -541,8 +541,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         }
         mainPlayPauseBtn.setImageResource(R.drawable.ic_play_song);
     }
-
-
 }
 
 

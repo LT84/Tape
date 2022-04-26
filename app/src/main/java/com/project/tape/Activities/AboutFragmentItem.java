@@ -760,8 +760,5 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
     @Override
     public void onMediaButtonDoubleClick() {
-
     }
-
-
 }

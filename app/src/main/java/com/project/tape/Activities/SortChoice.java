@@ -85,6 +85,4 @@ public class SortChoice extends AppCompatActivity {
             overridePendingTransition(0, R.anim.hold);
         }
     };
-
-
 }

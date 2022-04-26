@@ -20,6 +20,4 @@ public class JsonDataMap {
     public void setMap(Map<String, String> map) {
         this.map = map;
     }
-
-
 }

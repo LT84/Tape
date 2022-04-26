@@ -67,6 +67,4 @@ public class HeadsetActionButtonReceiver extends BroadcastReceiver {
             doublePressTimer = null;
         }
     }
-
-
 }

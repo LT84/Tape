@@ -984,8 +984,5 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     @Override
     public void onMediaButtonDoubleClick() {
-
     }
-
-
 }

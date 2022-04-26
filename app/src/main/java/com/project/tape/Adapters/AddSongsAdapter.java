@@ -102,6 +102,4 @@ public class AddSongsAdapter extends RecyclerView.Adapter<AddSongsAdapter.ViewHo
         addSongsArray.addAll(mAddSongsArray);
         notifyDataSetChanged();
     }
-
-
 }

@@ -295,7 +295,5 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     @Override
     public void onMediaButtonDoubleClick() {
     }
-
-
 }
 

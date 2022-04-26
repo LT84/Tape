@@ -411,8 +411,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     @Override
     public void onMediaButtonDoubleClick() {
     }
-
-
 }
 
 

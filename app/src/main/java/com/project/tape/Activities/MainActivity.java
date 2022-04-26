@@ -479,6 +479,4 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
     @Override
     public void onBackPressed() {
     }
-
-
 }
