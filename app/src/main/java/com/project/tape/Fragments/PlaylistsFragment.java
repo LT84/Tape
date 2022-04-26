@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -151,11 +150,9 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         //Unregister broadcastReceiver after app was resumed
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
             fromBackground = false;
         }
         createChannel();
-        Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
         trackAudioSource();
 
         //Register headphones buttons
@@ -194,7 +191,6 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
             //if locked
         } else {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_PLAYLISTSFRAGMENT");
         }
 
         //Puts repeatBtn state in to shared Preferences
@@ -213,7 +209,6 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         //Creates broadcastReceiver when app is collapsed
         if (playlistsFragmentOpened) {
             createChannel();
-            Log.i("broadcast", "reg_PLAYLISTSFRAGMENT");
             fromBackground = true;
         }
     }
@@ -222,7 +217,6 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
     public void onDestroy() {
         super.onDestroy();
         //Save json
-        Log.i("arraySize", Integer.toString(playListsList.size()));
         jsonDataPlaylists.setArray(playListsList);
         json = gson.toJson(jsonDataPlaylists);
         getActivity().getSharedPreferences("json", Context.MODE_PRIVATE).edit()
@@ -243,7 +237,6 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
         } else {
             popupView = inflater.inflate(R.layout.popup_window_add_new_album, null);
         }
-
 
 
         //Create the popup window

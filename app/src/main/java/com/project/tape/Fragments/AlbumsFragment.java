@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +38,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.tape.Activities.AboutFragmentItem;
 import com.project.tape.Adapters.AlbumsAdapter;
-import com.project.tape.R;
 import com.project.tape.ItemClasses.Album;
+import com.project.tape.R;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.MusicLoader;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
@@ -69,6 +68,7 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
 
     private boolean fromBackground = false;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -88,9 +88,9 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
+
         //Sets adapter to list and applies settings to recyclerView
         albumsAdapter = new AlbumsAdapter(getContext(), albumLists);
-
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setAdapter(albumsAdapter);
         myRecyclerView.setItemViewCacheSize(300);
@@ -156,12 +156,10 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
 
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_SONGSFRAGMENT");
             fromBackground = false;
         }
 
         createChannel();
-        Log.i("broadcast", "reg_ALBUMSFRAGMENT");
         trackAudioSource();
 
         //Register headphones buttons
@@ -200,7 +198,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
             //if locked
         } else {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_ALBUMSFRAGMENT");
         }
 
         positionIndex = LLMAlbumFragment.findFirstVisibleItemPosition();
@@ -221,7 +218,6 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         super.onStop();
         if (albumsFragmentOpened) {
             createChannel();
-            Log.i("broadcast", "reg_ALBUMSFRAGMENT");
             fromBackground = true;
         }
     }

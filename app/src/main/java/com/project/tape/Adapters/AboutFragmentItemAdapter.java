@@ -53,18 +53,21 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
         holder.tv_artist.setText(songsInAlbumList.get(position).getArtist());
         holder.tv_album.setText(songsInAlbumList.get(position).getAlbum());
 
-        if (item_index == position &&  previousAlbumName.equals(albumName)) {
+        if (item_index == position && previousAlbumName.equals(albumName)) {
             holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
-        } else if (item_index == position && previousArtistName.equals(artistName)){
-                holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
-                holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
-                holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
+            holder.tv_dash.setTextColor(Color.parseColor("#ff03dac5"));
+        } else if (item_index == position && previousArtistName.equals(artistName)) {
+            holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
+            holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
+            holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
+            holder.tv_dash.setTextColor(Color.parseColor("#b3ffffff"));
         } else {
             holder.tv_title.setTextColor(Color.parseColor("#ffffff"));
             holder.tv_artist.setTextColor(Color.parseColor("#b3ffffff"));
             holder.tv_album.setTextColor(Color.parseColor("#b3ffffff"));
+            holder.tv_dash.setTextColor(Color.parseColor("#b3ffffff"));
         }
     }
 
@@ -78,6 +81,7 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
         TextView tv_title;
         TextView tv_artist;
         TextView tv_album;
+        TextView tv_dash;
         OnItemListener onAlbumInfoListener;
         LinearLayout item_linearlayout;
 
@@ -88,6 +92,7 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
 
             tv_title = (TextView) itemView.findViewById(R.id.song_title);
             tv_artist = (TextView) itemView.findViewById(R.id.artist_title);
+            tv_dash = (TextView) itemView.findViewById(R.id.dash);
             tv_album = (TextView) itemView.findViewById(R.id.album_title);
             tv_title.setTextColor(Color.parseColor("#ffffff"));
             itemView.setOnClickListener(this);

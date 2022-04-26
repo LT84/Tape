@@ -50,7 +50,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -528,12 +527,10 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
 
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-            Log.i("broadcast", "unreg_ABOUTITEM");
             fromBackground = false;
         }
 
         createChannel();
-        Log.i("broadcast", "reg_ABOUTITEM");
         trackAudioSource();
 
         //Register headphones buttons
@@ -573,7 +570,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-            Log.i("broadcast", "unreg_ABOUTITEM");
         }
     }
 
@@ -582,7 +578,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         super.onStop();
         if (aboutFragmentItemOpened) {
             createChannel();
-            Log.i("broadcast", "reg_ABOUTITEM");
             fromBackground = true;
         }
     }

@@ -45,7 +45,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,15 +72,14 @@ import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.RecyclerItemClickListener;
 import com.project.tape.Services.OnClearFromRecentService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 
-public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAdapter.OnPlaylistListener,
-        Playable, MediaPlayer.OnCompletionListener, HeadsetActionButtonReceiver.Delegate {
+public class AboutPlaylist extends AppCompatActivity implements Playable, MediaPlayer.OnCompletionListener,
+        HeadsetActionButtonReceiver.Delegate {
 
     TextView song_title_in_playlist, artist_name_in_playlist, song_title_main, artist_name_main, album_title_playlist;
     ImageButton backBtn, playPauseBtnInPlaylist, addSongsToPlaylist;
@@ -191,7 +189,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                     .into(album_cover_in_playlist);
         }
 
-        aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, currentSongsInPlaylist, this);
+        aboutPlaylistAdapter = new AboutPlaylistAdapter(AboutPlaylist.this, currentSongsInPlaylist);
         aboutPlaylistAdapter.updatePlaylistList(currentSongsInPlaylist);
         myRecyclerView = findViewById(R.id.playlist_songs_recyclerView);
         myRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -208,7 +206,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
                         fromAlbumInfo = false;
                         fromArtistInfo = false;
                         fromPlaylist = true;
-                        //!!!!!!!!!!!!!!!!!!
+
                         getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
                                 .putBoolean("fromPlaylist", fromPlaylist).commit();
                         previousSongsInPlaylist.clear();
@@ -350,21 +348,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
             onTrackPlay();
         }
-    }
-
-    //Calls when audio source changed
-    BroadcastReceiver audioSourceChangedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
-                // onTrackPause();
-            }
-        }
-    };
-
-    @Override
-    public void onPlaylistClick(int position) throws IOException {
     }
 
     public void switchToNextSong() {
@@ -591,7 +574,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-            Log.i("broadcast", "unreg_ABOUTPLAYLIST");
         }
 
         this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
@@ -609,12 +591,10 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-            Log.i("broadcast", "unreg_ABOUTPLAYLIST");
             fromBackground = false;
         }
 
         createChannel();
-        Log.i("broadcast", "reg_ABOUTPLAYLIST");
         trackAudioSourceInPlaylist();
 
         //Register headphones buttons
@@ -646,7 +626,6 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
         super.onStop();
         if (aboutPlaylistOpened) {
             createChannel();
-            Log.i("broadcast", "reg_ABOUTPLAYLIST");
             fromBackground = true;
         }
     }
@@ -670,14 +649,7 @@ public class AboutPlaylist extends AppCompatActivity implements AboutPlaylistAda
 
             jsonDataSongs = gson.fromJson(json, JsonDataSongs.class);
             currentSongsInPlaylist.addAll(jsonDataSongs.getArray());
-
-
-            Log.i("jsonMap", this.getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE)
-                    .getString("sharedJsonStringMap", ""));
-            Log.i("jsonMap", incomingName);
-            Log.i("jsonString", json);
         }
-
     }
 
     public void writeNewPlaylistSongsToJson() {

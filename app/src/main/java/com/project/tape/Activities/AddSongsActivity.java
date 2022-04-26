@@ -14,9 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.tape.Adapters.AddSongsAdapter;
 import com.project.tape.R;
 
-import java.io.IOException;
-
-public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapter.OnAddSongListener {
+public class AddSongsActivity extends AppCompatActivity {
 
     AddSongsAdapter addSongsAdapter;
     RecyclerView addSongsRecyclerView;
@@ -33,15 +31,11 @@ public class AddSongsActivity extends AppCompatActivity implements AddSongsAdapt
         backBtn = findViewById(R.id.backBtn_addSongs);
         backBtn.setOnClickListener(btnL);
 
-        addSongsAdapter = new AddSongsAdapter(AddSongsActivity.this, songsList, this);
+        addSongsAdapter = new AddSongsAdapter(AddSongsActivity.this, songsList);
         addSongsAdapter.updateAddSongsListList(songsList);
         addSongsRecyclerView = findViewById(R.id.add_songs_recyclerView);
         addSongsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         addSongsRecyclerView.setAdapter(addSongsAdapter);
-    }
-
-    @Override
-    public void onAddSongClick(int position) throws IOException {
     }
 
     View.OnClickListener btnL = new View.OnClickListener() {

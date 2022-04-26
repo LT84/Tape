@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.tape.ItemClasses.Song;
 import com.project.tape.R;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -23,13 +22,10 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
     private int item_index;
     private Context mContext;
     private ArrayList<Song> songsInAlbumList;
-    private OnPlaylistListener onPlaylistListener;
 
-
-    public AboutPlaylistAdapter(Context mContext, ArrayList<Song> songsInAlbumList, OnPlaylistListener onPlaylistListener) {
+    public AboutPlaylistAdapter(Context mContext, ArrayList<Song> songsInAlbumList) {
         this.mContext = mContext;
         this.songsInAlbumList = songsInAlbumList;
-        this.onPlaylistListener = onPlaylistListener;
     }
 
 
@@ -38,7 +34,7 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
     public PlaylistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v;
         v = LayoutInflater.from(mContext).inflate(R.layout.item_song, parent, false);
-        PlaylistViewHolder vHolder = new PlaylistViewHolder(v, onPlaylistListener);
+        PlaylistViewHolder vHolder = new PlaylistViewHolder(v);
         return vHolder;
     }
 
@@ -52,10 +48,12 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
             holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
+            holder.tv_dash.setTextColor(Color.parseColor("#ff03dac5"));
         } else {
             holder.tv_title.setTextColor(Color.parseColor("#ffffff"));
             holder.tv_artist.setTextColor(Color.parseColor("#b3ffffff"));
             holder.tv_album.setTextColor(Color.parseColor("#b3ffffff"));
+            holder.tv_dash.setTextColor(Color.parseColor("#b3ffffff"));
         }
     }
 
@@ -65,34 +63,22 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
     }
 
 
-    public class PlaylistViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class PlaylistViewHolder extends RecyclerView.ViewHolder {
         TextView tv_title;
         TextView tv_artist;
         TextView tv_album;
-        OnPlaylistListener onPlaylistListener;
+        TextView tv_dash;
         LinearLayout item_linearlayout;
 
-        public PlaylistViewHolder(@NonNull View itemView, OnPlaylistListener onPlaylistListener) {
+        public PlaylistViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.onPlaylistListener = onPlaylistListener;
             item_linearlayout = (LinearLayout) itemView.findViewById(R.id.song_item);
 
             tv_title = (TextView) itemView.findViewById(R.id.song_title);
             tv_artist = (TextView) itemView.findViewById(R.id.artist_title);
+            tv_dash = (TextView) itemView.findViewById(R.id.dash);
             tv_album = (TextView) itemView.findViewById(R.id.album_title);
             tv_title.setTextColor(Color.parseColor("#ffffff"));
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            try {
-                onPlaylistListener.onPlaylistClick(getAdapterPosition());
-                item_index = getAdapterPosition();
-                notifyDataSetChanged();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -105,10 +91,6 @@ public class AboutPlaylistAdapter extends RecyclerView.Adapter<AboutPlaylistAdap
     public void updateColorAfterSongSwitch(int position) {
         item_index = position;
         notifyDataSetChanged();
-    }
-
-    public interface OnPlaylistListener {
-        void onPlaylistClick(int position) throws IOException;
     }
 
 

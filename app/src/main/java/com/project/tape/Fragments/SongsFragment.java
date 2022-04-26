@@ -31,7 +31,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,8 +104,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
-
-
         playbackAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -131,13 +128,14 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .getBoolean("fromAlbumInfo", false);
         fromArtistInfo = getActivity().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromArtistInfo", false);
-        uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
-                .getString("uri", songsList.get(0).getData()));
         fromPlaylist = getActivity().getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE)
                 .getBoolean("fromPlaylist", false);
+        if (songsList.size() != 0) {
+            uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
+                    .getString("uri", songsList.get(0).getData()));
+        }
 
-
-        //!!!!!!!!!!
+        //Get playlists and songs from them
         getSongsFromJson();
 
         //Fills up staticCurrentSongsInAlbum
@@ -181,21 +179,26 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             }
         }
 
-        metaDataInFragment(uri);
+        //MetaData
+        if (uri != null) {
+            metaDataInFragment(uri);
+        }
 
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
 
-        mediaPlayer = MediaPlayer.create(getContext(), uri);
-        mediaPlayer.setOnCompletionListener(SongsFragment.this);
+        //Create MediaPlayer
+        if (uri != null) {
+            mediaPlayer = MediaPlayer.create(getContext(), uri);
+            mediaPlayer.setOnCompletionListener(SongsFragment.this);
+        }
 
         //Sets adapter to list and applies settings to recyclerView
         songsAdapter = new SongsAdapter(getContext(), songsList, this);
+        SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         myRecyclerView.setAdapter(songsAdapter);
-
-        SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
 
         //Sorting artists array
         sortArtistsList();
@@ -203,10 +206,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         return v;
     }
 
-    //!!!!!!!!!
-    //Get json
+    //Get playlists and songs from them
     public void getSongsFromJson() {
-       String incomingName = getActivity().getSharedPreferences("sharedPrefPlaylistName", Context.MODE_PRIVATE)
+        String incomingName = getActivity().getSharedPreferences("sharedPrefPlaylistName", Context.MODE_PRIVATE)
                 .getString("sharedPrefPlaylistName", " ");
 
         jsonMap = getActivity().getSharedPreferences("sharedJsonStringMap", Context.MODE_PRIVATE)
@@ -226,8 +228,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         }
     }
 
-    /*Switches next composition, sets album cover in main, sets
-          title and artist when SongsFragment is opened*/
     @Override
     public void onResume() {
         super.onResume();
@@ -240,12 +240,10 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_SONGSFRAGMENT");
             fromBackground = false;
         }
 
         createChannel();
-        Log.i("broadcast", "reg_SONGSFRAGMENT");
         trackAudioSource();
 
         //Sets adapter after user sets sort preference
@@ -288,7 +286,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             //if locked
         } else {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_SONGSFRAGMENT");
         }
     }
 
@@ -299,7 +296,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         if (songsFragmentOpened && !songInfoTabOpened) {
             createChannel();
             fromBackground = true;
-            Log.i("broadcast", "reg_SONGSFRAGMENT");
         }
 
         if (repeatBtnClicked) {
@@ -310,8 +306,11 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                     .putBoolean("repeatBtnClicked", false).commit();
         }
 
-        getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("uri", uri.toString()).commit();
+        if (uri != null) {
+            getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                    .putString("uri", uri.toString()).commit();
+        }
+
         getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
                 .putString("songNameStr", songNameStr).commit();
         getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
@@ -326,7 +325,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
     }
 
-    //Plays song after it clicked in RecyclerView
     @Override
     public void onSongClick(int position) {
         this.position = position;

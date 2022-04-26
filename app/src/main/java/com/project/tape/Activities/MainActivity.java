@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
             createChannel();
         }
 
+        //Read external storage permission
         permission();
 
         playPauseBtn = findViewById(R.id.pause_button);
@@ -228,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     }
 
-    //Permission to read jsonDataSongs from phone
+    //Read external storage permission
     private void permission() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -237,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     }
 
+    //Read external storage request
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -392,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         return super.onOptionsItemSelected(item);
     }
 
-
+    //Create NotificationChannel
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,

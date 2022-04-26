@@ -13,8 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.project.tape.R;
 import com.project.tape.ItemClasses.Song;
+import com.project.tape.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,24 +25,21 @@ public class AddSongsAdapter extends RecyclerView.Adapter<AddSongsAdapter.ViewHo
 
     public static ArrayList<Song> addSongsArray;
 
-    private OnAddSongListener onAddSongListener;
-
     public static int positionInAddAdapter;
 
     public static boolean setCheckBox;
 
 
-    public AddSongsAdapter(Context mContext, ArrayList<Song> addSongsArray, OnAddSongListener onAddSongListener) {
+    public AddSongsAdapter(Context mContext, ArrayList<Song> addSongsArray) {
         this.mContext = mContext;
         this.addSongsArray = addSongsArray;
-        this.onAddSongListener = onAddSongListener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(mContext).inflate(R.layout.item_add_song, parent, false);
-        ViewHolder vHolder = new ViewHolder(v, onAddSongListener);
+        ViewHolder vHolder = new ViewHolder(v);
         vHolder.checkBox.setChecked(false);
         return vHolder;
     }
@@ -83,45 +80,27 @@ public class AddSongsAdapter extends RecyclerView.Adapter<AddSongsAdapter.ViewHo
         return addSongsArray.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tv_title;
         TextView tv_artist;
         TextView tv_album;
         TextView tv_dash;
         CheckBox checkBox;
-        OnAddSongListener onAddSongListener;
 
-        public ViewHolder(@NonNull View itemView, OnAddSongListener onAddSongListener) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.onAddSongListener = onAddSongListener;
             tv_title = itemView.findViewById(R.id.song_title_addSongs);
             tv_artist = itemView.findViewById(R.id.artist_title_addSongs);
             tv_dash = itemView.findViewById(R.id.dash_addSongs);
             tv_album = itemView.findViewById(R.id.album_title_addSongs);
             checkBox = itemView.findViewById(R.id.add_songs_checkBox);
-            itemView.setOnClickListener(this);
         }
-
-
-        @Override
-        public void onClick(View v) {
-            try {
-                onAddSongListener.onAddSongClick(getAdapterPosition());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public void updateAddSongsListList(ArrayList<Song> mAddSongsArray) {
         addSongsArray = new ArrayList<>();
         addSongsArray.addAll(mAddSongsArray);
         notifyDataSetChanged();
-    }
-
-    public interface OnAddSongListener {
-        void onAddSongClick(int position) throws IOException;
     }
 
 

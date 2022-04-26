@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +68,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         //Booleans
         coverLoaded = false;
 
+        //Init views
         artist_name = v.findViewById(R.id.artist_name_artistsFragment);
         myRecyclerView = (RecyclerView) v.findViewById(R.id.artists_recyclerview);
         song_title_main = (TextView) getActivity().findViewById(R.id.song_title_main);
@@ -78,7 +78,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         album_cover_main = (ImageView) getActivity().findViewById(R.id.album_cover_main);
         mainPlayPauseBtn = (ImageButton) getActivity().findViewById(R.id.pause_button);
 
-
+        //Sets adapter to list and applies settings to recyclerView
         artistsAdapter = new ArtistsAdapter(getContext(), artistList, this);
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(LLMAlbumFragment);
@@ -102,15 +102,12 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         playlistsFragmentOpened = false;
         aboutPlaylistOpened = false;
 
-        Log.i("artistNameStr", artistNameStr);
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_SONGSFRAGMENT");
             fromBackground = false;
         }
 
         createChannel();
-        Log.i("broadcast", "reg_ARTISTSFRAGMENT");
         trackAudioSource();
 
         //Register headphones buttons
@@ -148,7 +145,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
             //if locked
         } else {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_ARTISTSFRAGMENT");
         }
     }
 
@@ -157,7 +153,6 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
         super.onStop();
         if (artistsFragmentOpened) {
             createChannel();
-            Log.i("broadcast", "reg_ARTISTSFRAGMENT");
             fromBackground = true;
         }
     }
