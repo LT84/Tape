@@ -27,4 +27,5 @@ public class OnClearFromRecentService extends Service {
     public void onTaskRemoved(Intent rootIntent) {
         stopSelf();
     }
+
 }
