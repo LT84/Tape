@@ -12,8 +12,10 @@ import static com.project.tape.Fragments.FragmentGeneral.isPlaying;
 import static com.project.tape.Fragments.FragmentGeneral.position;
 import static com.project.tape.Fragments.FragmentGeneral.songsList;
 import static com.project.tape.Fragments.PlaylistsFragment.playListsList;
+import static com.project.tape.Fragments.PlaylistsFragment.playlistsAdapter;
 import static com.project.tape.Fragments.SongsFragment.artistList;
 import static com.project.tape.Fragments.SongsFragment.mediaPlayer;
+import static com.project.tape.Fragments.SongsFragment.songsAdapter;
 import static com.project.tape.Fragments.SongsFragment.staticCurrentArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousArtistSongs;
 import static com.project.tape.Fragments.SongsFragment.staticPreviousSongsInAlbum;
@@ -50,9 +52,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
-import com.project.tape.Fragments.AlbumsFragment;
 import com.project.tape.Fragments.ArtistsFragment;
-import com.project.tape.Fragments.PlaylistsFragment;
 import com.project.tape.Fragments.SongsFragment;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.ItemClasses.Album;
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                     myAlbumSearch.add(album);
                 }
             }
-            AlbumsFragment.albumsAdapter.updateAlbumList(myAlbumSearch);
+            albumsAdapter.updateAlbumList(myAlbumSearch);
         }
         if (artistsFragmentSelected) {
             searchOpenedInArtistsFragments = true;
@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                     songsFromSearch.add(song);
                 }
             }
-            SongsFragment.songsAdapter.updateSongList(mySearch);
+            songsAdapter.updateSongList(mySearch);
         } else {
             songSearchWasOpened = true;
             userInput = newText.toLowerCase();
@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
                     myPlaylistSearch.add(playlist);
                 }
             }
-            PlaylistsFragment.playlistsAdapter.updatePlaylistList(myPlaylistSearch);
+            playlistsAdapter.updatePlaylistList(myPlaylistSearch);
         }
         return true;
     }

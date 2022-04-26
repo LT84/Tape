@@ -195,7 +195,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         //Sets adapter to list and applies settings to recyclerView
         songsAdapter = new SongsAdapter(getContext(), songsList, this);
-        SongsFragment.songsAdapter.updateColorAfterSongSwitch(position);
+        songsAdapter.updateColorAfterSongSwitch(position);
         myRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(VERTICAL_ITEM_SPACE));
         myRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         myRecyclerView.setAdapter(songsAdapter);
