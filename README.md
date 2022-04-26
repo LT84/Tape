@@ -10,4 +10,6 @@
 App screenshots:
 
 
-![regegege](https://user-images.githubusercontent.com/98738839/165350421-3a8c9b4c-5af3-4a35-ab65-138faa09d999.png)
+![2](https://user-images.githubusercontent.com/98738839/165351762-398ba627-793b-4e64-8f57-a0430b329508.png)
+
+
