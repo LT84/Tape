@@ -15,5 +15,4 @@ App screenshots:
 
 ![2](https://user-images.githubusercontent.com/98738839/165351762-398ba627-793b-4e64-8f57-a0430b329508.png)
 
-Tape app apk:[Uploading Tape.zip…]()
-
+Tape app apk: [Tape.zip](https://github.com/LT84/Tape/files/8565892/Tape.zip)
