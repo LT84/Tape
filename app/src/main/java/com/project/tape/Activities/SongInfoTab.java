@@ -48,6 +48,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -203,6 +204,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .getDuration()) / 1000;
             time_duration_total.setText(formattedTime(durationTotal));
         } else if (fromPlaylist) {
+            Log.i("fromPlaylist", Boolean.toString(fromPlaylist));
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
             durationTotal = Integer.parseInt(previousSongsInPlaylist
                     .get(positionInAboutPlaylist)
@@ -447,8 +449,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .putString("artistNameStr", artistNameStr).commit();
         this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
-        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("uri", uri.toString()).commit();
     }
 
     //Creates new Thread for previous song
@@ -652,8 +652,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .putString("artistNameStr", artistNameStr).commit();
         this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
-        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("uri", uri.toString()).commit();
     }
 
     //When song is finished, switches to next song
@@ -682,9 +680,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                 .putString("artistNameStr", artistNameStr).commit();
         this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
-        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("uri", uri.toString()).commit();
-
     }
 
     @Override
@@ -729,8 +724,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
-        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
-                .putString("uri", uri.toString()).commit();
         super.onPause();
     }
 
@@ -741,13 +734,25 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             createChannel();
             fromBackground = true;
         }
+
+        this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+        secondBroadcastUnregistered = true;
+
+        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
+        this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
+        this.getSharedPreferences("songSearchWasOpened", Context.MODE_PRIVATE).edit()
+                .putBoolean("songSearchWasOpened", songSearchWasOpened).commit();
+        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
+        this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromPlaylist", fromPlaylist).commit();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-        secondBroadcastUnregistered = true;
     }
 
     private void initViews() {

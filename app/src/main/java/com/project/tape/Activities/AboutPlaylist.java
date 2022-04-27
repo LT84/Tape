@@ -8,6 +8,7 @@ import static com.project.tape.Activities.AboutFragmentItem.positionInInfoAboutI
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.fromSearch;
 import static com.project.tape.Activities.MainActivity.songNameStr;
+import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
 import static com.project.tape.Activities.SongInfoTab.shuffleBtnClicked;
@@ -575,11 +576,6 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
         }
-
-        this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromPlaylist", fromPlaylist).commit();
-        this.getSharedPreferences("positionInAboutPlaylist", Context.MODE_PRIVATE).edit()
-                .putInt("positionInAboutPlaylist", positionInAboutPlaylist).commit();
     }
 
 
@@ -628,6 +624,19 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
             createChannel();
             fromBackground = true;
         }
+
+        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
+        this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
+        this.getSharedPreferences("songSearchWasOpened", Context.MODE_PRIVATE).edit()
+                .putBoolean("songSearchWasOpened", songSearchWasOpened).commit();
+        this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromArtistInfo", fromArtistInfo).commit();
+        this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromPlaylist", fromPlaylist).commit();
+        this.getSharedPreferences("positionInAboutPlaylist", Context.MODE_PRIVATE).edit()
+                .putInt("positionInAboutPlaylist", positionInAboutPlaylist).commit();
     }
 
 
@@ -676,6 +685,8 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
     protected void onDestroy() {
         super.onDestroy();
         writeNewPlaylistSongsToJson();
+        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
     }
 
     //Calls when audio source changed

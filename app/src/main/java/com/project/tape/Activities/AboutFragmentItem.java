@@ -591,6 +591,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                 .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
         this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromPlaylist", fromPlaylist).commit();
+        this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
+                .putString("uri", uri.toString()).commit();
     }
 
     @Override

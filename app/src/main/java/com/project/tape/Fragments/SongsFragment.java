@@ -9,6 +9,7 @@ import static com.project.tape.Activities.AboutPlaylist.fromPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.getSongsInPlaylistMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonDataMap;
 import static com.project.tape.Activities.AboutPlaylist.jsonMap;
+import static com.project.tape.Activities.AboutPlaylist.positionInAboutPlaylist;
 import static com.project.tape.Activities.AboutPlaylist.previousSongsInPlaylist;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.songNameStr;
@@ -121,7 +122,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         position = getActivity().getSharedPreferences("position", Context.MODE_PRIVATE)
                 .getInt("position", position);
         positionInInfoAboutItem = getActivity().getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE)
-                .getInt("positionInInfoAboutItem", positionInInfoAboutItem);
+                .getInt("positionInInfoAboutItem", 0);
+        positionInAboutPlaylist = getActivity().getSharedPreferences("positionInAboutPlaylist", Context.MODE_PRIVATE)
+                .getInt("positionInAboutPlaylist", 0);
         songNameStr = getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
                 .getString("songNameStr", " ");
         fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
