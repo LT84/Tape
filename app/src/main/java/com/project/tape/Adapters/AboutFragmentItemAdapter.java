@@ -62,7 +62,7 @@ public class AboutFragmentItemAdapter extends RecyclerView.Adapter<AboutFragment
             holder.tv_title.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_artist.setTextColor(Color.parseColor("#ff03dac5"));
             holder.tv_album.setTextColor(Color.parseColor("#ff03dac5"));
-            holder.tv_dash.setTextColor(Color.parseColor("#b3ffffff"));
+            holder.tv_dash.setTextColor(Color.parseColor("#ff03dac5"));
         } else {
             holder.tv_title.setTextColor(Color.parseColor("#ffffff"));
             holder.tv_artist.setTextColor(Color.parseColor("#b3ffffff"));

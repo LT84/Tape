@@ -50,6 +50,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -108,7 +109,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         albumsFragmentOpened = false;
         artistsFragmentOpened = false;
         songInfoTabOpened = false;
-        aboutFragmentItemOpened = true;
         playlistsFragmentOpened = false;
 
         if (mediaPlayer.isPlaying()) {
@@ -529,11 +529,15 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
 
+        aboutFragmentItemOpened = true;
+
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
             fromBackground = false;
+            Log.i("broadcast", "unreg_AboutFragment");
         }
 
+        Log.i("broadcast", "reg_AboutFragment");
         createChannel();
         trackAudioSource();
 
@@ -574,6 +578,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            Log.i("broadcast", "unreg_AboutFragment");
         }
     }
 
@@ -582,6 +587,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         super.onStop();
         if (aboutFragmentItemOpened) {
             createChannel();
+            Log.i("broadcast", "reg_AboutFragment");
             fromBackground = true;
         }
     }

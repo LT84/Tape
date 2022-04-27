@@ -78,7 +78,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     private SeekBar seekBar;
     private final Handler handler = new Handler();
 
-    public static boolean repeatBtnClicked, shuffleBtnClicked, songInfoTabOpened, secondBroadcastUnregistered;
+    public static boolean repeatBtnClicked, shuffleBtnClicked, songInfoTabOpened;
 
     NotificationManager notificationManager;
 
@@ -684,12 +684,19 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
     @Override
     protected void onResume() {
+        super.onResume();
+        song_title.setText(songNameStr);
+        artist_name.setText(artistNameStr);
+
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverSongsInfoTab);
+            Log.i("broadcast", "unreg_songsInfoTab");
             fromBackground = false;
         }
 
-        createChannel();
+        createChannelInfoTab();
+        Log.i("broadcast", "reg_songsInfoTab");
+
         trackAudioSource();
 
         //Register headphones buttons
@@ -699,9 +706,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         nextThreadBtn();
         playThreadBtn();
         previousThreadBtn();
-        song_title.setText(songNameStr);
-        artist_name.setText(artistNameStr);
-        super.onResume();
     }
 
     @Override
@@ -720,6 +724,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverSongsInfoTab);
+            Log.i("broadcast", "unreg_singsInfoTab");
         }
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
@@ -730,9 +735,11 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     @Override
     protected void onStop() {
         super.onStop();
+
         if (songInfoTabOpened) {
-            createChannel();
+            createChannelInfoTab();
             fromBackground = true;
+            Log.i("broadcast", "reg_songsInfoTab");
         }
 
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
@@ -750,6 +757,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        this.unregisterReceiver(broadcastReceiverSongsInfoTab);
+        Log.i("broadcast", "unreg_singsInfoTab");
     }
 
     private void initViews() {
@@ -863,7 +872,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         }
     };
 
-    private void createChannel() {
+    private void createChannelInfoTab() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,
                     "Tape", NotificationManager.IMPORTANCE_HIGH);

@@ -16,7 +16,6 @@ import static com.project.tape.Activities.MainActivity.songNameStr;
 import static com.project.tape.Activities.MainActivity.songSearchWasOpened;
 import static com.project.tape.Activities.MainActivity.songsFromSearch;
 import static com.project.tape.Activities.SongInfoTab.repeatBtnClicked;
-import static com.project.tape.Activities.SongInfoTab.songInfoTabOpened;
 import static com.project.tape.Activities.SortChoice.sortChoiceChanged;
 import static com.project.tape.Adapters.SongsAdapter.mSongsList;
 import static com.project.tape.Adapters.SongsAdapter.myRecyclerView;
@@ -32,6 +31,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -243,10 +243,13 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
+            Log.i("broadcast", "unreg_songsFragment");
             fromBackground = false;
         }
 
         createChannel();
+        Log.i("broadcast", "reg_songsFragment");
+
         trackAudioSource();
 
         //Sets adapter after user sets sort preference
@@ -296,8 +299,9 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     public void onStop() {
         super.onStop();
 
-        if (songsFragmentOpened && !songInfoTabOpened) {
+        if (songsFragmentOpened) {
             createChannel();
+            Log.i("broadcast", "reg_songsFragment");
             fromBackground = true;
         }
 
