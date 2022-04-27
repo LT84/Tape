@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        android:text="@string/delete_this_playlist"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:layout_marginStart="7dp"/>
