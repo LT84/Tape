@@ -234,6 +234,8 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
                         song_title_in_playlist.setText(songNameStr);
                         artist_name_in_playlist.setText(artistNameStr);
 
+                        mediaPlayer.setOnCompletionListener(AboutPlaylist.this);
+
                         playPauseBtnInPlaylist.setImageResource(R.drawable.ic_pause_song);
                     }
 
@@ -446,6 +448,7 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
                 .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
         this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     public void switchToPreviousSong() {
@@ -555,6 +558,7 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
                 .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
         this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
                 .putInt("position", position).commit();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     //Gets random number

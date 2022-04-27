@@ -62,6 +62,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.project.tape.Adapters.AboutFragmentItemAdapter;
+import com.project.tape.Fragments.FragmentGeneral;
 import com.project.tape.Interfaces.Playable;
 import com.project.tape.ItemClasses.Song;
 import com.project.tape.R;
@@ -305,6 +306,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         artist_name_in_album.setText(artistNameStr);
 
         playPauseBtnInItemInfo.setImageResource(R.drawable.ic_pause_song);
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     public void switchToNextSong() {
@@ -385,13 +387,13 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             }
         }
 
-        metaDataInAboutFragmentItem(uri);
         mediaPlayer = MediaPlayer.create(this, uri);
-
-        mediaPlayer.start();
+        metaDataInAboutFragmentItem(uri);
 
         song_title_in_album.setText(songNameStr);
         artist_name_in_album.setText(artistNameStr);
+
+        mediaPlayer.start();
 
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("progress", uri.toString()).commit();
@@ -403,6 +405,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                 .putInt("position", position).commit();
         this.getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
                 .putString("previousArtistName", previousArtistName).commit();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     public void switchToPreviousSong() {
@@ -512,6 +515,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                 .putInt("position", position).commit();
         this.getSharedPreferences("previousArtistName", Context.MODE_PRIVATE).edit()
                 .putString("previousArtistName", previousArtistName).commit();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     //Gets random number
@@ -598,7 +602,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         onTrackNext();
-        mediaPlayer.setOnCompletionListener(this);
+        FragmentGeneral.mediaPlayer.setOnCompletionListener(this);
     }
 
 
@@ -678,6 +682,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.ic_pause_song);
     }
 
     @Override
@@ -701,6 +706,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
                     R.drawable.ic_pause_song, position, songsList.size() - 1);
         }
         audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        playPauseBtnInItemInfo.setImageResource(R.drawable.ic_pause_song);
     }
 
     @Override

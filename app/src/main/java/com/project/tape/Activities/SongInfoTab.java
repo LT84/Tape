@@ -685,7 +685,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     @Override
     protected void onResume() {
         if (fromBackground) {
-            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            this.unregisterReceiver(broadcastReceiverSongsInfoTab);
             fromBackground = false;
         }
 
@@ -719,7 +719,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         if (myKM.inKeyguardRestrictedInputMode()) {
             //if locked
         } else {
-            this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
+            this.unregisterReceiver(broadcastReceiverSongsInfoTab);
         }
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
@@ -734,9 +734,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             createChannel();
             fromBackground = true;
         }
-
-        this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-        secondBroadcastUnregistered = true;
 
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
@@ -844,7 +841,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         this.registerReceiver(audioSourceChangedReceiver, intentFilter);
     }
 
-    BroadcastReceiver broadcastReceiverAboutFragmentInfo = new BroadcastReceiver() {
+    BroadcastReceiver broadcastReceiverSongsInfoTab = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getExtras().getString("actionName");
@@ -875,7 +872,7 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
-            this.registerReceiver(broadcastReceiverAboutFragmentInfo, new IntentFilter("SONGS_SONGS"));
+            this.registerReceiver(broadcastReceiverSongsInfoTab, new IntentFilter("SONGS_SONGS"));
             this.startService(new Intent(this, OnClearFromRecentService.class));
         }
     }
