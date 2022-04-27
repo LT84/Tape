@@ -2,6 +2,7 @@ package com.project.tape.Fragments;
 
 import static android.app.Activity.RESULT_OK;
 import static com.project.tape.Activities.AboutFragmentItem.aboutFragmentItemOpened;
+import static com.project.tape.Activities.AboutFragmentItem.fromAlbumInfo;
 import static com.project.tape.Activities.AboutPlaylist.aboutPlaylistOpened;
 import static com.project.tape.Activities.MainActivity.artistNameStr;
 import static com.project.tape.Activities.MainActivity.searchOpenedInAlbumFragments;
@@ -22,7 +23,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -219,9 +219,11 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
         super.onStop();
         if (albumsFragmentOpened) {
             createChannel();
-            Log.i("broadcast", "reg_Albums");
             fromBackground = true;
         }
+
+        getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
     }
 
     //Creating LinearLayoutManager

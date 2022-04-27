@@ -67,7 +67,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
 
     NotificationManager notificationManager;
 
-    public static Uri uri;
     public static MediaPlayer mediaPlayer = new MediaPlayer();
 
     public static int position = 0;
@@ -86,6 +85,7 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
     public static AudioManager audioManager;
     public static AudioAttributes playbackAttributes;
 
+    public static Uri uri;
 
     //Searches for mp3 files on phone and puts information about them in columns
     protected void loadAudio() throws NullPointerException {

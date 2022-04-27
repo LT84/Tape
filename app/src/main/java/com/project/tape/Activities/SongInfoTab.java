@@ -48,7 +48,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -173,6 +172,9 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         } else if (fromArtistInfo) {
             songNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getTitle();
             artistNameStr = staticPreviousArtistSongs.get(positionInInfoAboutItem).getArtist();
+        } else if (fromPlaylist) {
+            songNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getTitle();
+            artistNameStr = previousSongsInPlaylist.get(positionInAboutPlaylist).getArtist();
         } else {
             songNameStr = songsList.get(position).getTitle();
             artistNameStr = songsList.get(position).getArtist();
@@ -204,7 +206,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
                     .getDuration()) / 1000;
             time_duration_total.setText(formattedTime(durationTotal));
         } else if (fromPlaylist) {
-            Log.i("fromPlaylist", Boolean.toString(fromPlaylist));
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
             durationTotal = Integer.parseInt(previousSongsInPlaylist
                     .get(positionInAboutPlaylist)
@@ -690,12 +691,10 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
 
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverSongsInfoTab);
-            Log.i("broadcast", "unreg_songsInfoTab");
             fromBackground = false;
         }
 
         createChannelInfoTab();
-        Log.i("broadcast", "reg_songsInfoTab");
 
         trackAudioSource();
 
@@ -724,7 +723,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverSongsInfoTab);
-            Log.i("broadcast", "unreg_singsInfoTab");
         }
 
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
@@ -739,17 +737,16 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         if (songInfoTabOpened) {
             createChannelInfoTab();
             fromBackground = true;
-            Log.i("broadcast", "reg_songsInfoTab");
         }
 
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
         this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
-        this.getSharedPreferences("songSearchWasOpened", Context.MODE_PRIVATE).edit()
-                .putBoolean("songSearchWasOpened", songSearchWasOpened).commit();
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
+        this.getSharedPreferences("songSearchWasOpened", Context.MODE_PRIVATE).edit()
+                .putBoolean("songSearchWasOpened", songSearchWasOpened).commit();
         this.getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromPlaylist", fromPlaylist).commit();
     }
@@ -758,7 +755,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     protected void onDestroy() {
         super.onDestroy();
         this.unregisterReceiver(broadcastReceiverSongsInfoTab);
-        Log.i("broadcast", "unreg_singsInfoTab");
     }
 
     private void initViews() {

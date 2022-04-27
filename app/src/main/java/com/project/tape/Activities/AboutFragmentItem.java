@@ -50,7 +50,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -534,10 +533,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         if (fromBackground) {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
             fromBackground = false;
-            Log.i("broadcast", "unreg_AboutFragment");
         }
 
-        Log.i("broadcast", "reg_AboutFragment");
         createChannel();
         trackAudioSource();
 
@@ -578,7 +575,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             //if locked
         } else {
             this.unregisterReceiver(broadcastReceiverAboutFragmentInfo);
-            Log.i("broadcast", "unreg_AboutFragment");
         }
     }
 
@@ -587,7 +583,6 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         super.onStop();
         if (aboutFragmentItemOpened) {
             createChannel();
-            Log.i("broadcast", "reg_AboutFragment");
             fromBackground = true;
         }
     }
@@ -595,6 +590,8 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
+                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromArtistInfo", fromArtistInfo).commit();
         this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()

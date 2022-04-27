@@ -75,6 +75,7 @@ import com.project.tape.Services.OnClearFromRecentService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -82,7 +83,8 @@ import java.util.Random;
 public class AboutPlaylist extends AppCompatActivity implements Playable, MediaPlayer.OnCompletionListener,
         HeadsetActionButtonReceiver.Delegate {
 
-    TextView song_title_in_playlist, artist_name_in_playlist, song_title_main, artist_name_main, album_title_playlist;
+    TextView song_title_in_playlist, artist_name_in_playlist, song_title_main, artist_name_main, album_title_playlist,
+    delete_song_text;
     ImageButton backBtn, playPauseBtnInPlaylist, addSongsToPlaylist;
     ImageView album_cover_in_playlist;
     Button openFullInfoTab;
@@ -268,8 +270,15 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
         popupWindow.setAnimationStyle(R.style.popupWindowAnimation);
         popupWindow.showAtLocation(view, Gravity.CENTER_HORIZONTAL, 0, -230);
 
+        delete_song_text = popupView.findViewById(R.id.alertText);
         closeAlertPopupBtn = popupView.findViewById(R.id.close_popup_alert_btn);
         deletePlaylistBtn = popupView.findViewById(R.id.popup_delete_btn);
+
+        if (Locale.getDefault().getLanguage().equals("en")) {
+            delete_song_text.setText("Delete song ?");
+        } else {
+            delete_song_text.setText("Удалить композицию ?");
+        }
 
         //CloseAlertPopupBtn listener
         closeAlertPopupBtn.setOnClickListener(new View.OnClickListener() {

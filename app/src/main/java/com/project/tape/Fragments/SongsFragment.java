@@ -31,7 +31,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +52,8 @@ import com.project.tape.SecondaryClasses.CreateNotification;
 import com.project.tape.SecondaryClasses.HeadsetActionButtonReceiver;
 import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 
@@ -125,17 +126,38 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .getInt("positionInInfoAboutItem", 0);
         positionInAboutPlaylist = getActivity().getSharedPreferences("positionInAboutPlaylist", Context.MODE_PRIVATE)
                 .getInt("positionInAboutPlaylist", 0);
-        songNameStr = getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
-                .getString("songNameStr", " ");
         fromAlbumInfo = getActivity().getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromAlbumInfo", false);
         fromArtistInfo = getActivity().getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE)
                 .getBoolean("fromArtistInfo", false);
         fromPlaylist = getActivity().getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE)
                 .getBoolean("fromPlaylist", false);
-        if (songsList.size() != 0 && uri != null) {
+
+        //CheckUri
+        Uri tempUri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
+                .getString("uri", songsList.get(0).getData()));
+        if (Files.exists(Paths.get(tempUri.getPath())) && songsList.size() != 0) {
+
             uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                     .getString("uri", songsList.get(0).getData()));
+
+            songNameStr = getActivity().getSharedPreferences("songNameStr", Context.MODE_PRIVATE)
+                    .getString("songNameStr", " ");
+            albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
+                    .getString("albumName", " ");
+            previousAlbumName = getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE)
+                    .getString("previousAlbumName", " ");
+            artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
+                    .getString("artistNameStr", " ");
+            previousArtistName = getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE)
+                    .getString("previousArtistName", " ");
+        } else {
+            uri = Uri.parse(songsList.get(0).getData());
+            albumName = songsList.get(0).getAlbum();
+            songNameStr = songsList.get(0).getTitle();
+            artistNameStr = songsList.get(0).getArtist();
+            previousAlbumName = songsList.get(0).getAlbum();
+            previousArtistName = songsList.get(0).getAlbum();
         }
 
         //Get playlists and songs from them
@@ -143,8 +165,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         //Fills up staticCurrentSongsInAlbum
         int a = 0;
-        albumName = getActivity().getSharedPreferences("albumName", Context.MODE_PRIVATE)
-                .getString("albumName", " ");
         for (int i = 0; i < songsList.size(); i++) {
             if (albumName.equals(songsList.get(i).getAlbum())) {
                 staticCurrentSongsInAlbum.add(a, songsList.get(i));
@@ -152,8 +172,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             }
         }
         //Fills up staticPreviousSongsInAlbum
-        previousAlbumName = getActivity().getSharedPreferences("previousAlbumName", Context.MODE_PRIVATE)
-                .getString("previousAlbumName", " ");
         int b = 0;
         for (int i = 0; i < songsList.size(); i++) {
             if (previousAlbumName.equals(songsList.get(i).getAlbum())) {
@@ -162,8 +180,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             }
         }
         //Fills up staticArtistSongs
-        artistNameStr = getActivity().getSharedPreferences("artistNameStr", Context.MODE_PRIVATE)
-                .getString("artistNameStr", " ");
         int c = 0;
         for (int i = 0; i < songsList.size(); i++) {
             if (artistNameStr.equals(songsList.get(i).getArtist())) {
@@ -173,8 +189,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
         }
         //Fills up staticPreviousArtistSongs
         int d = 0;
-        previousArtistName = getActivity().getSharedPreferences("previousArtistName", Context.MODE_PRIVATE)
-                .getString("previousArtistName", " ");
         for (int i = 0; i < songsList.size(); i++) {
             if (previousArtistName.equals(songsList.get(i).getArtist())) {
                 staticPreviousArtistSongs.add(d, songsList.get(i));
@@ -243,12 +257,10 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         if (fromBackground) {
             getActivity().unregisterReceiver(broadcastReceiver);
-            Log.i("broadcast", "unreg_songsFragment");
             fromBackground = false;
         }
 
         createChannel();
-        Log.i("broadcast", "reg_songsFragment");
 
         trackAudioSource();
 
@@ -301,7 +313,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
 
         if (songsFragmentOpened) {
             createChannel();
-            Log.i("broadcast", "reg_songsFragment");
             fromBackground = true;
         }
 
