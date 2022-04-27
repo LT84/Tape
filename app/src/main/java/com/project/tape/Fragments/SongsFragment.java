@@ -133,7 +133,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
                 .getBoolean("fromArtistInfo", false);
         fromPlaylist = getActivity().getSharedPreferences("fromPlaylist", Context.MODE_PRIVATE)
                 .getBoolean("fromPlaylist", false);
-        if (songsList.size() != 0) {
+        if (songsList.size() != 0 && uri != null) {
             uri = Uri.parse(getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE)
                     .getString("uri", songsList.get(0).getData()));
         }
