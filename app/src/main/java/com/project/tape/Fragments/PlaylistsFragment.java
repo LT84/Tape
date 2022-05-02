@@ -48,6 +48,7 @@ import com.project.tape.SecondaryClasses.VerticalSpaceItemDecoration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -298,9 +299,12 @@ public class PlaylistsFragment extends FragmentGeneral implements MediaPlayer.On
                         allAlbumsNamesSet.add(addNewPlaylistEditText.getText().toString());
                         playListsList.add(playlist);
                     } else {
-                        Toast.makeText(getContext(), "Playlist with this name already exists", Toast.LENGTH_SHORT).show();
+                        if (Locale.getDefault().getLanguage().equals("en")) {
+                            Toast.makeText(getContext(), "Playlist with this name already exists", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Плейлист с таким именем уже есть", Toast.LENGTH_SHORT).show();
+                        }
                     }
-
                     popupWindow.dismiss();
                     playlistsAdapter.updatePlaylistList(playListsList);
                 }
