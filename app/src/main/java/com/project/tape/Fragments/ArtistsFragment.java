@@ -51,7 +51,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     private Parcelable listState;
 
     final int REQUEST_CODE = 1;
-    private static final int VERTICAL_ITEM_SPACE = 25;
+    private static final int VERTICAL_ITEM_SPACE = 10;
 
     public static ArtistsAdapter artistsAdapter;
 

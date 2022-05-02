@@ -33,7 +33,6 @@ public class SortChoice extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         getSupportActionBar().hide();
 
-        sortChoiceChanged = true;
         switchBetweenSorts = true;
 
         radioGroup = findViewById(R.id.radio_group);
@@ -50,6 +49,7 @@ public class SortChoice extends AppCompatActivity {
     }
 
     public void onRadioButtonClicked(View view) {
+        sortChoiceChanged = true;
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
         SharedPreferences.Editor editor = getSharedPreferences(SORT_PREF, MODE_PRIVATE).edit();
