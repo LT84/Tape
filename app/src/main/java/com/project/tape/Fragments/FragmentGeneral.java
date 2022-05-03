@@ -190,8 +190,6 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
             repeatBtnClicked = false;
         }
 
-        coverLoaded = true;
-
         //Sets song and artist strings
         if (fromAlbumInfo) {
             uri = Uri.parse(staticPreviousSongsInAlbum.get(positionInInfoAboutItem).getData());
@@ -228,11 +226,13 @@ public abstract class FragmentGeneral extends Fragment implements Playable, Head
         }
 
         mediaPlayer = MediaPlayer.create(getContext(), uri);
+
+        mediaPlayer.start();
+
         metaDataInFragment(uri);
 
         song_title_main.setText(songNameStr);
         artist_name_main.setText(artistNameStr);
-        mediaPlayer.start();
 
         getActivity().getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();

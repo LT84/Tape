@@ -221,6 +221,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
             switch (v.getId()) {
                 case R.id.backBtn_fragmentItemInfo:
                     finish();
+                    overridePendingTransition(0, R.anim.hold);
                     break;
                 case R.id.pause_button_in_itemInfo:
                     playPauseBtnClicked();
@@ -590,6 +591,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        overridePendingTransition(0, R.anim.hold);
         this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
                 .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
         this.getSharedPreferences("fromArtistInfo", Context.MODE_PRIVATE).edit()

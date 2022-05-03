@@ -637,7 +637,6 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
             createChannel();
             fromBackground = true;
         }
-
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();
         this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
@@ -697,6 +696,7 @@ public class AboutPlaylist extends AppCompatActivity implements Playable, MediaP
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        overridePendingTransition(0, R.anim.hold);
         writeNewPlaylistSongsToJson();
         this.getSharedPreferences("uri", Context.MODE_PRIVATE).edit()
                 .putString("uri", uri.toString()).commit();

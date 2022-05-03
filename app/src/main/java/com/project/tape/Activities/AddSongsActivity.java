@@ -55,5 +55,11 @@ public class AddSongsActivity extends AppCompatActivity {
         super.onResume();
         setCheckBox = false;
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        overridePendingTransition(0, R.anim.hold);
+    }
 }
 

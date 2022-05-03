@@ -269,6 +269,7 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
             loadAudio();
             songsAdapter = new SongsAdapter(getContext(), songsList, this);
             myRecyclerView.setAdapter(songsAdapter);
+            songsAdapter.updateColorAfterSongSwitch(position);
             sortChoiceChanged = false;
         }
 
