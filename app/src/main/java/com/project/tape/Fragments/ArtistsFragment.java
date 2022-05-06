@@ -64,7 +64,7 @@ public class ArtistsFragment extends FragmentGeneral implements ArtistsAdapter.O
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
-        v = inflater.inflate(R.layout.artists_fragment, container, false);
+        v = inflater.inflate(R.layout.fragment_artists, container, false);
         //Booleans
         coverLoaded = false;
 

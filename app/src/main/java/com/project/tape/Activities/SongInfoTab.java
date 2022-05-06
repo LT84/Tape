@@ -658,29 +658,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     //When song is finished, switches to next song
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (repeatBtnClicked) {
-            onTrackNext();
-            mediaPlayer.setOnCompletionListener(this);
-        } else {
-            onTrackNext();
-            mediaPlayer.setOnCompletionListener(this);
-            SongInfoTab.this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
-                    .putInt("position", position).commit();
-        }
-
-        mediaPlayer.start();
-
-        //SharedPreferences
-        this.getSharedPreferences("fromAlbumInfo", Context.MODE_PRIVATE).edit()
-                .putBoolean("fromAlbumInfo", fromAlbumInfo).commit();
-        this.getSharedPreferences("positionInInfoAboutItem", Context.MODE_PRIVATE).edit()
-                .putInt("positionInInfoAboutItem", positionInInfoAboutItem).commit();
-        this.getSharedPreferences("songNameStr", Context.MODE_PRIVATE).edit()
-                .putString("songNameStr", songNameStr).commit();
-        this.getSharedPreferences("artistNameStr", Context.MODE_PRIVATE).edit()
-                .putString("artistNameStr", artistNameStr).commit();
-        this.getSharedPreferences("position", Context.MODE_PRIVATE).edit()
-                .putInt("position", position).commit();
+        onTrackNext();
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     @Override
@@ -705,6 +684,8 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
         nextThreadBtn();
         playThreadBtn();
         previousThreadBtn();
+
+
     }
 
     @Override
@@ -733,7 +714,6 @@ public class SongInfoTab extends AppCompatActivity implements MediaPlayer.OnComp
     @Override
     protected void onStop() {
         super.onStop();
-
         if (songInfoTabOpened) {
             createChannelInfoTab();
             fromBackground = true;

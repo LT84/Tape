@@ -54,7 +54,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.project.tape.Adapters.FragmentsAdapter;
 import com.project.tape.Fragments.ArtistsFragment;
 import com.project.tape.Fragments.SongsFragment;
-import com.project.tape.Interfaces.Playable;
 import com.project.tape.ItemClasses.Album;
 import com.project.tape.ItemClasses.Playlist;
 import com.project.tape.ItemClasses.Song;
@@ -67,7 +66,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, Playable, LoaderManager.LoaderCallbacks<List<Album>> {
+public class MainActivity extends AppCompatActivity implements androidx.appcompat.widget.SearchView.OnQueryTextListener, LoaderManager.LoaderCallbacks<List<Album>> {
 
     ImageButton playPauseBtn;
     TabLayout tabLayout;
@@ -406,15 +405,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         }
     }
 
-    @Override
-    public void onTrackPrevious() {
-    }
-
-    @Override
-    public void onTrackNext() {
-    }
-
-    @Override
     public void onTrackPlay() {
         isPlaying = true;
         mediaPlayer.start();
@@ -435,7 +425,6 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         playPauseBtn.setImageResource(R.drawable.ic_pause_song);
     }
 
-    @Override
     public void onTrackPause() {
         isPlaying = false;
         mediaPlayer.pause();
@@ -455,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         playPauseBtn.setImageResource(R.drawable.ic_play_song);
     }
 
-    //Music loader methods
+    //MusicLoader methods
     @NonNull
     @Override
     public Loader<List<Album>> onCreateLoader(int id, @Nullable Bundle args) {
@@ -474,9 +463,5 @@ public class MainActivity extends AppCompatActivity implements androidx.appcompa
         if (!songsFragmentSelected) {
             albumsAdapter.clearItem();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
     }
 }

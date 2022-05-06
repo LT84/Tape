@@ -74,7 +74,7 @@ public class AlbumsFragment extends FragmentGeneral implements MediaPlayer.OnCom
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v;
-        v = inflater.inflate(R.layout.albums_fragment, container, false);
+        v = inflater.inflate(R.layout.fragment_albums, container, false);
         //Booleans
         coverLoaded = false;
 

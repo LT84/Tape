@@ -110,6 +110,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         songInfoTabOpened = false;
         playlistsFragmentOpened = false;
 
+        //Checking is mediaPlayer playing now
         if (mediaPlayer.isPlaying()) {
             isPlaying = true;
         } else {
@@ -187,6 +188,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
     }
 
+    //Getting album cover
     public void metaDataInAboutFragmentItem(Uri uri) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(uri.toString());
@@ -205,6 +207,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         coverLoaded = false;
     }
 
+    //Setting playPauseBtnInItemInfo image
     private void getIntentMethod() {
         if (songsList != null) {
             if (mediaPlayer.isPlaying()) {
@@ -234,7 +237,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
     };
 
-    //Sets play button image
+    //Sets play button image after click
     public void playPauseBtnClicked() {
         if (isPlaying) {
             onTrackPause();
@@ -244,6 +247,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
     }
 
+    //RecyclerView click listener
     public void onItemClick(int position) throws IOException {
         this.positionInInfoAboutItem = position;
         fromSearch = false;
@@ -651,6 +655,7 @@ public class AboutFragmentItem extends AppCompatActivity implements AboutFragmen
         }
     };
 
+    //Creates channel for notification
     private void createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CreateNotification.CHANNEL_ID,

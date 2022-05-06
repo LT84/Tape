@@ -311,7 +311,6 @@ public class SongsFragment extends FragmentGeneral implements SongsAdapter.OnSon
     @Override
     public void onStop() {
         super.onStop();
-
         if (songsFragmentOpened) {
             createChannel();
             fromBackground = true;
