@@ -11,10 +11,8 @@
 
 Tape presentation [Серпухов проект.pptx](https://github.com/LT84/Tape/files/8641226/default.pptx)
 
-Tape app apk: [Tape.zip](https://github.com/LT84/Tape/files/8641372/Tape.zip)
-
-
-
 Music for test, if you dont have one: [Music samples.zip](https://github.com/LT84/Tape/files/8695246/Music.samples.zip)
+
+Tape app apk: [Tape.zip](https://github.com/LT84/Tape/files/8641372/Tape.zip)
 
 
