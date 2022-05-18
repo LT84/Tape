@@ -9,7 +9,7 @@
 ![Screenshots](https://user-images.githubusercontent.com/98738839/166492687-5fa70cbc-15a8-417b-a450-913ee526771c.png)
 
 
-Tape presentation [Серпухов проект.pptx] [Серпухов проект.pptx](https://github.com/LT84/Tape/files/8719218/default.pptx)
+Tape presentation [Серпухов проект.pptx](https://github.com/LT84/Tape/files/8719218/default.pptx)
 
 Tape app apk: [Tape.zip](https://github.com/LT84/Tape/files/8641372/Tape.zip)
 
