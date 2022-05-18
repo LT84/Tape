@@ -8,8 +8,9 @@
 
 ![Screenshots](https://user-images.githubusercontent.com/98738839/166492687-5fa70cbc-15a8-417b-a450-913ee526771c.png)
 
-Music for test, if you dont have one: [Music samples.zip](https://github.com/LT84/Tape/files/8695246/Music.samples.zip)
+https://user-images.githubusercontent.com/98738839/169120091-1f6a327b-1947-4454-919e-6800d4482fef.mp4
 
+Music for test, if you dont have one: [Music samples.zip](https://github.com/LT84/Tape/files/8695246/Music.samples.zip)
 
 Tape presentation [Серпухов проект.pptx](https://github.com/LT84/Tape/files/8719218/default.pptx)
 
