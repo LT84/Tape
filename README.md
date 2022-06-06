@@ -6,6 +6,13 @@
 
 ![Screenshots](https://user-images.githubusercontent.com/98738839/166492687-5fa70cbc-15a8-417b-a450-913ee526771c.png)
 
+App in work:
+
+https://user-images.githubusercontent.com/98738839/172202841-f6b1a506-b15d-4f08-bef0-cc01e78433c8.mp4
+
+
+
+
 Music for test, if you dont have one: [Music samples.zip](https://github.com/LT84/Tape/files/8695246/Music.samples.zip)
 
-Tape app apk: [Tape.zip](https://github.com/LT84/Tape/files/8641372/Tape.zip)
+Tape apk: [Tape.zip](https://github.com/LT84/Tape/files/8641372/Tape.zip)
